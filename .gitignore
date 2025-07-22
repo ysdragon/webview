@@ -1,0 +1,15 @@
+build/
+
+*.o
+
+.DS_Store
+.directory
+Thumbs.db
+
+.vscode/
+.idea/
+*.swp
+*~
+
+*.bak
+*.cf

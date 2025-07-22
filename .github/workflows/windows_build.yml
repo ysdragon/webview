@@ -1,0 +1,64 @@
+name: Windows Build
+
+on:
+  push:
+    paths:
+      - '**.c'
+      - '**.h'
+  pull_request:
+    paths:
+      - '**.c'
+      - '**.h'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        include:
+          - arch: x64
+            arch_name: amd64
+          - arch: ARM64
+            arch_name: arm64
+
+    steps:
+    - name: Checkout ring-webview
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Clone Ring Language
+      uses: actions/checkout@v4
+      with:
+        repository: ring-lang/ring
+        path: ring
+
+    - name: Configure and Build Ring Language for ${{ matrix.arch_name }}
+      shell: cmd
+      run: |
+        cd ring\language
+        REM Use the matrix variable to set the architecture
+        cmake . -A ${{ matrix.arch }}
+        cmake --build . --config Release
+        cmake --install .
+
+    - name: Set RING environment variable
+      run: echo "RING=$(pwd)\ring" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Configure and Build ring-webview lib for ${{ matrix.arch_name }}
+      shell: cmd
+      run: |
+        rmdir /s /q lib
+        cmake . -A ${{ matrix.arch }}
+        cmake --build . --config Release
+        if "${{ matrix.arch_name }}" == "arm64" (
+          if not exist lib\windows\arm64 mkdir lib\windows\arm64
+          move /Y lib\windows\amd64\ring_webview.dll lib\windows\arm64\ring_webview.dll
+        )
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ring-webview-windows-${{ matrix.arch_name }}
+        path: lib

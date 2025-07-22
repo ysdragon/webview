@@ -1,0 +1,68 @@
+name: FreeBSD Build
+
+on:
+  push:
+    paths:
+      - '**.c'
+      - '**.h'
+  pull_request:
+    paths:
+      - '**.c'
+      - '**.h'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - release: "14.3"
+            arch: amd64
+            arch_name: amd64
+            name: freebsd-amd64
+          - release: "14.3"
+            arch: aarch64
+            arch_name: arm64
+            name: freebsd-arm64
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Build in FreeBSD VM
+      id: freebsd_build
+      uses: vmactions/freebsd-vm@v1.2.1
+      with:
+        release: ${{ matrix.release }}
+        arch: ${{ matrix.arch }}
+        usesh: true
+        sync: sshfs
+        prepare: |
+          pkg install -y cmake git ninja pkgconf webkit2-gtk_60
+
+        run: |
+          # Clone Ring Language
+          git clone --depth 1 https://github.com/ring-lang/ring.git ring
+          cd ring
+
+          # Set RING environment variable
+          export RING=$(pwd)
+
+          # Build and Install Ring Language
+          cd language
+          cmake . -DCMAKE_BUILD_TYPE=Release -GNinja
+          ninja install
+          cd ../..
+          
+          rm -rf lib
+
+          # Build ring-webview lib
+          cmake . -DCMAKE_BUILD_TYPE=Release -GNinja
+          ninja
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ring-webview-${{ matrix.name }}
+        path: lib
