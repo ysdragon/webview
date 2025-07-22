@@ -41,6 +41,7 @@ aPackageInfo = [
 		"examples/11_theme_switcher.ring",
 		"examples/12_unbind.ring",
 		"examples/13_to_do_list.ring",
+		"examples/14_live_markdown_editor.ring",
 		"src/utils/color.ring",
 		"src/utils/install.ring",
 		"README.md",
