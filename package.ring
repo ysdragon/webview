@@ -47,6 +47,7 @@ aPackageInfo = [
 		"examples/17_chart.ring",
 		"examples/18_http_fetch.ring",
 		"examples/19_quote_generator.ring",
+		"examples/20_avatar_quotes.ring",
 		"src/utils/color.ring",
 		"src/utils/install.ring",
 		"README.md",
