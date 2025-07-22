@@ -1,28 +1,31 @@
 <div align="center">
+
   <img src="img/logo.png" alt="WebView Logo" width="200">
+
   <h1>WebView</h1>
+
   <p>
-    <p align="center">
-      <a href="https://ring-lang.github.io/">
-        <img src="https://img.shields.io/badge/language-Ring-blue.svg" alt="Language">
-      </a>
-      <br>
-      <a href="https://github.com/ysdragon/webview/blob/main/LICENSE">
-        <img src="https://img.shields.io/github/license/ysdragon/webview?color=green" alt="License">
-      </a>
-      <a href="https://github.com/ysdragon/webview/releases/latest">
-        <img src="https://img.shields.io/github/v/release/ysdragon/webview?color=orange" alt="Version">
-      </a>
-      <br>
-      <a href="https://github.com/ysdragon/webview/actions">
-        <img src="https://img.shields.io/github/actions/workflow/status/ysdragon/webview/ubuntu_build.yml?branch=main&label=build" alt="Build Status">
-      </a>
-      <br>
-      <a href="https://github.com/ysdragon/webview/issues">
-        <img src="https://img.shields.io/github/issues/ysdragon/webview?color=yellow" alt="Issues">
-      </a>
-    </p>
+     Create beautiful, cross-platform desktop apps with Ring and web technologies.
   </p>
+
+  <p>
+    <a href="https://ring-lang.github.io/">
+      <img src="https://img.shields.io/badge/language-Ring-blue.svg" alt="Language">
+    </a>
+    <a href="https://github.com/ysdragon/webview/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/ysdragon/webview" alt="License">
+    </a>
+    <a href="https://github.com/ysdragon/webview/releases/latest">
+      <img src="https://img.shields.io/github/v/release/ysdragon/webview" alt="Version">
+    </a>
+    <a href="https://github.com/ysdragon/webview/actions">
+      <img src="https://img.shields.io/github/actions/workflow/status/ysdragon/webview/ubuntu_build.yml?branch=main&label=build" alt="Build Status">
+    </a>
+    <a href="https://github.com/ysdragon/webview/issues">
+      <img src="https://img.shields.io/github/issues/ysdragon/webview?color=yellow" alt="Issues">
+    </a>
+  </p>
+
 </div>
 
 WebView is a powerful Ring library that allows you to create modern, cross-platform desktop applications using web technologies for the frontend, while using Ring as the backend. It provides a simple and intuitive API for building beautiful graphical user interfaces.
