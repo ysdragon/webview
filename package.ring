@@ -56,7 +56,8 @@ aPackageInfo = [
 		"lib/windows/arm64/ring_webview.dll"
 	],
 	:linuxfiles = 	[
-		"lib/linux/amd64/libring_webview.so"
+		"lib/linux/amd64/libring_webview.so",
+		"lib/linux/arm64/libring_webview.so"
 	],
 	:ubuntufiles = 	[
 
