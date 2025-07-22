@@ -51,6 +51,7 @@ aPackageInfo = [
 		"examples/21_prayer_times.ring",
 		"examples/22_chat_bot.ring",
 		"examples/23_mock_pos.ring",
+		"examples/24_ringfetch.ring",
 		"src/utils/color.ring",
 		"src/utils/install.ring",
 		"README.md",
