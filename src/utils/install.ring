@@ -38,6 +38,8 @@ off
 # Get system architecture
 cArchName = getarch()
 switch cArchName
+	on "x86"
+		cArchName = "i386"
 	on "x64"
 		cArchName = "amd64"
 	on "arm64"
