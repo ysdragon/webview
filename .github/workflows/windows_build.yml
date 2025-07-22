@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: x86
+          - arch: Win32
             arch_name: i386
           - arch: x64
             arch_name: amd64
