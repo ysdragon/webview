@@ -5,10 +5,12 @@ on:
     paths:
       - '**.c'
       - '**.h'
+      - '.github/workflows/windows_build.yml'
   pull_request:
     paths:
       - '**.c'
       - '**.h'
+      - '.github/workflows/windows_build.yml'
 
 jobs:
   build:
@@ -17,6 +19,8 @@ jobs:
     strategy:
       matrix:
         include:
+          - arch: x86
+            arch_name: i386
           - arch: x64
             arch_name: amd64
           - arch: ARM64
@@ -55,6 +59,11 @@ jobs:
         if "${{ matrix.arch_name }}" == "arm64" (
           if not exist lib\windows\arm64 mkdir lib\windows\arm64
           move /Y lib\windows\amd64\ring_webview.dll lib\windows\arm64\ring_webview.dll
+        )
+
+        if "${{ matrix.arch_name }}" == "i386" (
+          if not exist lib\windows\i386 mkdir lib\windows\i386
+          move /Y lib\windows\amd64\ring_webview.dll lib\windows\i386\ring_webview.dll
         )
 
     - name: Upload artifacts
