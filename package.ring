@@ -30,6 +30,7 @@ aPackageInfo = [
 		"examples/01_basic.ring",
 		"examples/02_navigate.ring",
 		"examples/03_local_html.ring",
+		"examples/assets/index.html",
 		"examples/04_callbacks.ring",
 		"examples/05_inject_eval_callback.ring",
 		"examples/06_showcase.ring",
