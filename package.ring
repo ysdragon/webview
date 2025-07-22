@@ -44,6 +44,7 @@ aPackageInfo = [
 		"examples/14_live_markdown_editor.ring",
 		"examples/15_color_palette.ring",
 		"examples/16_qr_code_generator.ring",
+		"examples/17_chart.ring",
 		"src/utils/color.ring",
 		"src/utils/install.ring",
 		"README.md",
