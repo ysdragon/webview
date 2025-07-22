@@ -42,6 +42,7 @@ aPackageInfo = [
 		"examples/12_unbind.ring",
 		"examples/13_to_do_list.ring",
 		"examples/14_live_markdown_editor.ring",
+		"examples/15_color_palette.ring",
 		"src/utils/color.ring",
 		"src/utils/install.ring",
 		"README.md",
