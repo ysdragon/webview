@@ -46,6 +46,7 @@ aPackageInfo = [
 		"examples/16_qr_code_generator.ring",
 		"examples/17_chart.ring",
 		"examples/18_http_fetch.ring",
+		"examples/19_quote_generator.ring",
 		"src/utils/color.ring",
 		"src/utils/install.ring",
 		"README.md",
