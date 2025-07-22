@@ -50,6 +50,7 @@ aPackageInfo = [
 		"examples/20_avatar_quotes.ring",
 		"examples/21_prayer_times.ring",
 		"examples/22_chat_bot.ring",
+		"examples/23_mock_pos.ring",
 		"src/utils/color.ring",
 		"src/utils/install.ring",
 		"README.md",
