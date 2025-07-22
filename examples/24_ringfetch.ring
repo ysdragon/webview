@@ -611,7 +611,7 @@ func loadFetchHTML()
 # Handles requests from JavaScript to get all system data.
 func handleGetSystemData(id, req)
 	aData = buildSystemDataList()
-	cJson = list2json(aData)
+	cJson = substr(list2json(aData), char(13), "")
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson)
 
 # --- Helper Functions ---
@@ -629,7 +629,7 @@ func buildSystemDataList()
 	cUptime = sys.sysUptime([])
 	cShell = sys.shell()[:name] + " " + sys.shell()[:version]
 	cPackages = sys.packageManager()
-	cPackages = cPackages[:count] + " ("+cPackages[:name]+")"
+	cPackages = string(cPackages[:count]) + " ("+cPackages[:name]+")"
 
 	# --- Hardware Information ---
 	oCPU = sys.cpu([:usage = 1])
