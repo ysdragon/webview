@@ -55,6 +55,7 @@ aPackageInfo = [
 		"examples/23_mock_pos.ring",
 		"examples/24_ringfetch.ring",
 		"examples/25_drawing.ring",
+		"examples/26_using_weblib.ring",
 		"README.md",
 		"docs/REFERENCE.md",
 		"docs/USAGE.md",
