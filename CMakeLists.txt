@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(RingWebview)
 
+include(FetchContent)
+
 # Get the Ring source directory from environment or use default
 if(NOT DEFINED ENV{RING})
 	set(RING "${CMAKE_CURRENT_SOURCE_DIR}/../..")
@@ -70,7 +72,17 @@ set(WEBVIEW_INSTALL_TARGETS OFF)
 set(WEBVIEW_ENABLE_PACKAGING OFF)
 
 # Add webview as a subdirectory to build it
-add_subdirectory(src/webview)
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/webview/CMakeLists.txt")
+    message(STATUS "webview source not found, fetching from GitHub...")
+    FetchContent_Declare(
+        webview
+        GIT_REPOSITORY https://github.com/webview/webview.git
+        GIT_TAG        master
+    )
+    FetchContent_MakeAvailable(webview)
+else()
+    add_subdirectory(src/webview)
+endif()
 
 # Create the Ring webview extension shared library
 add_library(ring_webview SHARED
@@ -78,9 +90,9 @@ add_library(ring_webview SHARED
 )
 
 # Include directories
-target_include_directories(ring_webview PRIVATE 
+target_include_directories(ring_webview PRIVATE
 	${RING_INCLUDE}
-	${CMAKE_CURRENT_SOURCE_DIR}/webview/core/include
+	${webview_SOURCE_DIR}/core/include
 )
 
 # Determine Ring library based on OS
