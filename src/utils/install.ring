@@ -70,15 +70,18 @@ try
 	if isWindows()
 		systemSilent("copy /y " + '"' + cLibPath + '" "' + exefolder() + '"')
 	else
+		cLibDir = exefolder() + ".." + cPathSep + "lib"
 		if isFreeBSD() or isMacOSX()
 			cDestDir = "/usr/local/lib"
 		but isLinux()
 			cDestDir = "/usr/lib"
 		ok
-		cCommand = 'which sudo >/dev/null 2>&1 && sudo ln -sf "' + cLibPath + '" "' + cDestDir + 
+		cCommand1 = 'ln -sf "' + cLibPath + '" "' + cLibDir + '"'
+		cCommand2 = 'which sudo >/dev/null 2>&1 && sudo ln -sf "' + cLibPath + '" "' + cDestDir + 
 				'" || (which doas >/dev/null 2>&1 && doas ln -sf "' + cLibPath + '" "' + cDestDir + 
 				'" || ln -sf "' + cLibPath + '" "' + cDestDir + '")'
-		system(cCommand)
+		system(cCommand1)
+		system(cCommand2)
 	ok
 
 	# Copy examples to the samples/UsingWebView directory
