@@ -66,6 +66,7 @@ aPackageInfo = [
 
 	],
 	:windowsfiles = 	[
+		"lib/windows/i386/ring_webview.dll",
 		"lib/windows/amd64/ring_webview.dll",
 		"lib/windows/arm64/ring_webview.dll"
 	],
