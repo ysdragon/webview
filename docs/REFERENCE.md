@@ -15,12 +15,6 @@ Creates a new `WebView` instance.
 
 ---
 
-### `braceend()`
-
-Called automatically when the `WebView` object goes out of scope (e.g., at the end of a `WebView { ... }` block). It ensures that associated resources are properly cleaned up by calling `destroy()`. This method should not be called directly by the user.
-
----
-
 ### `run()`
 
 Runs the main event loop for the webview. This is a blocking call that will not return until the webview window is closed. It also calls `destroy()` automatically when the loop ends.
