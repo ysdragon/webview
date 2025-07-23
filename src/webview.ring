@@ -18,13 +18,6 @@ Class WebView
 		ok
 
 	/**
-	 * Called when the class is destroyed (brace end).
-	 * Cleans up resources.
-	 */
-	func braceend()
-		self.destroy()
-
-	/**
 	 * Checks if the webview has been destroyed.
 	 * @return true if destroyed, false otherwise.
 	 */
