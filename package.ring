@@ -68,6 +68,7 @@ aPackageInfo = [
 		"examples/26_using_weblib.ring",
 		"examples/27_adhkar_counter.ring",
 		"examples/28_ring_playground.ring",
+		"examples/29_notes.ring",
 		"README.md",
 		"docs/REFERENCE.md",
 		"docs/USAGE.md",
