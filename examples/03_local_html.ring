@@ -3,7 +3,7 @@
 load "webview.ring"
 
 # Optional Configuration for the WebView instance.
-cWebViewConfig = [
+aWebViewConfig = [
 	:debug = true  # Enable debug mode
 ]
 

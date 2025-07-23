@@ -7,7 +7,7 @@ oWebView = NULL
 
 # Optional Configuration for the WebView instance.
 # This can be customized as needed.
-cWebViewConfig = [
+aWebViewConfig = [
     :debug = false,  # Disable debug mode
     :window = NULL  # No parent window, create a new one
 ]
