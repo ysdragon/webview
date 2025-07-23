@@ -5,10 +5,14 @@ on:
     paths:
       - '**.c'
       - '**.h'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/macos_build.yml'
   pull_request:
     paths:
       - '**.c'
       - '**.h'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/macos_build.yml'
 
 jobs:
   build:
