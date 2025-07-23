@@ -59,6 +59,8 @@ if not fexists(cLibPath)
 	? colorText([:text = "Error: WebView library not found!", :color = :BRIGHT_RED, :style = :BOLD])
 	? colorText([:text = "Expected location: ", :color = :YELLOW]) + colorText([:text = cLibPath, :color = :CYAN])
 	? colorText([:text = "Please ensure the library is built for your platform (" + cOSName + "/" + cArchName + ")", :color = :BRIGHT_MAGENTA])
+	? colorText([:text = "You can refer to README.md for build instructions: ", :color = :CYAN]) + colorText([:text = exefolder() + ".." + cPathSep + "tools" + cPathSep + "ringpm" + cPathSep + 
+		"packages" + cPathSep + "webview" + cPathSep + "README.md", :color = :YELLOW])
 	return
 ok
 
