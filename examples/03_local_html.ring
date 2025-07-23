@@ -8,7 +8,7 @@ cWebViewConfig = [
 ]
 
 # Create a new WebView instance.
-oWebView = new WebView(0, NULL)
+oWebView = new WebView()
 
 # Configure the WebView properties using the object-oriented approach.
 oWebView {
