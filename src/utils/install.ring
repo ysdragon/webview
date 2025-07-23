@@ -105,10 +105,25 @@ try
 			OSCopyFile(cExamplesPath + cPathSep + item[1])
 		ok
 	next
-
+	
 	# Change back to the original directory
 	chdir(cCurrentDir)
 
+	# Check if webview.ring exists in the exefolder
+	if fexists(exefolder() + "webview.ring")
+		# Remove the existing webview.ring file
+		remove(exefolder() + "webview.ring")
+
+		# Write the load command to the webview.ring file
+		write(exefolder() + "load" + cPathSep + "webview.ring", `load "/../../tools/ringpm/packages/webview/lib.ring"`)
+	ok
+	
+	# Ensure the Ring2EXE libs directory exists
+	if direxists(exefolder() + ".." + cPathSep + "tools" + cPathSep + "ring2exe" + cPathSep + "libs")
+		# Write the library definition to the webview.ring file for Ring2EXE
+		write(exefolder() + ".." + cPathSep + "tools" + cPathSep + "ring2exe" + cPathSep + "libs" + cPathSep + "webview.ring", getRing2EXEContent())
+	ok
+	
 	? colorText([:text = "Successfully installed Ring WebView!", :color = :BRIGHT_GREEN, :style = :BOLD])
 	? colorText([:text = "You can refer to samples in: ", :color = :CYAN]) + colorText([:text = cSamplesPath, :color = :YELLOW])
 	? colorText([:text = "Or in the package directory: ", :color = :CYAN]) + colorText([:text = cExamplesPath, :color = :YELLOW])
@@ -116,3 +131,21 @@ catch
 	? colorText([:text = "Error: Failed to install Ring WebView!", :color = :BRIGHT_RED, :style = :BOLD])
 	? colorText([:text = "Details: ", :color = :YELLOW]) + colorText([:text = cCatchError, :color = :CYAN])
 done
+
+
+func getRing2EXEContent
+	return `aLibrary = [:name = :webview,
+	 :title = "WebView",
+	 :windowsfiles = [
+		"ring_webview.dll"
+	 ],
+	 :linuxfiles = [
+		"libring_webview.so"
+	 ],
+	 :macosxfiles = [
+		"libring_webview.dylib"
+	 ],
+	 :ubuntudep = "libgtk-4-1 libwebkitgtk-6.0-4",
+	 :fedoradep = "gtk4 webkitgtk6.0",
+	 :macosxdep = ""
+	]`
