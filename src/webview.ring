@@ -24,7 +24,6 @@ Class WebView
 	func braceend()
 		self.destroy()
 
-	# Public method to check if the webview has been destroyed.
 	/**
 	 * Checks if the webview has been destroyed.
 	 * @return true if destroyed, false otherwise.
@@ -44,7 +43,6 @@ Class WebView
 		# After run() finishes, the window is closed, so we must destroy.
 		self.destroy()
 
-	# Destroys the webview instance and releases associated resources.
 	/**
 	 * Destroys the webview instance and releases resources.
 	 */
