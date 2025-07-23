@@ -15,9 +15,19 @@ aPackageInfo = [
 	],
 	:libs = 	[
 		[
-			:name = "",
-			:version = "",
-			:providerusername = ""
+			:name = "jsonlib",
+			:version = "1.0.16",
+			:providerusername = "ringpackages"
+		],
+		[
+			:name = "SysInfo",
+			:version = "1.3.0",
+			:providerusername = "ysdragon"
+		],
+		[
+			:name = "markdown",
+			:version = "1.1.0",
+			:providerusername = "ysdragon"
 		]
 	],
 	:files = 	[
