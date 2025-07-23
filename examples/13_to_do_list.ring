@@ -9,7 +9,14 @@ load "jsonlib.ring"
 oWebView = NULL
 aTodos = []
 cTodosFile = "todos.json"
-
+aBindList = [
+		["getInitialTodos", :handleGetInitialTodos],
+		["addTodo", :handleAddTodo],
+		["toggleTodo", :handleToggleTodo],
+		["deleteTodo", :handleDeleteTodo],
+		["getCategories", :handleGetCategories]
+	]
+	
 # ==================================================
 # Main Application Flow
 # ==================================================
@@ -24,13 +31,8 @@ func main()
 	# Set the window size (no size constraint).
 	oWebView.setSize(700, 700, WEBVIEW_HINT_NONE)
 
-	# Bind Ring functions to be callable from JavaScript.
-	# These functions handle various to-do list operations.
-	oWebView.bind("getInitialTodos", :handleGetInitialTodos) # Get initial state (todos and categories).
-	oWebView.bind("addTodo", :handleAddTodo)                 # Add a new to-do item.
-	oWebView.bind("toggleTodo", :handleToggleTodo)           # Toggle a to-do item's completion status.
-	oWebView.bind("deleteTodo", :handleDeleteTodo)           # Delete a to-do item.
-	oWebView.bind("getCategories", :handleGetCategories)     # Get unique categories for filtering.
+	# Bind Ring functions to be callable from JavaScript using bindMany().
+	oWebView.bindMany(NULL)
 
 	# Load the HTML content for the to-do list UI.
 	loadTodoHTML()
