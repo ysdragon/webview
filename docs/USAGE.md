@@ -10,22 +10,23 @@ Every WebView application starts with creating a `WebView` instance, setting its
 # Load the webview library
 load "webview.ring"
 
-# Create a new WebView instance
-oWebView = new WebView(1, NULL)
+# To customize, modify the global config before creating the instance
+aWebViewConfig[:debug] = false
 
-oWebView {
-    # Set the window title
-    setTitle("My App")
+# Create a new WebView instance using the global configuration
+oWebView = new WebView()
 
-    # Set the window size
-    setSize(800, 600, WEBVIEW_HINT_NONE)
+# Set the window title
+oWebView.setTitle("My App")
 
-    # Load your HTML content
-    setHtml("<h1>Hello, World!</h1>")
+# Set the window size
+oWebView.setSize(800, 600, WEBVIEW_HINT_NONE)
 
-    # Run the main event loop
-    run()
-}
+# Load your HTML content
+oWebView.setHtml("<h1>Hello, World!</h1>")
+
+# Run the main event loop
+oWebView.run()
 ```
 
 ## Loading External HTML
@@ -59,10 +60,16 @@ You can expose Ring functions to your JavaScript code using the `bind()` method.
 ```ring
 load "jsonlib.ring" # Required for JSON parsing
 
-oWebView {
-    # ...
-    bind("sayHello", :greet) # Bind the 'greet' function
-    # ...
+# Define a global list of functions to bind
+aBindList = [
+    ["sayHello", :greet]
+]
+
+# The new WebView() constructor automatically binds the global `aBindList`.
+oWebView = new WebView()
+
+# You can also bind more functions later
+oWebView.bind("anotherFunc", :anotherHandler)
 
 func greet(id, req)
     # `id` is the callback ID for wreturn()
