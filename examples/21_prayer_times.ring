@@ -28,10 +28,9 @@ func main()
 
 	# Load the HTML content for the prayer times UI.
 	loadPrayerTimesHTML()
+	
 	# Run the webview's main event loop. This is a blocking call.
 	oWebView.run()
-	# Destroy the webview instance.
-	oWebView.destroy()
 
 # Defines the HTML structure.
 func loadPrayerTimesHTML()

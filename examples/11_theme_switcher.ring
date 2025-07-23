@@ -31,9 +31,6 @@ func main()
 	see "Running the WebView main loop. Interact with the UI to switch themes." + nl
 	oWebView.run()
 
-	see "Cleaning up WebView resources..." + nl
-	oWebView.destroy()
-
 # Function to load the HTML content.
 func loadThemeHTML()
 	cHTML = `

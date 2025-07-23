@@ -149,11 +149,6 @@ func main()
 	see "3. Running webview main loop. Interact with the GUI to test functionalities." + nl
 	oWebView.run()
 
-	# Clean up and destroy the webview instance.
-	see "4. Destroying webview instance and cleaning up resources..." + nl
-	oWebView.destroy()
-	see "   Webview instance destroyed." + nl
-
 	see "Demo finished. Program exiting." + nl
 
 # --- Ring Callback Handlers (Bound to JavaScript) ---

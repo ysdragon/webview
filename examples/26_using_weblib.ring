@@ -219,9 +219,6 @@ w.setHtml(mypage.output())
 # Run the webview's main event loop. This is a blocking call.
 w.run()
 
-# Destroy the webview instance.
-w.destroy()
-
 see "Webview closed." + nl
 
 func showAlert(id, req)

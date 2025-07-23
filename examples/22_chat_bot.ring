@@ -37,8 +37,6 @@ func main()
 	oWebView.run()
 
 	see "Cleaning up WebView resources and exiting." + nl
-	# Destroy the webview instance.
-	oWebView.destroy()
 
 # Handles requests from JavaScript to get the initial application settings.
 func handleGetInitialSettings(id, req)

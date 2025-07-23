@@ -26,9 +26,6 @@ func main()
 	# Run the webview's main event loop. This is a blocking call.
 	oWebView.run()
 
-	see "Cleaning up WebView resources and exiting." + nl
-	oWebView.destroy()
-
 # Function to load the HTML content.
 func loadHTML()
 	cHTML = `

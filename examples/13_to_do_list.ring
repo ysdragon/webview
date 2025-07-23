@@ -43,9 +43,6 @@ func main()
 
 	see "Cleaning up WebView resources and exiting." + nl
 
-	# Destroy the webview instance (Optional).
-	oWebView.destroy()
-
 # Function to load the HTML content.
 func loadTodoHTML()
 	cHTML = '

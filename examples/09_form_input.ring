@@ -21,9 +21,6 @@ func main()
 	see "Running the WebView main loop..." + nl
 	oWebView.run()
 
-	see "Cleaning up WebView resources..." + nl
-	oWebView.destroy()
-
 # Function to load the HTML content.
 func loadFormHTML()
 	cHTML = `

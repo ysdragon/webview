@@ -195,10 +195,7 @@ func main()
 
 	# Run the webview's main event loop. This is a blocking call.
 	oWebView.run()
-
-	# Destroy the webview instance.
-	oWebView.destroy()
-
+	
 	see "WebView closed. Program finished." + nl
 
 # This function is called by JavaScript via `window.greet()`.

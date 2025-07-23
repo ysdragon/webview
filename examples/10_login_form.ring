@@ -234,8 +234,6 @@ cLoginHTML = `
 oWebView.setHtml(cLoginHTML)
 # Run the webview's main event loop. This is a blocking call.
 oWebView.run()
-# Destroy the webview instance.
-oWebView.destroy()
 
 see "Application finished." + nl
 

@@ -46,9 +46,6 @@ func main()
 	# Run the webview's main event loop. This is a blocking call.
 	oWebView.run()
 
-	# Destroy the webview instance.
-	oWebView.destroy()
-
 # Function to load the HTML content.
 func loadCounterHTML()
 	cHTML = `

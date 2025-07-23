@@ -38,9 +38,6 @@ func main()
 	# Run the webview's main event loop. This is a blocking call.
 	oWebView.run()
 
-	# Destroy the webview instance.
-	oWebView.destroy()
-
 # Defines the HTML structure and inline JavaScript for the QR code generator.
 func loadQRCodeHTML()
 	cHTML = `
