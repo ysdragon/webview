@@ -5,11 +5,13 @@ on:
     paths:
       - '**.c'
       - '**.h'
+      - '**/CMakeLists.txt'
       - '.github/workflows/windows_build.yml'
   pull_request:
     paths:
       - '**.c'
       - '**.h'
+      - '**/CMakeLists.txt'
       - '.github/workflows/windows_build.yml'
 
 jobs:
@@ -56,15 +58,6 @@ jobs:
         rmdir /s /q lib
         cmake . -A ${{ matrix.arch }}
         cmake --build . --config Release
-        if "${{ matrix.arch_name }}" == "arm64" (
-          if not exist lib\windows\arm64 mkdir lib\windows\arm64
-          move /Y lib\windows\amd64\ring_webview.dll lib\windows\arm64\ring_webview.dll
-        )
-
-        if "${{ matrix.arch_name }}" == "i386" (
-          if not exist lib\windows\i386 mkdir lib\windows\i386
-          move /Y lib\windows\amd64\ring_webview.dll lib\windows\i386\ring_webview.dll
-        )
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4

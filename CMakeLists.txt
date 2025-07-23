@@ -13,6 +13,7 @@ endif()
 # Set paths
 set(RING_INCLUDE "${RING}/language/include")
 set(RING_LIB "${RING}/lib")
+set(RING_BIN "${RING}/bin")
 
 set(RING_WEBVIEW_C_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/ring_webview.c")
 
@@ -29,13 +30,31 @@ else()
     message(FATAL_ERROR "Unsupported operating system: ${CMAKE_SYSTEM_NAME}")
 endif()
 
-string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" CMAKE_SYSTEM_PROCESSOR_LC)
-if(CMAKE_SYSTEM_PROCESSOR_LC MATCHES "x86_64|amd64")
-    set(ARCH_DIR "amd64")
-elseif(CMAKE_SYSTEM_PROCESSOR_LC MATCHES "aarch64|arm64")
-    set(ARCH_DIR "arm64")
-else()
-    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+# Determine architecture
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND DEFINED CMAKE_GENERATOR_PLATFORM)
+    if(CMAKE_GENERATOR_PLATFORM STREQUAL "Win32")
+        set(ARCH_DIR "i386")
+    elseif(CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
+        set(ARCH_DIR "amd64")
+    elseif(CMAKE_GENERATOR_PLATFORM STREQUAL "ARM64")
+        set(ARCH_DIR "arm64")
+    else()
+        message(WARNING "Unsupported CMAKE_GENERATOR_PLATFORM: ${CMAKE_GENERATOR_PLATFORM}, falling back to CMAKE_SYSTEM_PROCESSOR")
+    endif()
+endif()
+
+# Fallback to CMAKE_SYSTEM_PROCESSOR if ARCH_DIR is not set
+if(NOT DEFINED ARCH_DIR)
+    string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" CMAKE_SYSTEM_PROCESSOR_LC)
+    if(CMAKE_SYSTEM_PROCESSOR_LC MATCHES "i386|i686|x86")
+        set(ARCH_DIR "i386")
+    elseif(CMAKE_SYSTEM_PROCESSOR_LC MATCHES "x86_64|amd64")
+        set(ARCH_DIR "amd64")
+    elseif(CMAKE_SYSTEM_PROCESSOR_LC MATCHES "aarch64|arm64")
+        set(ARCH_DIR "arm64")
+    else()
+        message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+    endif()
 endif()
 
 # Set the destination directory for the built library
@@ -90,14 +109,27 @@ else()
 endif()
 
 # Move the built library to the OS/architecture-specific directory after build
-add_custom_command(
-	TARGET ring_webview
-	POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E make_directory ${LIB_DEST_DIR}
-	COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:ring_webview> ${LIB_DEST_DIR}/$<TARGET_FILE_NAME:ring_webview>
-	COMMENT "Moving built library to ${LIB_DEST_DIR}"
-	VERBATIM
-)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    add_custom_command(
+        TARGET ring_webview
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${LIB_DEST_DIR}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${RING_BIN}
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:ring_webview> ${RING_BIN}/
+        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:ring_webview> ${LIB_DEST_DIR}/$<TARGET_FILE_NAME:ring_webview>
+        COMMENT "Moving library to ${LIB_DEST_DIR} and copying to ${RING_BIN}"
+        VERBATIM
+    )
+else()
+    add_custom_command(
+        TARGET ring_webview
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${LIB_DEST_DIR}
+        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:ring_webview> ${LIB_DEST_DIR}/$<TARGET_FILE_NAME:ring_webview>
+        COMMENT "Moving built library to ${LIB_DEST_DIR}"
+        VERBATIM
+    )
+endif()
 
 # Install rule
 get_filename_component(NORMALIZED_RING_LIB "${RING_LIB}" ABSOLUTE)
