@@ -104,9 +104,7 @@ Creating a basic WebView application is straightforward. Here’s a simple examp
 load "webview.ring"
 
 # Create a new WebView instance.
-# The first parameter is for debug mode (1 = on, 0 = off).
-# The second parameter is for a parent window handle (optional).
-oWebView = new WebView(1, NULL)
+oWebView = new WebView()
 
 oWebView {
     # Set the title of the native window.
@@ -117,18 +115,7 @@ oWebView {
     setSize(800, 600, WEBVIEW_HINT_NONE)
 
     # Load HTML content into the webview.
-    setHtml(`
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <title>Hello World!</title>
-            </head>
-            <body>
-                <h1>Welcome to Ring WebView!</h1>
-                <p>This is a desktop app built with web tech.</p>
-            </body>
-        </html>
-    `)
+    setHtml(`<h1>Welcome to Ring WebView!</h1>`)
 
     # Run the main event loop. This will block until the window is closed.
     run()
