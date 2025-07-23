@@ -1,5 +1,23 @@
 # This file is part of the Ring WebView library.
 
+
+/*
+ * aWebViewConfig: Global configuration for the WebView class.
+ * Fields:
+ *   :debug   - (Boolean) Enable debug mode for the WebView (default: true).
+ *   :window  - (Pointer/NULL) Native window handle to associate with the WebView (default: NULL).
+ *               Set to NULL to let the library create its own window.
+ */
+aWebViewConfig = [
+	:debug = true,
+	:window = NULL
+]
+
+/**
+ * Class WebView: Represents a webview instance for displaying HTML content.
+ * Provides methods for binding Ring functions to JavaScript, navigating URLs,
+ * and managing the webview lifecycle.
+ */
 Class WebView
 
 	_pWebView
@@ -7,15 +25,16 @@ Class WebView
 	_isDestroyed = false
 
 	/**
-	 * Initializes the WebView instance.
-	 * @param debug Enable debug mode if true.
-	 * @param window Native window handle or NULL.
+	 * Initializes the WebView instance using global configuration.
 	 */
-	func init(debug, window)
-		self._pWebView = webview_create(debug, window)
+	func init
+		self._pWebView = webview_create(aWebViewConfig[:debug], aWebViewConfig[:window])
 		if isNull(self._pWebView) or not isPointer(self._pWebView)
 			raise("Failed to create webview instance.")
 		ok
+
+		# Automatically bind global `aBindList` if it exists.
+		bindMany(NULL)
 
 	/**
 	 * Checks if the webview has been destroyed.
