@@ -2,7 +2,7 @@
  * ring_webview.c
  * This file is part of the Ring WebView library.
  * Author: Youssef Saeed (ysdragon) <youssefelkholey@gmail.com>
-*/
+ */
 
 #include "ring.h"
 
@@ -36,7 +36,7 @@ void ring_webview_bind_callback(const char *id, const char *req, void *arg)
 	RingState *pRingState = pVM->pRingState;
 
 	// Mutex Lock
-    ring_vm_mutexlock(pVM);
+	ring_vm_mutexlock(pVM);
 
 	// Save current stack and call state.
 	int nSP_before = pVM->nSP;
@@ -70,7 +70,7 @@ void ring_webview_bind_callback(const char *id, const char *req, void *arg)
 	pVM->nFuncSP = nFuncSP_before;
 
 	// Mutex Unlock
-    ring_vm_mutexunlock(pVM);
+	ring_vm_mutexunlock(pVM);
 }
 
 // Custom free function for the bind object to be used by the GC
@@ -99,32 +99,34 @@ void ring_webview_dispatch_callback(webview_t w, void *arg)
 	RingWebViewDispatch *pDispatch = (RingWebViewDispatch *)arg;
 
 	// Mutex Lock for thread safety
-    ring_vm_mutexlock(pDispatch->pVM);
+	ring_vm_mutexlock(pDispatch->pVM);
 
 	// Execute the Ring code
 	ring_vm_runcode(pDispatch->pVM, pDispatch->cCode);
 
 	// Mutex Unlock
-    ring_vm_mutexunlock(pDispatch->pVM);
+	ring_vm_mutexunlock(pDispatch->pVM);
 
 	// Free the allocated memory
 	ring_state_free(pDispatch->pVM->pRingState, pDispatch->cCode);
 	ring_state_free(pDispatch->pVM->pRingState, pDispatch);
 }
 
-// Custom free function for the webview_t object
-void ring_webview_free(void *pState, void *pPointer)
+// Helper to destroy webview and free resources to avoid duplication.
+void ring_webview_destroy_internal(webview_t *pWebView)
 {
-	webview_t *pWebView = (webview_t *)pPointer;
-	
-	// Check if the pointer and the handle it points to are valid
 	if (pWebView && *pWebView)
 	{
 		webview_destroy(*pWebView);
 		*pWebView = NULL;
 	}
+}
 
-	// Free the container pointer itself
+// Custom free function for the webview_t object, called by the GC.
+void ring_webview_free(void *pState, void *pPointer)
+{
+	webview_t *pWebView = (webview_t *)pPointer;
+	ring_webview_destroy_internal(pWebView);
 	ring_state_free(pState, pPointer);
 }
 
@@ -135,7 +137,7 @@ RING_FUNC(ring_webview_dispatch)
 		RING_API_ERROR(RING_API_MISS2PARA);
 		return;
 	}
-	
+
 	if (!RING_API_ISCPOINTER(1) || !RING_API_ISSTRING(2))
 	{
 		RING_API_ERROR(RING_API_BADPARATYPE);
@@ -179,7 +181,7 @@ RING_FUNC(ring_webview_bind)
 		RING_API_ERROR(RING_API_MISS3PARA);
 		return;
 	}
-	
+
 	if (!RING_API_ISCPOINTER(1) || !RING_API_ISSTRING(2) || !RING_API_ISSTRING(3))
 	{
 		RING_API_ERROR(RING_API_BADPARATYPE);
@@ -228,7 +230,7 @@ RING_FUNC(ring_webview_unbind)
 		RING_API_ERROR(RING_API_MISS2PARA);
 		return;
 	}
-	
+
 	if (!RING_API_ISCPOINTER(1) || !RING_API_ISSTRING(2))
 	{
 		RING_API_ERROR(RING_API_BADPARATYPE);
@@ -288,14 +290,7 @@ RING_FUNC(ring_webview_destroy)
 	}
 
 	webview_t *pWebView = (webview_t *)RING_API_GETCPOINTER(1, "webview_t");
-
-	// Check if the pointer and the handle it points to are valid
-	if (pWebView && *pWebView)
-	{
-		webview_destroy(*pWebView);
-		*pWebView = NULL;
-	}
-
+	ring_webview_destroy_internal(pWebView);
 	RING_API_SETNULLPOINTER(1);
 }
 
