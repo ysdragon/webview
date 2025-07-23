@@ -50,7 +50,7 @@ Class WebView
 
 		self._pWebView = NULL
 		self._bindings = []
-        
+		
 	func terminate()
 		if self.isDestroyed()
 			return
@@ -86,6 +86,31 @@ Class WebView
 			add(self._bindings, aBindResult)
 		ok
 		return aBindResult
+
+	/**
+	 * Binds multiple Ring functions to JavaScript function names.
+	 * @param aList A list of [jsName, ringFuncName] pairs.
+	 */
+	func bindMany(aList)
+		if self.isDestroyed()
+			return
+		ok
+
+		if isNull(aList)
+			if isGlobal("aBindList")
+				aList = aBindList
+			else
+				return # No bindings to process
+			ok
+		ok
+
+		if isList(aList)
+			for aItem in aList
+				if isList(aItem) and len(aItem) = 2
+					self.bind(aItem[1], aItem[2])
+				ok
+			next
+		ok
 
 	/**
 	 * Unbinds a JavaScript function name.
