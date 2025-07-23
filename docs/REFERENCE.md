@@ -78,6 +78,15 @@ Binds a Ring function to a JavaScript function, allowing it to be called from th
 
 ---
 
+### `bindMany(aList)`
+
+Binds multiple Ring functions to JavaScript functions in a single call. This is a convenient alternative to calling `bind()` multiple times.
+
+-   **`aList`**: (List, optional) A list of binding pairs, where each pair is a list containing `[jsName, ringFuncName]`.
+    -   If `aList` is not provided (or is `NULL`), the method will look for a global variable named `aBindList` and use it if it exists and is a list. This allows you to define your bindings in a central location.
+
+---
+
 ### `unbind(jsName)`
 
 Removes a previously created JavaScript-to-Ring binding. After unbinding, calls from JavaScript to `jsName` will no longer invoke the Ring function.
