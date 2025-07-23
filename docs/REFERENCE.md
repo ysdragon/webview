@@ -6,12 +6,18 @@ This document provides a detailed reference for the Ring WebView library API.
 
 The `WebView` class is the core of the library, providing all the necessary methods to create and manage a webview window.
 
-### `new WebView(debug, window)`
+### `new WebView()`
 
-Creates a new `WebView` instance.
+Creates a new `WebView` instance. The constructor is now parameter-less and uses a global configuration list for setup.
 
--   **`debug`**: (Boolean) Set to `true` to enable debug mode, which provides access to developer tools.
--   **`window`**: (Pointer) A native window handle to use as the parent. Pass `NULL` to create a new, top-level window.
+#### Global Configuration
+
+The `WebView` class relies on a global list named `aWebViewConfig` for its initial settings. You can modify this list before creating a `WebView` instance to customize its behavior.
+
+-   **`aWebViewConfig[:debug]`**: (Boolean) Set to `true` (default) to enable debug mode.
+-   **`aWebViewConfig[:window]`**: (Pointer) A native window handle to use as the parent. Defaults to `NULL`.
+
+> **Note:** When a `WebView` instance is created, the `init()` method is called automatically. As part of this process, `bindMany(NULL)` is invoked. If a global list named `aBindList` exists and is a valid list, all bindings defined in `aBindList` will be registered automatically during initialization.
 
 ---
 
