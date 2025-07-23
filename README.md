@@ -162,7 +162,19 @@ If you want to contribute to the development of Ring WebView or build it from so
 
 ### Build Steps
 
-1.  **Set the `RING` Environment Variable:**
+1. **Clone the Repository:**
+   Clone the WebView repository to your local machine.
+   ```sh
+   git clone https://github.com/ysdragon/webview.git --recursive
+   ```
+
+   > **Note:**  
+   > If you installed the library using RingPM, you can go to the `src` directory of the package and run:
+   > ```sh
+   > git clone https://github.com/webview/webview.git
+   > ```
+
+2.  **Set the `RING` Environment Variable:**
     Before running CMake, you must set the `RING` environment variable to point to the root directory of the Ring language source code.
     - Windows
       - Command Prompt
@@ -179,7 +191,7 @@ If you want to contribute to the development of Ring WebView or build it from so
       export RING=/path/to/ring
       ```
 
-2.  **Configure with CMake:**
+3.  **Configure with CMake:**
     Create a build directory and run CMake from within it.
     ```sh
     mkdir build
@@ -187,7 +199,7 @@ If you want to contribute to the development of Ring WebView or build it from so
     cmake ..
     ```
 
-3.  **Build the Project:**
+4.  **Build the Project:**
     Compile the source code using the build toolchain configured by CMake (e.g., Make, Ninja).
     ```sh
     cmake --build .
