@@ -3,8 +3,7 @@
 load "webview.ring"
 
 # Create a new WebView instance.
-# Parameters: debug mode (1 for on, 0 for off), parent window handle (NULL for a new window).
-oWebView = new WebView(1, NULL)
+oWebView = new WebView()
 
 oWebView {
 	# Set the title of the webview window.

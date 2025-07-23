@@ -8,7 +8,7 @@ oWebView = NULL
 
 func main()
 	see "Setting up Form Input App..." + nl
-	oWebView = new WebView(1, NULL)
+	oWebView = new WebView()
 
 	oWebView.setTitle("Ring Form Input")
 	oWebView.setSize(500, 400, WEBVIEW_HINT_NONE)
@@ -30,7 +30,6 @@ func loadFormHTML()
 	<!DOCTYPE html>
 	<html>
 	<head>
-		<title>Ring Form Input</title>
 		<meta charset="UTF-8">
 		<style>
 			body {

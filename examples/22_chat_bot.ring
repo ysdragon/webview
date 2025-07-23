@@ -12,10 +12,12 @@ cSettingsFile = "chat_settings.json"
 aSettings = []
 
 func main()
+	# Load initial settings from file or create defaults.
 	aSettings = loadSettings()
+	
 	see "Setting up Advanced Chat Bot Application..." + nl
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	# Set the window title.
 	oWebView.setTitle("Chat Bot")

@@ -15,8 +15,8 @@ cQuotesAPI = "https://avatarquotes.xyz/api/quotes"
 # ==================================================
 
 func main()
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	# Set the window title.
 	oWebView.setTitle("Avatar Quotes Generator")
@@ -203,7 +203,6 @@ func handleFetchQuote(id, req)
 
 	try
 		cResponse = download(cQuotesAPI) # Fetch data from the Avatar Quotes API.
-		? cResponse
 		aJson = json2list(cResponse)["quotes"][1] # Parse the JSON response.
 		# Structure the result as a list (array) for JSON conversion.
 		aResult = [

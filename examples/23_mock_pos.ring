@@ -7,6 +7,16 @@ load "jsonlib.ring"
 
 # Global variables
 oWebView = NULL
+
+# Global list of bindings to be callable from JavaScript.
+aBindList = [
+	["getInitialData", :handleGetInitialData],  # Get initial product and cart data.
+	["addToCart", :handleAddToCart],             # Add an item to the shopping cart.
+	["checkout", :handleCheckout],               # Process the checkout.
+	["removeFromCart", :handleRemoveFromCart]    # Remove an item from the cart.
+]
+
+# Sample product data for the POS system.
 aProducts = [
 	["Coffee", 4.50],
 	["Salad", 9.00],
@@ -14,23 +24,19 @@ aProducts = [
 	["Soda", 2.00],
 	["Water", 1.50]
 ]
+
+# Global cart to hold items added by the user.
 aCart = []
 
 func main()
 	see "Setting up the POS System WebView..." + nl
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	# Set the window title.
 	oWebView.setTitle("Mock POS Example")
 	# Set the window size (no size constraint).
 	oWebView.setSize(800, 700, WEBVIEW_HINT_NONE)
-
-	# Bind Ring functions to be callable from JavaScript.
-	oWebView.bind("getInitialData", :handleGetInitialData)     # Get initial product and cart data.
-	oWebView.bind("addToCart", :handleAddToCart)               # Add an item to the shopping cart.
-	oWebView.bind("checkout", :handleCheckout)                 # Process the checkout.
-	oWebView.bind("removeFromCart", :handleRemoveFromCart) # Remove an item from the cart.
 
 	# Load the HTML content for the POS UI.
 	loadPOS_HTML()

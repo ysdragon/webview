@@ -5,24 +5,27 @@ load "jsonlib.ring"
 
 # --- Global State ---
 oWebView = NULL
+
+# Bind Ring functions to be callable from JavaScript.
+aBindList = [
+	["addStroke", :handleAddStroke],
+	["undoStroke", :handleUndoStroke],
+	["redoStroke", :handleRedoStroke],
+	["clearCanvas", :handleClearCanvas],
+	["getDrawingHistory", :handleGetDrawingHistory]
+]
+
 aDrawingHistory = []
 nCurrentHistoryIndex = -1
 
 func main()
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	# Set the window title.
 	oWebView.setTitle("Ring Drawing App with Undo/Redo")
 	# Set the window size (no size constraint).
 	oWebView.setSize(800, 650, WEBVIEW_HINT_NONE)
-
-	# Bind Ring functions to be callable from JavaScript.
-	oWebView.bind("addStroke", :handleAddStroke)
-	oWebView.bind("undoStroke", :handleUndoStroke)
-	oWebView.bind("redoStroke", :handleRedoStroke)
-	oWebView.bind("clearCanvas", :handleClearCanvas)
-	oWebView.bind("getDrawingHistory", :handleGetDrawingHistory)
 
 	# Load the HTML content for the drawing application UI.
 	loadDrawingHTML()

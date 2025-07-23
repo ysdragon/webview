@@ -8,14 +8,13 @@ oWebView = NULL
 
 func main()
 	# Create a new WebView instance.
-	# The `1` enables debug mode, `NULL` creates a new window.
-	oWebView = new WebView(1, NULL)
+	oWebView = new WebView()
 
 	oWebView {
 		# Set the title of the webview window.
 		setTitle("Ring Digital Clock")
 		# Set the size of the webview window. WEBVIEW_HINT_NONE means no size constraint.
-		setSize(400, 180, WEBVIEW_HINT_NONE)
+		setSize(450, 180, WEBVIEW_HINT_NONE)
 
 		# Bind the `requestTime` function to handle time requests from JavaScript.
 		# When JS calls `window.requestTime()`, this anonymous Ring function will execute.

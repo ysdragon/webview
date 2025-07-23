@@ -6,8 +6,8 @@ load "jsonlib.ring"
 oWebView = NULL
 
 func main()
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	# Set the window title.
 	oWebView.setTitle("Ring WebView Unbind Example")

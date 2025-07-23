@@ -14,17 +14,23 @@ aAzkar = [
 	["لَا إلَه إلّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلُّ شَيْءِ قَدِيرِ", 1],
 ]
 
+# Bind Ring functions to be callable from JavaScript.
+aBindList = [
+	["getInitialCount", :handleGetInitialCount], # Get initial count and Zikr text
+	["incrementCounter", :handleIncrementCounter], # Increment the counter
+	["resetCounter", :handleResetCounter] # Reset the counter
+]
 
 func main()
-	oWebView = new WebView(1, NULL)
+	see "Starting Adhkar Counter App..." + nl
+	# Create a new WebView instance.
+	oWebView = new WebView()
 	
-	oWebView {        
+	oWebView {       
+		# Set the title of the webview window. 
 		setTitle("السبحة")
+		# Set the size of the webview window (width, height, hint).
 		setSize(500, 700, WEBVIEW_HINT_NONE)
-
-		bind("getInitialCount", :handleGetInitialCount)
-		bind("incrementCounter", :handleIncrementCounter)
-		bind("resetCounter", :handleResetCounter)
 
 		loadSebhaHTML()
 

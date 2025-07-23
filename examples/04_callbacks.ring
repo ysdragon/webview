@@ -6,8 +6,13 @@ load "webview.ring"
 # --- Global variable to hold the webview instance ---
 oWebView = NULL
 
+# List of bindings for the webview instance (optional global list loaded by default).
+aBindList = [
+	["myRingFunc3", :myRingCallback2],
+]
+
 func main
-	oWebView = new WebView(1, NULL)
+	oWebView = new WebView()
 
 	oWebView {
 		setTitle("Ring Webview - Callback Example")
@@ -35,7 +40,7 @@ func main
 					<style>
 						body {
 							font-family: 'Segoe UI', Arial, sans-serif;
-							background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%);
+							background: linear-gradient(120deg, #f0f4f8 0%, #dbeafe 100%);
 							margin: 0;
 							padding: 0;
 							display: flex;
@@ -46,55 +51,69 @@ func main
 						.container {
 							background: #fff;
 							margin-top: 60px;
-							padding: 32px 40px 40px 40px;
-							border-radius: 16px;
-							box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-							max-width: 420px;
+							padding: 36px 44px 44px 44px;
+							border-radius: 20px;
+							box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+							max-width: 440px;
 							width: 100%;
+							transition: box-shadow 0.2s;
+						}
+						.container:hover {
+							box-shadow: 0 10px 40px rgba(37,99,235,0.13);
 						}
 						h1 {
-							color: #2d3748;
-							margin-bottom: 10px;
+							color: #1e293b;
+							margin-bottom: 12px;
+							font-size: 2.1em;
+							letter-spacing: 0.5px;
 						}
 						p {
-							color: #4a5568;
-							margin-bottom: 28px;
+							color: #475569;
+							margin-bottom: 30px;
+							font-size: 1.08em;
 						}
 						.button-row {
 							display: flex;
 							justify-content: center;
-							gap: 16px;
-							margin-bottom: 24px;
+							gap: 18px;
+							margin-bottom: 26px;
 						}
 						button {
-							background: #2563eb;
+							background: linear-gradient(90deg, #2563eb 60%, #38bdf8 100%);
 							color: #fff;
 							border: none;
-							border-radius: 6px;
-							font-size: 16px;
-							padding: 12px 22px;
+							border-radius: 8px;
+							font-size: 17px;
+							padding: 13px 26px;
 							cursor: pointer;
-							transition: background 0.2s;
-							box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+							transition: background 0.18s, transform 0.13s;
+							box-shadow: 0 2px 10px rgba(37,99,235,0.10);
+							font-weight: 500;
+							outline: none;
 						}
-						button:hover {
-							background: #1d4ed8;
+						button:hover, button:focus {
+							background: linear-gradient(90deg, #1d4ed8 60%, #0ea5e9 100%);
+							transform: translateY(-2px) scale(1.04);
 						}
 						#response {
-							margin-top: 18px;
-							font-size: 18px;
+							margin-top: 20px;
+							font-size: 19px;
 							color: #059669;
-							min-height: 24px;
-							font-weight: 500;
+							min-height: 26px;
+							font-weight: 600;
 							transition: color 0.2s;
+							word-break: break-word;
 						}
 						@media (max-width: 600px) {
 							.container {
-								padding: 18px 8px 24px 8px;
+								padding: 20px 8px 26px 8px;
 							}
 							.button-row {
 								flex-direction: column;
-								gap: 10px;
+								gap: 12px;
+							}
+							h1 {
+								font-size: 1.3em;
 							}
 						}
 					</style>
@@ -109,6 +128,7 @@ func main
 						<div class="button-row">
 							<button onclick="callRingAnon()">Call Anonymous Function</button>
 							<button onclick="callRingNormal()">Call Normal Function</button>
+							<button onclick="callRingFunc3()">Call Function with Default Bindings (aBindList)</button>
 						</div>
 						<div id="response"></div>
 					</div>
@@ -120,6 +140,11 @@ func main
 						}
 						function callRingNormal() {
 							myRingFunc2('Sent from JS (normal)').then(res => {
+								showResponse(res);
+							});
+						}
+						function callRingFunc3() {
+							myRingFunc3('Sent from JS (Using the default aBindList)').then(res => {
 								showResponse(res);
 							});
 						}
@@ -140,3 +165,9 @@ func myRingCallback(id, req)
 	see "Called from JavaScript! Callback ID: " + id + ", Request Data: " + req + nl
 	# Send a response back to JavaScript.
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello back from Ring normal function!"')
+
+# A regular Ring function to be bound and called from JavaScript.
+func myRingCallback2(id, req)
+	see "Called from JavaScript! Callback ID: " + id + ", Request Data: " + req + nl
+	# Send a response back to JavaScript.
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello back Ring aBindList"')

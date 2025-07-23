@@ -23,16 +23,13 @@ aBindList = [
 
 func main()
 	see "Setting up To-Do List Application..." + nl
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	# Set the window title.
 	oWebView.setTitle("Ring To-Do List")
 	# Set the window size (no size constraint).
 	oWebView.setSize(700, 700, WEBVIEW_HINT_NONE)
-
-	# Bind Ring functions to be callable from JavaScript using bindMany().
-	oWebView.bindMany(NULL)
 
 	# Load the HTML content for the to-do list UI.
 	loadTodoHTML()
@@ -45,7 +42,8 @@ func main()
 	oWebView.run()
 
 	see "Cleaning up WebView resources and exiting." + nl
-	# Destroy the webview instance.
+
+	# Destroy the webview instance (Optional).
 	oWebView.destroy()
 
 # Function to load the HTML content.

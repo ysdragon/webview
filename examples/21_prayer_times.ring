@@ -15,13 +15,13 @@ cPrayerTimesAPI = "http://api.aladhan.com/v1/timingsByCity"
 
 func main()
 	see "Setting up Prayer Times Application..." + nl
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	# Set the window title.
 	oWebView.setTitle("Prayer Times")
 	# Set the window size (no size constraint).
-	oWebView.setSize(450, 800, WEBVIEW_HINT_NONE)
+	oWebView.setSize(450, 700, WEBVIEW_HINT_NONE)
 
 	# Bind Ring functions to be callable from JavaScript.
 	oWebView.bind("getPrayerTimes", :handleGetPrayerTimes)

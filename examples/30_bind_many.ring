@@ -5,6 +5,13 @@ load "webview.ring"
 # Variable to hold the webview instance.
 oWebView = NULL
 
+# Optional Configuration for the WebView instance.
+# This can be customized as needed.
+cWebViewConfig = [
+    :debug = false,  # Disable debug mode
+    :window = NULL  # No parent window, create a new one
+]
+
 # Define a global list of bindings for the first webview instance.
 # The WebView class will automatically detect and use this global list.
 aBindList = [
@@ -16,16 +23,13 @@ aBindList = [
 
 func main
     # Create a webview instance, which will use the global `aBindList`.
-    oWebView = new WebView(true, NULL)
+    oWebView = new WebView()
     
     oWebView {
         # Set the title and size of the webview window.
         setTitle("bindMany() - Global List")
         setSize(500, 230, WEBVIEW_HINT_NONE)
         
-        # Bind the global list of functions to the webview.
-        bindMany(NULL)  # Pass NULL to use the global list
-
         # You can also use bindMany(BindList) to explicitly bind the list.
         # Like this: 
         # BindList = [

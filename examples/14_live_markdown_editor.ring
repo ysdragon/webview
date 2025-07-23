@@ -11,29 +11,26 @@ load "jsonlib.ring"
 oWebView = NULL
 oMarkdown = new Markdown()
 oMarkdown.setFlags(MD_FLAG_TABLES | MD_FLAG_STRIKETHROUGH | MD_FLAG_TASKLISTS | MD_FLAG_PERMISSIVEAUTOLINKS)
-
+aBindList = [
+	["updateMarkdown", :handleMarkdownUpdate]  # Bind the updateMarkdown function to handle Markdown updates
+]
 
 func main()
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	oWebView {
 		# Set the title of the webview window.
 		setTitle("Live Markdown Editor")
 		# Set the size of the webview window (width, height, hint).
 		setSize(1024, 768, WEBVIEW_HINT_NONE)
-
-		# Bind the `updateMarkdown` function to be callable from JavaScript.
-		# This function will receive the Markdown text from the editor.
-		bind("updateMarkdown", :handleMarkdownUpdate)
-
 		# Load the HTML content for the editor UI.
 		loadEditorHTML()
 
 		# Run the webview's main event loop. This is a blocking call.
 		run()
 
-		# No need to destroy the webview instance here, as it will be automatically cleaned up when the braces are closed.
+		# No need to destroy the webview instance here, as it will be automatically cleaned up when the run() method exits.
 	}
 
 # Defines the HTML structure and inline JavaScript for the Markdown editor.

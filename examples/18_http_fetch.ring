@@ -11,8 +11,8 @@ oWebView = NULL
 
 func main()
 	see "Setting up HTTP Fetcher Application..." + nl
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	# Set the window title.
 	oWebView.setTitle("HTTP Fetcher")

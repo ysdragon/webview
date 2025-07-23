@@ -13,8 +13,8 @@ oWebView = NULL
 sys = new SysInfo
 
 func main()
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	oWebView {
 		# Set the title of the webview window.
@@ -33,7 +33,7 @@ func main()
 		run()
 
 		# No need to manually destroy the webview instance,
-		# as it will be automatically cleaned up when braces are closed.
+		# as it will be automatically cleaned up when the run() method exits.
 	}
 
 # Defines the HTML structure and inline JavaScript for the RingFetch dashboard.

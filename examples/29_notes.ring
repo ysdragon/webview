@@ -5,6 +5,18 @@ load "jsonlib.ring"
 
 # --- Global Variables ---
 oWebView = NULL # Instance of the WebView class
+
+# Bind Ring functions to be callable from JavaScript.
+# These functions handle various notes and settings operations.
+aBindList = [
+	["getInitialNotes", :handleGetInitialNotes],     # Get initial notes data
+	["addNote", :handleAddNote],                     # Add a new note
+	["editNote", :handleEditNote],                   # Edit an existing note
+	["deleteNote", :handleDeleteNote],               # Delete a note
+	["getInitialSettings", :handleGetInitialSettings], # Get initial settings (e.g., language)
+	["saveSettings", :handleSaveSettings]            # Save updated settings
+]
+
 aNotes = [] # Each item will be [cNoteText, cTimestamp]
 cNotesFile = "notes.json" # File to store notes
 cNotesSettingsFile = "notes_settings.json" # File to store settings
@@ -16,22 +28,13 @@ func main()
 	# Load existing notes from a file at application startup.
 	loadNotes()
 	see "Setting up Notes Application..." + nl
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	# Set the window title.
 	oWebView.setTitle("Notes")
 	# Set the window size (no size constraint).
 	oWebView.setSize(600, 700, WEBVIEW_HINT_NONE)
-
-	# Bind Ring functions to be callable from JavaScript.
-	# These functions handle various notes and settings operations.
-	oWebView.bind("getInitialNotes", :handleGetInitialNotes)     # Get initial notes data.
-	oWebView.bind("addNote", :handleAddNote)                     # Add a new note.
-	oWebView.bind("editNote", :handleEditNote)                   # Edit an existing note.
-	oWebView.bind("deleteNote", :handleDeleteNote)               # Delete a note.
-	oWebView.bind("getInitialSettings", :handleGetInitialSettings) # Get initial settings (e.g., language).
-	oWebView.bind("saveSettings", :handleSaveSettings)           # Save updated settings.
 
 	# Load the HTML content for the notes application UI.
 	loadNotesHTML()

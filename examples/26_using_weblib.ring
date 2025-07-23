@@ -5,8 +5,13 @@ load "webview.ring"
 load "weblib.ring"
 import System.Web
 
+# Define a global binding list for the webview instance.
+aBindList = [
+	["showAlert", :showAlert]
+]
+
 // Create a new webview instance
-w = new WebView(1, NULL)
+w = new WebView()
 
 // Set the title and size
 w.setTitle("Using WebLib")
@@ -176,6 +181,30 @@ myPage = new HtmlPage {
 				target = "_blank"
 			}
 		}
+	
+		div {
+			style = "display: flex; flex-direction: column; align-items: center; margin-top: 2.5em; gap: 1.2em;"
+			button {
+				style = "
+					background: linear-gradient(90deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+					color: #fff;
+					border: none;
+					border-radius: 12px;
+					padding: 14px 32px;
+					font-size: 1.08em;
+					font-weight: 600;
+					cursor: pointer;
+					transition: transform 0.15s cubic-bezier(.4,2,.6,1), box-shadow 0.18s;
+					box-shadow: 0 6px 24px 0 rgba(34,211,238,0.15), 0 1.5px 6px 0 rgba(192,132,252,0.10);
+					letter-spacing: 0.03em;
+					outline: none;
+				"
+				onmouseover = "this.style.transform='translateY(-2px) scale(1.04)'; this.style.boxShadow='0 10px 32px 0 rgba(34,211,238,0.22), 0 2px 8px 0 rgba(192,132,252,0.16)';"
+				onmouseout = "this.style.transform='none'; this.style.boxShadow='0 6px 24px 0 rgba(34,211,238,0.15), 0 1.5px 6px 0 rgba(192,132,252,0.10)';"
+				text("🚀 Show Alert")
+				onclick = "window.showAlert()"
+			}
+		}
 	}
 
 	p {
@@ -194,3 +223,7 @@ w.run()
 w.destroy()
 
 see "Webview closed." + nl
+
+func showAlert(id, req)
+	w.evalJS("alert('Hello from Ring! This alert was triggered by a callback.')")
+	w.wreturn(id, WEBVIEW_ERROR_OK, '""')

@@ -10,8 +10,8 @@ oWebView = NULL
 
 func main()
 	see "Setting up Color Palette Generator Application..." + nl
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	oWebView {
 		setTitle("Color Palette Generator")

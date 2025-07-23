@@ -4,8 +4,7 @@
 load "webview.ring"
 
 # Create a new WebView instance.
-# Parameters: debug mode (1 for on, 0 for off), parent window handle (NULL for a new window).
-oWebView = new WebView(1, NULL)
+oWebView = new WebView()
 
 # Configure the WebView properties using the object-oriented approach.
 oWebView {
@@ -21,8 +20,8 @@ oWebView {
     # This is a blocking call that keeps the window open until it's closed by the user.
     run()
 
-    # No need to explicitly destroy the webview instance here,
-    # as when closing braces are reached, the webview instance is automatically destroyed.
+    # No need to explicitly destroy the webview instance here.
+    # The webview will be automatically cleaned up when the run() method exits.
 }
 
 see "Webview closed." + nl

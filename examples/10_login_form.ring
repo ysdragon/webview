@@ -4,9 +4,16 @@
 load "webview.ring"
 load "jsonlib.ring"
 
+# Global aBindList to hold the Ring functions that can be called from JavaScript.
+# This list is automatically detected by the WebView class.
+aBindList = [
+	["handleLogin", :handleLogin], # `handleLogin` processes authentication requests.
+	["handleShowWelcome", :handleShowWelcome], # `handleShowWelcome` switches the webview content to the welcome screen.
+	["closeApp", :closeApp] # `closeApp` terminates the webview application.
+]
+
 # Create a new WebView instance.
-# The `1` enables debug mode, `NULL` creates a new window.
-oWebView = new WebView(1, NULL)
+oWebView = new WebView()
 
 # Set the title of the webview window.
 oWebView.setTitle("Ring WebView Login Example")
@@ -222,14 +229,6 @@ cLoginHTML = `
 </body>
 </html>
 `
-
-# Bind the Ring functions to be callable from JavaScript.
-# `handleLogin` processes authentication requests.
-# `handleShowWelcome` switches the webview content to the welcome screen.
-# `closeApp` terminates the webview application.
-oWebView.bind("handleLogin", :handleLogin)
-oWebView.bind("handleShowWelcome", :handleShowWelcome)
-oWebView.bind("closeApp", :closeApp)
 
 # Set the initial HTML content (the login form).
 oWebView.setHtml(cLoginHTML)

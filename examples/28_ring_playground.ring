@@ -3,11 +3,12 @@
 load "webview.ring"
 load "jsonlib.ring"
 
+# Global variable to hold the webview instance.
 oWebView = NULL
 
 func main()
-	# Create a new WebView instance (debug mode enabled).
-	oWebView = new WebView(1, NULL)
+	# Create a new WebView instance.
+	oWebView = new WebView()
 
 	oWebView {
 		# Set the title of the webview window.

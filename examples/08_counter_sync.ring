@@ -7,11 +7,14 @@ load "jsonlib.ring"
 # Global variables
 oWebView = NULL
 nCount = 0
+aBindList = [
+	["incrementFromRingInternal", :incrementFromRingInternal],
+	["decrementFromRingInternal", :decrementFromRingInternal]
+]
 
 func main()
 	# Create a new WebView instance.
-	# The `1` enables debug mode, `NULL` creates a new window.
-	oWebView = new WebView(1, NULL)
+	oWebView = new WebView()
 
 	# Set the title of the webview window.
 	oWebView.setTitle("Ring Counter Sync")
@@ -35,18 +38,6 @@ func main()
 	oWebView.bind("getInitialCount", func (id, req) {
 		see "Ring: JavaScript requested initial count." + nl
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(nCount)) # Return the current count as a string.
-	})
-	oWebView.bind("incrementFromRingInternal", func (id, req) {
-		see "Ring: Internal increment triggered from JavaScript." + nl
-		nCount++
-		updateUICounter() # Update the UI after changing count.
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}') # Acknowledge the JS call.
-	})
-	oWebView.bind("decrementFromRingInternal", func (id, req) {
-		see "Ring: Internal decrement triggered from JavaScript." + nl
-		nCount--
-		updateUICounter() # Update the UI after changing count.
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}') # Acknowledge the JS call.
 	})
 
 	# Load the HTML content for the counter UI.
@@ -229,6 +220,20 @@ func loadCounterHTML()
 	</html>
 	`
 	oWebView.setHtml(cHTML)
+
+
+# --- Callbacks from JavaScript (Called from aBindList) ---
+func incrementFromRingInternal(id, req)
+	see "Ring: Incrementing from internal call." + nl
+	nCount++
+	updateUICounter() # Update the UI after changing count.
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}') # Acknowledge the JS call.
+
+func decrementFromRingInternal(id, req)
+	see "Ring: Decrementing from internal call." + nl
+	nCount--
+	updateUICounter() # Update the UI after changing count.
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}') # Acknowledge the JS call.
 
 # --- Helper Function ---
 

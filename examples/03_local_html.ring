@@ -2,8 +2,12 @@
 
 load "webview.ring"
 
+# Optional Configuration for the WebView instance.
+cWebViewConfig = [
+	:debug = true  # Enable debug mode
+]
+
 # Create a new WebView instance.
-# Parameters: debug mode (0 for off), parent window handle (NULL for a new window).
 oWebView = new WebView(0, NULL)
 
 # Configure the WebView properties using the object-oriented approach.

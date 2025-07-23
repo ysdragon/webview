@@ -11,14 +11,9 @@ func main()
 	see "--- Ring WebView: Inject, Eval, and Bind/Callback Demo ---" + nl
 
 	# Create a new webview window using the WebView class.
-	# The `1` enables debug mode, `NULL` creates a new window.
-	see "1. Attempting to create a new WebView instance..." + nl
-	try
-		oWebView = new WebView(1, NULL)
-	catch
-		see "Error: Failed to create WebView window. Please ensure the library is correctly installed." + nl
-		bye # Exit if webview creation fails.
-	done
+	see "1. Create a new WebView instance..." + nl
+	oWebView = new WebView()
+
 	see "   WebView instance successfully created." + nl
 
 	# Set the title of the webview window.
