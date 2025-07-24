@@ -4,6 +4,7 @@
 load "webview.ring"
 load "jsonlib.ring"
 load "internetlib.ring"
+load "threads.ring"
 
 # Global variable to hold the WebView instance.
 oWebView = NULL
@@ -196,6 +197,13 @@ func loadQuoteHTML()
 func handleFetchQuote(id, req)
 	see "Ring: JavaScript requested a new quote." + nl
 	
+	# Create a new thread to fetch the quote asynchronously.
+	oThread = new_thrd_t()
+	thrd_create(oThread, "fetchQuote('" + id + "')")
+	thrd_detach(oThread)
+
+# Handles requests from handleFetchQuote.
+func fetchQuote(id)	
 	cResponse = ""
 	bError = false
 	cErrorMessage = ""
