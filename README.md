@@ -154,6 +154,7 @@ If you want to contribute to the development of Ring WebView or build it from so
    ```sh
    git clone https://github.com/ysdragon/webview.git --recursive
    ```
+   > **NOTE**: Skip this step if you have already installed the library using RingPM.
 
 2.  **Set the `RING` Environment Variable:**
     Before running CMake, you must set the `RING` environment variable to point to the root directory of the Ring language source code.
