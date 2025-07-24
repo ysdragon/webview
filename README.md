@@ -1,30 +1,24 @@
 <div align="center">
 
-  <img src="img/logo.png" alt="WebView Logo" width="200">
+<img src="img/logo.png" alt="WebView Logo" width="200">
 
-  <h1>WebView</h1>
+# WebView
 
-  <p>
-     Create beautiful, cross-platform desktop apps with Ring and web technologies.
-  </p>
+Create beautiful, cross-platform desktop apps with Ring and web technologies.
 
-  <p>
-    <a href="https://ring-lang.github.io/">
-      <img src="https://img.shields.io/badge/language-Ring-blue.svg" alt="Language">
-    </a>
-    <a href="https://github.com/ysdragon/webview/blob/main/LICENSE">
-      <img src="https://img.shields.io/github/license/ysdragon/webview" alt="License">
-    </a>
-    <a href="https://github.com/ysdragon/webview/releases/latest">
-      <img src="https://img.shields.io/github/v/release/ysdragon/webview" alt="Version">
-    </a>
-    <a href="https://github.com/ysdragon/webview/actions">
-      <img src="https://img.shields.io/github/actions/workflow/status/ysdragon/webview/ubuntu_build.yml?branch=main&label=build" alt="Build Status">
-    </a>
-    <a href="https://github.com/ysdragon/webview/issues">
-      <img src="https://img.shields.io/github/issues/ysdragon/webview?color=yellow" alt="Issues">
-    </a>
-  </p>
+[language-ring]: https://img.shields.io/badge/language-Ring-2D54CB.svg?style=for-the-badge&labelColor=414868
+[build-status]: https://img.shields.io/github/actions/workflow/status/ysdragon/webview/ubuntu_build.yml?branch=main&label=build&style=for-the-badge&labelColor=414868&logoColor=C0CAF5&color=8c73cc
+[last-commit]: https://img.shields.io/github/last-commit/ysdragon/webview?style=for-the-badge&logo=github&logoColor=C0CAF5&labelColor=414868&color=8c73cc
+[release-version]: https://img.shields.io/github/v/release/ysdragon/webview?style=for-the-badge&logo=webtrees&logoColor=C0CAF5&labelColor=414868&color=7664C6
+[license]: https://img.shields.io/github/license/ysdragon/webview?style=for-the-badge&logo=opensourcehardware&label=License&logoColor=C0CAF5&labelColor=414868&color=8c73cc
+[issues]: https://img.shields.io/github/issues/ysdragon/webview?color=8c73cc&style=for-the-badge&logo=github&logoColor=C0CAF5&labelColor=414868
+
+[![][language-ring]](https://ring-lang.github.io/)
+[![][build-status]](https://github.com/ysdragon/webview/actions)
+[![][last-commit]](https://github.com/ysdragon/webview/pulse)
+[![][release-version]](https://github.com/ysdragon/webview/releases/latest)
+[![][license]](https://github.com/ysdragon/webview/blob/main/LICENSE)
+[![][issues]](https://github.com/ysdragon/webview/issues)
 
 </div>
 
