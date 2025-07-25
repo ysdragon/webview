@@ -40,7 +40,7 @@ func main()
 	see "   Title set to 'WebView All Functions Demo'." + nl
 
 	# Set window size.
-	see "Setting window size..." + nl
+	see "   Setting window size..." + nl
 	oWebView.setSize(500, 700, WEBVIEW_HINT_NONE)
 
 	# Define the HTML and JavaScript content for the webview.
@@ -518,7 +518,7 @@ func main()
 # Echo handler for JS ring_echo.
 func handle_echo(id, req)
 	cMessage = json2list(req)[1][1]
-	see "Ring: handle_echo received: '" + cMessage + "'" + nl
+	see "   Ring: handle_echo received: '" + cMessage + "'" + nl
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Echo: ' + cMessage + '"')
 
 # Return version info for JS ring_getVersion.
@@ -589,5 +589,5 @@ func handle_terminate(id, req)
 
 # Handler for dispatch() demo.
 func ring_dispatchedFunc()
-	see "Ring: ring_dispatchedFunc executed via dispatch!" + nl
+	see "   Ring: ring_dispatchedFunc executed via dispatch!" + nl
 	oWebView.evalJS("alert('Dispatched Ring function executed!');")
