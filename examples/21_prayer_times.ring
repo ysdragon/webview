@@ -25,6 +25,7 @@ func main()
 
 	# Bind Ring functions to be callable from JavaScript.
 	oWebView.bind("getPrayerTimes", :handleGetPrayerTimes)
+	oWebView.bind("getLocation", :handleGetLocation)
 
 	# Load the HTML content for the prayer times UI.
 	loadPrayerTimesHTML()
@@ -142,7 +143,7 @@ func loadPrayerTimesHTML()
 			font-size: 1.25em;
 			color: var(--text-secondary);
 			margin-bottom: 1em;
-			text-align: right;
+			text-align: center;
 			font-weight: 500;
 		}
 		.prayer-list {
@@ -333,7 +334,6 @@ func loadPrayerTimesHTML()
 	</div>
 
 	<script>
-		// Moved to top for definition before use
 		async function fetchPrayerTimes(city, country) {
 			try {
 				const result = await window.getPrayerTimes(city, country);
@@ -348,11 +348,25 @@ func loadPrayerTimesHTML()
 			}
 		}
 
-		// Moved to top for definition before use
 		function fetchPrayerTimesByInput() {
 			const city = document.getElementById("city-input").value || "Cairo";
 			const country = document.getElementById("country-input").value || "Egypt";
 			fetchPrayerTimes(city, country);
+		}
+
+		async function fetchLocationAndPrayerTimes() {
+			try {
+				const loc = await window.getLocation();
+				if (loc && loc.city && loc.country) {
+					document.getElementById("city-input").value = loc.city;
+					document.getElementById("country-input").value = loc.country;
+					fetchPrayerTimes(loc.city, loc.country);
+				} else {
+					fetchPrayerTimes("Cairo", "Egypt");
+				}
+			} catch (e) {
+				fetchPrayerTimes("Cairo", "Egypt");
+			}
 		}
 
 		const prayerNames = {
@@ -501,7 +515,7 @@ func loadPrayerTimesHTML()
 		}
 
 		window.onload = () => {
-			fetchPrayerTimes("القاهرة", "مصر");
+			fetchLocationAndPrayerTimes();
 		};
 		
 	</script>
@@ -509,7 +523,6 @@ func loadPrayerTimesHTML()
 </html>'
 	
 	oWebView.setHtml(cHTML)
-
 # Handles requests from JavaScript to get prayer times for a specified city and country.
 func handleGetPrayerTimes(id, req)
 	cCity = "القاهرة"
@@ -521,9 +534,41 @@ func handleGetPrayerTimes(id, req)
 		cCountry = aReq[2]
 	ok
 
-	# Construct the API URL. Method 5 for Egyptian prayer times.
-	cUrl = cPrayerTimesAPI + "?city=" + substr(cCity," ", "%20") + "&country=" + substr(cCountry," ", "%20") + "&method=5"
-	
+	# Select calculation method based on country
+	aMethodMap = [
+		[:country = "Egypt", :method = 5], [:country = "مصر", :method = 5],
+		[:country = "Saudi Arabia", :method = 4], [:country = "السعودية", :method = 4],
+		[:country = "Turkey", :method = 13], [:country = "تركيا", :method = 13],
+		[:country = "Morocco", :method = 21], [:country = "المغرب", :method = 21],
+		[:country = "Algeria", :method = 19], [:country = "الجزائر", :method = 19],
+		[:country = "Tunisia", :method = 18], [:country = "تونس", :method = 18],
+		[:country = "UAE", :method = 16], [:country = "الإمارات", :method = 16],
+		[:country = "Kuwait", :method = 9], [:country = "الكويت", :method = 9],
+		[:country = "Qatar", :method = 10], [:country = "قطر", :method = 10],
+		[:country = "Jordan", :method = 23], [:country = "الأردن", :method = 23],
+		[:country = "Singapore", :method = 11], [:country = "سنغافورة", :method = 11],
+		[:country = "France", :method = 12], [:country = "فرنسا", :method = 12],
+		[:country = "Russia", :method = 14], [:country = "روسيا", :method = 14],
+		[:country = "Malaysia", :method = 17], [:country = "ماليزيا", :method = 17],
+		[:country = "Indonesia", :method = 20], [:country = "إندونيسيا", :method = 20],
+		[:country = "USA", :method = 2], [:country = "United States", :method = 2], [:country = "أمريكا", :method = 2],
+		[:country = "UK", :method = 3], [:country = "United Kingdom", :method = 3], [:country = "بريطانيا", :method = 3],
+		[:country = "Pakistan", :method = 1], [:country = "باكستان", :method = 1],
+		[:country = "Iran", :method = 7], [:country = "إيران", :method = 7],
+		[:country = "Portugal", :method = 22], [:country = "البرتغال", :method = 22],
+		[:country = "Worldwide", :method = 15], [:country = "العالم", :method = 15]
+	]
+	nMethod = 3
+	for item in aMethodMap
+		if lower(item[:country]) = lower(cCountry)
+			nMethod = item[:method]
+			exit
+		ok
+	next
+
+	# Construct the API URL with the selected method.
+	cUrl = cPrayerTimesAPI + "?city=" + substr(cCity," ", "%20") + "&country=" + substr(cCountry," ", "%20") + "&method=" + nMethod
+
 	see "Fetching prayer times from: " + cUrl + nl
 	
 	cResponse = ""
@@ -554,3 +599,26 @@ func handleGetPrayerTimes(id, req)
 		ok
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json([:error = cErrorMsg]))
 	ok
+
+# Handles requests from JavaScript to get location using ip-api.com
+func handleGetLocation(id, req)
+	cUrl = "http://ip-api.com/json/"
+	cResponse = ""
+	cCity = ""
+	cCountry = ""
+	try
+		cResponse = download(cUrl)
+		aJson = json2list(cResponse)
+		if isList(aJson)
+			if isString(aJson["city"])
+				cCity = aJson["city"]
+			ok
+			if isString(aJson["country"])
+				cCountry = aJson["country"]
+			ok
+		ok
+	catch
+		cCity = ""
+		cCountry = ""
+	done
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json([:city = cCity, :country = cCountry]))
