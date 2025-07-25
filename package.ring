@@ -72,6 +72,7 @@ aPackageInfo = [
 		"examples/29_notes.ring",
 		"examples/30_bind_many.ring",
 		"examples/31_threaded_counter.ring",
+		"examples/32_tic_tac_toe.ring",
 		"README.md",
 		"docs/REFERENCE.md",
 		"docs/USAGE.md",
