@@ -9,8 +9,7 @@ load "jsonlib.ring"
 oWebView = NULL
 
 func main()
-	# Create a new webview instance using the procedural API.
-	# The '1' enables debug mode, NULL means create a new window.
+	# Create a new webview instance.
 	oWebView = new WebView()
 
 	# Set the title of the webview window.
