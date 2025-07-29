@@ -74,6 +74,7 @@ aPackageInfo = [
 		"examples/31_threaded_counter.ring",
 		"examples/32_tic_tac_toe.ring",
 		"examples/33_webview_all_demo.ring",
+		"examples/34_using_class_methods.ring",
 		"README.md",
 		"docs/REFERENCE.md",
 		"docs/USAGE.md",
