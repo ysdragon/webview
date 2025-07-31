@@ -13,6 +13,11 @@ aWebViewConfig = [
 	:window = NULL
 ]
 
+/*
+ * Internal global list to store objects for method bindings (used by eval in bind()).
+*/
+__aWebViewObjects = []
+
 /**
  * Class WebView: Represents a webview instance for displaying HTML content.
  * Provides methods for binding Ring functions to JavaScript, navigating URLs,
@@ -89,26 +94,75 @@ Class WebView
 		return webview_dispatch(self._pWebView, cCode)
 
 	/**
-	 * Binds a Ring function to a JavaScript function name.
-	 * @param jsName JavaScript function name.
-	 * @param ringFuncName Ring function name.
-	 * @return Binding result pointer.
+	 * Binds a Ring function or object methods to JavaScript.
+	 *
+	 * For simple functions:
+	 *   bind(jsName, ringFuncName)
+	 *
+	 * For object methods:
+	 *   bind(oObject, aMethods)
+	 *
+	 * @param p1 For functions, the JS name. For objects, the Ring object.
+	 * @param p2 For functions, the Ring function name. For objects, a list of method pairs.
+	 * @return Binding result pointer for simple functions, or nothing for objects.
 	 */
-	func bind(jsName, ringFuncName)
+	func bind(p1, p2)
 		if self.isDestroyed()
 			return
 		ok
 
-		aBindResult = webview_bind(self._pWebView, jsName, ringFuncName)
+		# Check for object binding
+		if isObject(p1) and isList(p2)
+			oObject = p1
+			aMethods = p2
 
-		if isPointer(aBindResult)
-			add(self._bindings, aBindResult)
+			# Store object and get its index
+			nObjectIndex = find(__aWebViewObjects, oObject)
+
+			if nObjectIndex = 0
+				add(__aWebViewObjects, ref(oObject))
+				nObjectIndex = len(__aWebViewObjects)
+			ok
+
+			for aMethodInfo in aMethods
+				if isList(aMethodInfo) and len(aMethodInfo) = 2 and isString(aMethodInfo[1]) and isString(aMethodInfo[2])
+					cJSName = aMethodInfo[1]
+					cMethodName = aMethodInfo[2]
+
+					# Create wrapper function
+					cFunc = eval(print2str(`
+						return func (id, req) { __aWebViewObjects[#{nObjectIndex}].#{cMethodName}(id,req) }
+					`))
+
+					# Bind the generated function
+					self.bind(cJSName, cFunc)
+				else
+					see "Warning: Invalid method definition." + nl
+				ok
+			next
+		else
+			# Simple function binding
+			jsName = p1
+			ringFuncName = p2
+			aBindResult = webview_bind(self._pWebView, jsName, ringFuncName)
+
+			if isPointer(aBindResult)
+				add(self._bindings, aBindResult)
+			ok
+			return aBindResult
 		ok
-		return aBindResult
 
 	/**
-	 * Binds multiple Ring functions to JavaScript function names.
-	 * @param aList A list of [jsName, ringFuncName] pairs.
+	 * Binds multiple Ring functions or object methods to JavaScript.
+	 *
+	 * This function accepts a list containing a mix of binding types:
+	 * - For simple functions: `["jsFunctionName", "ringFunctionName"]`
+	 * - For object methods: `[ringObject, [["jsFunctionName", "methodName"], ...]]`
+	 *
+	 * If `aList` is `NULL`, the function will attempt to use a global list
+	 * named `aBindList` as the source of bindings.
+	 *
+	 * @param aList A list of bindings. If `NULL`, uses the global `aBindList`.
 	 */
 	func bindMany(aList)
 		if self.isDestroyed()
