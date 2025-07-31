@@ -82,7 +82,6 @@ func greet(id, req)
     # Return a response to JavaScript
     oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Greeting received by Ring!"')
 
-}
 ```
 
 **JavaScript Code:**
@@ -96,6 +95,67 @@ async function callGreet() {
 <button onclick="callGreet()">Say Hello</button>
 ```
 When the button is clicked, the `greet` function in your Ring code will be called with the argument `'World'`, and the alert will show the response from Ring.
+
+### Binding Object Methods
+
+You can bind specific methods of a Ring object to JavaScript functions.
+
+**Ring Code:**
+```ring
+load "webview.ring"
+
+oCounter = new Counter
+oWebView = new WebView()
+
+oWebView.bind(oCounter, [
+			["getValue", :getValue],
+			["increment", :increment]
+		])
+
+oWebView.setHtml(`
+	<h1>Counter: <span id="counter">0</span></h1>
+	<button onclick="window.increment()">Increment</button>
+	<script>
+		async function updateValue() {
+			const value = await window.getValue();
+			document.getElementById('counter').innerText = value;
+		}
+		updateValue();
+	</script>
+`)
+oWebView.run()
+
+class Counter
+	value = 0
+
+	func getValue(id, req)
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, "" + self.value)
+
+	func increment(id, req)
+		self._value++
+		oWebView.evalJS("document.getElementById('counter').innerText = " + self.value)
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '""')
+```
+
+### Using `bindMany`
+
+You can use `bindMany` to bind multiple functions and object methods at once.
+
+```ring
+aBindList = [
+    # Simple function binding
+    ["showAlert", :showAlert],
+    # Object method binding
+    [oCounter, [
+        ["increment", :increment],
+        ["getValue", :getValue]
+    ]]
+]
+
+# This will be called automatically if `aBindList` is global,
+# or you can call it manually:
+oWebView.bindMany(aBindList)
+```
 
 ### Calling JavaScript from Ring
 
@@ -145,7 +205,7 @@ Here is an example of a simple counter application that demonstrates two-way bin
 load "webview.ring"
 
 # Create a new WebView instance
-oWebView = new WebView(1, NULL)
+oWebView = new WebView()
 
 oWebView {
     setTitle("Counter Example")

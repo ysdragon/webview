@@ -73,23 +73,27 @@ Sets the HTML content of the webview directly.
 
 ---
 
-### `bind(jsName, ringFuncName)`
+### `bind(p1, p2)`
 
-Binds a Ring function to a JavaScript function, allowing it to be called from the webview. When the JavaScript function `jsName` is called, the `ringFuncName` in Ring will be invoked.
+Binds a Ring function or a Ring object's methods to JavaScript.
 
--   **`jsName`**: (String) The name of the function to expose in JavaScript (e.g., `window.myFunction`).
--   **`ringFuncName`**: (String or Function Pointer) The name of the Ring function to call, or an anonymous function (e.g., `:myRingFunction` or `func(id, req) { ... }`). The Ring function receives two arguments:
-    -   `id`: (Number) A unique callback ID used for `wreturn()`.
-    -   `req`: (String) A JSON string containing the arguments passed from JavaScript. This string needs to be parsed in Ring (e.g., using `json2list()`).
+-   **Function Binding**: `bind(jsName, ringFuncName)`
+    -   `jsName` (String): The name of the function to expose in JavaScript (e.g., `myFunc`).
+    -   `ringFuncName` (String | FuncPtr): The name of the Ring function or a function pointer.
+-   **Object Method Binding**: `bind(oObject, aMethods)`
+    -   `oObject` (Object): The Ring object instance whose methods will be bound.
+    -   `aMethods` (List): A list of method pairs to bind. Each pair should be a list containing two strings: `["jsFunctionName", "objectMethodName"]`.
 
 ---
 
 ### `bindMany(aList)`
 
-Binds multiple Ring functions to JavaScript functions in a single call. This is a convenient alternative to calling `bind()` multiple times.
+Binds multiple Ring functions or object methods to JavaScript in a single call.
 
--   **`aList`**: (List, optional) A list of binding pairs, where each pair is a list containing `[jsName, ringFuncName]`.
-    -   If `aList` is not provided (or is `NULL`), the method will look for a global variable named `aBindList` and use it if it exists and is a list. This allows you to define your bindings in a central location.
+-   **`aList`**: (List, optional) A list where each item defines a binding.
+    -   For function binding, an item is a list of two elements: `["jsFunctionName", "ringFunctionName"]`.
+    -   For object method binding, an item is a list containing the object and a list of method pairs: `[oObject, [["jsMethod1", "ringMethod1"], ...]]`.
+    -   If `aList` is `NULL`, it uses the global `aBindList`.
 
 ---
 
