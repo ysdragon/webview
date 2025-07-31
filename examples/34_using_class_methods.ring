@@ -1,7 +1,7 @@
 # Using class methods as a WebView callback
 # This example demonstrates how to use a wrapper function to call class methods
-# from JavaScript callbacks in WebView, automating the process with
-# metaprogramming.
+# Or to call objects directly
+# from JavaScript callbacks in WebView.
 
 load "webview.ring"
 load "jsonlib.ring"
@@ -24,10 +24,15 @@ func main()
 
 	oWebView {
 		setTitle("Using Class Methods")
-		setSize(500, 300, WEBVIEW_HINT_NONE)
+		setSize(500, 400, WEBVIEW_HINT_NONE)
 
 		# Bind the dynamically created wrapper function to a JavaScript function name.
 		bind("callMyMethod", pMyMethod)
+
+		# Direct binding for myOtherMethod using the object instance.
+		bind(oMyClass, [
+			["callMyOtherMethod", "myOtherMethod"]
+		])
 
 		html = `
 			<!DOCTYPE html>
@@ -138,8 +143,9 @@ func main()
 				</div>
 				<div class="main-card">
 					<h1><i class="fa-solid fa-code-branch"></i> Calling Ring Class Methods</h1>
-					<p>This button will call a method on a Ring object instance via a dynamic wrapper.</p>
-					<button onclick="callRingMethod()"><i class="fa-solid fa-bolt"></i> Call myClass.myMethod()</button>
+					<p>This button will call a method on a Ring object instance via a dynamic wrapper. The new button demonstrates direct binding.</p>
+					<button onclick="callRingMethod()"><i class="fa-solid fa-bolt"></i> Call myClass.myMethod() (Wrapper)</button>
+					<button onclick="callRingOtherMethod()"><i class="fa-solid fa-magic"></i> Call myClass.myOtherMethod() (Direct)</button>
 					<div id="response"></div>
 				</div>
 				<script>
@@ -148,6 +154,17 @@ func main()
 						responseDiv.innerText = 'Calling Ring method...';
 						try {
 							const response = await window.callMyMethod('Some data from JavaScript');
+							responseDiv.innerText = 'Response from Ring: ' + response;
+						} catch (e) {
+							responseDiv.innerText = 'Error: ' + e;
+						}
+					}
+
+					async function callRingOtherMethod() {
+						const responseDiv = document.getElementById('response');
+						responseDiv.innerText = 'Calling Ring method directly...';
+						try {
+							const response = await window.callMyOtherMethod('Another data from JavaScript');
 							responseDiv.innerText = 'Response from Ring: ' + response;
 						} catch (e) {
 							responseDiv.innerText = 'Error: ' + e;
@@ -193,4 +210,10 @@ class myClass
 		# Send a response back to the JavaScript promise.
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello back from myClass.myMethod!"')
 
-
+	func myOtherMethod(id, req)
+		? "Method myClass.myOtherMethod() called directly from JavaScript."
+		aReq = json2list(req)
+		cDataFromJS = aReq[1]
+		? "  Callback ID: " + id
+		see "  Data from JS: " see cDataFromJS
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello back from myClass.myOtherMethod! (Direct Bind)"')
