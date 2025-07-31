@@ -132,7 +132,7 @@ class Counter
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, "" + self.value)
 
 	func increment(id, req)
-		self._value++
+		self.value++
 		oWebView.evalJS("document.getElementById('counter').innerText = " + self.value)
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '""')
 ```
