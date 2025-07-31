@@ -28,6 +28,11 @@ aPackageInfo = [
 			:name = "markdown",
 			:version = "1.1.0",
 			:providerusername = "ysdragon"
+		],
+		[
+			:name = "dialog",
+			:version = "1.0.0",
+			:providerusername = "ysdragon"
 		]
 	],
 	:files = 	[
