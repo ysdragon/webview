@@ -39,6 +39,7 @@ jobs:
       with:
         repository: ring-lang/ring
         path: ring
+        ref: v1.23
 
     - name: Configure and Build Ring Language for ${{ matrix.arch_name }}
       shell: cmd
