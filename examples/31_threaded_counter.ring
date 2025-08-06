@@ -213,7 +213,7 @@ func toggleCounter(id, req)
 func runCounterThread()
 	while bRunCounter
 		nCounter++
-		oWebView.evalJS("document.getElementById('counter').innerText = " + nCounter)
+		oWebView.dispatch(`oWebView.evalJS("document.getElementById('counter').innerText = " + nCounter)`)
 		sleep(0.1) # Sleep for 100ms
 	end
 	see "Ring: Counter thread finished execution." + nl
