@@ -98,14 +98,8 @@ void ring_webview_dispatch_callback(webview_t w, void *arg)
 
 	RingWebViewDispatch *pDispatch = (RingWebViewDispatch *)arg;
 
-	// Mutex Lock for thread safety
-	ring_vm_mutexlock(pDispatch->pVM);
-
 	// Execute the Ring code
-	ring_vm_runcode(pDispatch->pVM, pDispatch->cCode);
-
-	// Mutex Unlock
-	ring_vm_mutexunlock(pDispatch->pVM);
+	ring_vm_runcodefromthread(pDispatch->pVM, pDispatch->cCode);
 
 	// Free the allocated memory
 	ring_state_free(pDispatch->pVM->pRingState, pDispatch->cCode);
