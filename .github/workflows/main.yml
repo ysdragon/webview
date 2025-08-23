@@ -68,7 +68,7 @@ jobs:
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add lib
         if ! git diff --staged --quiet; then
-          git commit -m "Update libs from all builds"
+          git commit -m "* Update libs"
           git push
         else
           echo "No library changes to commit."
