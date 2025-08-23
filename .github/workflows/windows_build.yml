@@ -1,32 +1,25 @@
 name: Windows Build
 
 on:
-  push:
-    paths:
-      - '**.c'
-      - '**.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/windows_build.yml'
-  pull_request:
-    paths:
-      - '**.c'
-      - '**.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/windows_build.yml'
+  workflow_call:
+    inputs:
+      ring-version:
+        required: true
+        type: string
 
 jobs:
   build:
     runs-on: windows-latest
-    
+
     strategy:
       matrix:
         include:
-          - arch: Win32
-            arch_name: i386
-          - arch: x64
-            arch_name: amd64
-          - arch: ARM64
-            arch_name: arm64
+        - arch: Win32
+          arch_name: i386
+        - arch: x64
+          arch_name: amd64
+        - arch: ARM64
+          arch_name: arm64
 
     steps:
     - name: Checkout ring-webview
@@ -39,7 +32,7 @@ jobs:
       with:
         repository: ring-lang/ring
         path: ring
-        ref: v1.23
+        ref: ${{ inputs.ring-version }}
 
     - name: Configure and Build Ring Language for ${{ matrix.arch_name }}
       shell: cmd

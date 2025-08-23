@@ -1,18 +1,11 @@
 name: FreeBSD Build
 
 on:
-  push:
-    paths:
-    - '**.c'
-    - '**.h'
-    - '**/CMakeLists.txt'
-    - '.github/workflows/freebsd_build.yml'
-  pull_request:
-    paths:
-    - '**.c'
-    - '**.h'
-    - '**/CMakeLists.txt'
-    - '.github/workflows/freebsd_build.yml'
+  workflow_call:
+    inputs:
+      ring-version:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -47,7 +40,7 @@ jobs:
 
         run: |
           # Clone Ring Language
-          git clone --branch v1.23 --depth 1 https://github.com/ring-lang/ring.git ring
+          git clone --branch ${{ inputs.ring-version }} --depth 1 https://github.com/ring-lang/ring.git ring
           cd ring
 
           # Set RING environment variable

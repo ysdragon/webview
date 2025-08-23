@@ -1,18 +1,11 @@
 name: Ubuntu Build
 
 on:
-  push:
-    paths:
-    - '**.c'
-    - '**.h'
-    - '**/CMakeLists.txt'
-    - '.github/workflows/ubuntu_build.yml'
-  pull_request:
-    paths:
-    - '**.c'
-    - '**.h'
-    - '**/CMakeLists.txt'
-    - '.github/workflows/ubuntu_build.yml'
+  workflow_call:
+    inputs:
+      ring-version:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -43,7 +36,7 @@ jobs:
       with:
         repository: ring-lang/ring
         path: ring
-        ref: v1.23
+        ref: ${{ inputs.ring-version }}
 
     - name: Build and Install Ring Language
       run: |
