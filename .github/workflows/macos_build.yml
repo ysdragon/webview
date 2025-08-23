@@ -3,16 +3,16 @@ name: macOS Build
 on:
   push:
     paths:
-      - '**.c'
-      - '**.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/macos_build.yml'
+    - '**.c'
+    - '**.h'
+    - '**/CMakeLists.txt'
+    - '.github/workflows/macos_build.yml'
   pull_request:
     paths:
-      - '**.c'
-      - '**.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/macos_build.yml'
+    - '**.c'
+    - '**.h'
+    - '**/CMakeLists.txt'
+    - '.github/workflows/macos_build.yml'
 
 jobs:
   build:
@@ -20,12 +20,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-13
-            arch: amd64
-            name: macos-amd64
-          - os: macos-latest
-            arch: arm64
-            name: macos-arm64
+        - os: macos-13
+          arch: amd64
+          name: macos-amd64
+        - os: macos-latest
+          arch: arm64
+          name: macos-arm64
 
     steps:
     - name: Checkout ring-webview
@@ -38,6 +38,7 @@ jobs:
       with:
         repository: ring-lang/ring
         path: ring
+        ref: v1.23
 
     - name: Build and Install Ring Language
       run: |

@@ -3,16 +3,16 @@ name: Ubuntu Build
 on:
   push:
     paths:
-      - '**.c'
-      - '**.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/ubuntu_build.yml'
+    - '**.c'
+    - '**.h'
+    - '**/CMakeLists.txt'
+    - '.github/workflows/ubuntu_build.yml'
   pull_request:
     paths:
-      - '**.c'
-      - '**.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/ubuntu_build.yml'
+    - '**.c'
+    - '**.h'
+    - '**/CMakeLists.txt'
+    - '.github/workflows/ubuntu_build.yml'
 
 jobs:
   build:
@@ -20,12 +20,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-24.04
-            arch: amd64
-            name: ubuntu-24.04-amd64
-          - os: ubuntu-24.04-arm
-            arch: arm64
-            name: ubuntu-24.04-arm64
+        - os: ubuntu-24.04
+          arch: amd64
+          name: ubuntu-24.04-amd64
+        - os: ubuntu-24.04-arm
+          arch: arm64
+          name: ubuntu-24.04-arm64
 
     steps:
     - name: Install dependencies
@@ -43,6 +43,7 @@ jobs:
       with:
         repository: ring-lang/ring
         path: ring
+        ref: v1.23
 
     - name: Build and Install Ring Language
       run: |

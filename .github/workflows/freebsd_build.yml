@@ -3,16 +3,16 @@ name: FreeBSD Build
 on:
   push:
     paths:
-      - '**.c'
-      - '**.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/freebsd_build.yml'
+    - '**.c'
+    - '**.h'
+    - '**/CMakeLists.txt'
+    - '.github/workflows/freebsd_build.yml'
   pull_request:
     paths:
-      - '**.c'
-      - '**.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/freebsd_build.yml'
+    - '**.c'
+    - '**.h'
+    - '**/CMakeLists.txt'
+    - '.github/workflows/freebsd_build.yml'
 
 jobs:
   build:
@@ -20,14 +20,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - release: "14.3"
-            arch: amd64
-            arch_name: amd64
-            name: freebsd-amd64
-          - release: "14.3"
-            arch: aarch64
-            arch_name: arm64
-            name: freebsd-arm64
+        - release: "14.3"
+          arch: amd64
+          arch_name: amd64
+          name: freebsd-amd64
+        - release: "14.3"
+          arch: aarch64
+          arch_name: arm64
+          name: freebsd-arm64
 
     steps:
     - uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
 
         run: |
           # Clone Ring Language
-          git clone --depth 1 https://github.com/ring-lang/ring.git ring
+          git clone --branch v1.23 --depth 1 https://github.com/ring-lang/ring.git ring
           cd ring
 
           # Set RING environment variable
@@ -58,7 +58,7 @@ jobs:
           cmake . -DCMAKE_BUILD_TYPE=Release -GNinja
           ninja install
           cd ../..
-          
+
           rm -rf lib
 
           # Build ring-webview lib
