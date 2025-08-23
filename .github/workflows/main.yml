@@ -1,0 +1,77 @@
+name: Build and Update
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+    - '**.c'
+    - '**.h'
+    - '**/CMakeLists.txt'
+    - '.github/workflows/**'
+  pull_request:
+    paths:
+    - '**.c'
+    - '**.h'
+    - '**/CMakeLists.txt'
+    - '.github/workflows/**'
+
+jobs:
+  freebsd:
+    uses: ./.github/workflows/freebsd_build.yml
+    with:
+      ring-version: v1.23
+
+  macos:
+    uses: ./.github/workflows/macos_build.yml
+    with:
+      ring-version: v1.23
+
+  ubuntu:
+    uses: ./.github/workflows/ubuntu_build.yml
+    with:
+      ring-version: v1.23
+
+  windows:
+    uses: ./.github/workflows/windows_build.yml
+    with:
+      ring-version: v1.23
+
+  update-libs:
+    runs-on: ubuntu-latest
+    needs: [ freebsd, macos, ubuntu, windows ]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts from this workflow run
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Copy artifacts to lib directory
+      run: |
+        mkdir -p lib
+        for artifact_dir in artifacts/*/; do
+          if [ -d "$artifact_dir" ]; then
+            cp -a "${artifact_dir}." "lib/"
+          fi
+        done
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add lib
+        if ! git diff --staged --quiet; then
+          git commit -m "Update libs from all builds"
+          git push
+        else
+          echo "No library changes to commit."
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
