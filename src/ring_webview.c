@@ -23,6 +23,18 @@ typedef struct RingWebViewDispatch
 	char *cCode;
 } RingWebViewDispatch;
 
+// Duplicate a C string using ring_state_malloc and return the new string
+static char *ring_webview_string_strdup(void *pState, const char *cStr)
+{
+	char *cString;
+	unsigned int x, nSize;
+	nSize = strlen(cStr);
+	cString = (char *)ring_state_malloc(pState, nSize + RING_ONE);
+	RING_MEMCPY(cString, cStr, nSize);
+	cString[nSize] = '\0';
+	return cString;
+}
+
 // The C callback that webview will call from JavaScript
 void ring_webview_bind_callback(const char *id, const char *req, void *arg)
 {
@@ -148,7 +160,7 @@ RING_FUNC(ring_webview_dispatch)
 		return;
 	}
 	pDispatch->pVM = (VM *)pPointer;
-	pDispatch->cCode = ring_string_strdup(RING_API_STATE, cCodeToRun);
+	pDispatch->cCode = ring_webview_string_strdup(RING_API_STATE, cCodeToRun);
 	if (pDispatch->cCode == NULL)
 	{
 		RING_API_FREE(pDispatch);
@@ -194,7 +206,7 @@ RING_FUNC(ring_webview_bind)
 	}
 
 	pBind->pVM = (VM *)pPointer;
-	pBind->cFunc = ring_string_strdup(RING_API_STATE, ring_func_name);
+	pBind->cFunc = ring_webview_string_strdup(RING_API_STATE, ring_func_name);
 	if (pBind->cFunc == NULL)
 	{
 		RING_API_FREE(pBind);
