@@ -7,7 +7,7 @@
 Create beautiful, cross-platform desktop apps with Ring and web technologies.
 
 [language-ring]: https://img.shields.io/badge/language-Ring-2D54CB.svg?style=for-the-badge&labelColor=414868
-[build-status]: https://img.shields.io/github/actions/workflow/status/ysdragon/webview/ubuntu_build.yml?branch=main&label=build&style=for-the-badge&labelColor=414868&logoColor=C0CAF5&color=8c73cc
+[build-status]: https://img.shields.io/github/actions/workflow/status/ysdragon/webview/main.yml?branch=main&label=build&style=for-the-badge&labelColor=414868&logoColor=C0CAF5&color=8c73cc
 [last-commit]: https://img.shields.io/github/last-commit/ysdragon/webview?style=for-the-badge&logo=github&logoColor=C0CAF5&labelColor=414868&color=8c73cc
 [release-version]: https://img.shields.io/github/v/release/ysdragon/webview?style=for-the-badge&logo=webtrees&logoColor=C0CAF5&labelColor=414868&color=7664C6
 [license]: https://img.shields.io/github/license/ysdragon/webview?style=for-the-badge&logo=opensourcehardware&label=License&logoColor=C0CAF5&labelColor=414868&color=8c73cc
