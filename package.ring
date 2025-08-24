@@ -15,8 +15,23 @@ aPackageInfo = [
 	],
 	:libs = 	[
 		[
+			:name = "dialog",
+			:version = "1.0.0",
+			:providerusername = "ysdragon"
+		],
+		[
 			:name = "jsonlib",
 			:version = "1.0.16",
+			:providerusername = "ringpackages"
+		],
+		[
+			:name = "markdown",
+			:version = "1.1.0",
+			:providerusername = "ysdragon"
+		],
+		[
+			:name = "ringthreads",
+			:version = "1.0.6",
 			:providerusername = "ringpackages"
 		],
 		[
@@ -25,14 +40,9 @@ aPackageInfo = [
 			:providerusername = "ysdragon"
 		],
 		[
-			:name = "markdown",
-			:version = "1.1.0",
-			:providerusername = "ysdragon"
-		],
-		[
-			:name = "dialog",
-			:version = "1.0.0",
-			:providerusername = "ysdragon"
+			:name = "weblib",
+			:version = "1.0.7",
+			:providerusername = "ringpackages"
 		]
 	],
 	:files = 	[
