@@ -61,6 +61,7 @@ void ring_webview_bind_callback(const char *id, const char *req, void *arg)
 		// Function not found; clean up and return.
 		pVM->nSP = nSP_before;
 		pVM->nFuncSP = nFuncSP_before;
+		ring_vm_mutexunlock(pVM);
 		return;
 	}
 
