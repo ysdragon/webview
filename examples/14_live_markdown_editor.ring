@@ -14,6 +14,12 @@ oMarkdown.setFlags(MD_FLAG_TABLES | MD_FLAG_STRIKETHROUGH | MD_FLAG_TASKLISTS | 
 aBindList = [
 	["updateMarkdown", :handleMarkdownUpdate]  # Bind the updateMarkdown function to handle Markdown updates
 ]
+cRingDefinition = NULL
+try
+	cRingDefinition = read("assets/ring.js")
+catch
+	cRingDefinition = "function ring(code) { return code; }"
+done
 
 func main()
 	# Create a new WebView instance.
@@ -41,9 +47,8 @@ func loadEditorHTML()
 	<head>
 		<title>Live Markdown Editor</title>
 		<meta charset="UTF-8">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 		<style>
-			@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;600&display=swap');
-
 			:root {
 				--gh-bg-color: #0d1117;
 				--gh-text-color: #c9d1d9;
@@ -230,23 +235,23 @@ func loadEditorHTML()
 			<textarea id="editor" class="pane" placeholder="Type your Markdown here..."></textarea>
 			<div id="preview" class="pane"></div>
 		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+		<script>` + cRingDefinition + `</script>
 		<script>
+			hljs.registerLanguage("ring", ring);
 			const editor = document.getElementById('editor');
 			const preview = document.getElementById('preview');
 
 			editor.addEventListener('keydown', (e) => {
 				if (e.key === 'Tab') {
-					e.preventDefault(); // Prevent default tab behavior (focusing next element)
+					e.preventDefault();
 					const start = editor.selectionStart;
 					const end = editor.selectionEnd;
 
-					// Insert two spaces for a tab
 					editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
 
-					// Move cursor to the new position
 					editor.selectionStart = editor.selectionEnd = start + 2;
 
-					// Manually trigger input event to update preview
 					editor.dispatchEvent(new Event('input'));
 				}
 			});
@@ -255,6 +260,7 @@ func loadEditorHTML()
 				try {
 					const htmlContent = await window.updateMarkdown(editor.value);
 					preview.innerHTML = htmlContent;
+					hljs.highlightAll();
 				} catch (e) {
 					console.error("Error updating preview:", e);
 					preview.innerHTML = "<p style='color: #ef4444;'>Error processing Markdown.</p>";
@@ -273,14 +279,14 @@ func loadEditorHTML()
 func handleMarkdownUpdate(id, req)
 	req = json2list(req)[1]
 	
-	// Correctly parse the JSON request string into a Ring list
+	# Parse the JSON request string into a Ring list
 	cMarkdownText = req[1]
 
-	// Convert Markdown to HTML using our library
+	# Convert Markdown to HTML using our library
 	cRenderedHTML = oMarkdown.toHTML(cMarkdownText)
 	crenderedHTML = escape_json_string(cRenderedHTML)
 
-	// Return the generated HTML back to the JavaScript promise.
+	# Return the generated HTML back to the JavaScript promise.
 	cJsonResult = '"' + crenderedHTML + '"'
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult)
 
