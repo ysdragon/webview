@@ -20,7 +20,7 @@ func main()
 		# Set the title of the webview window.
 		setTitle("RingFetch - System Information Dashboard")
 		# Set the size of the webview window (no size constraint).
-		setSize(800, 700, WEBVIEW_HINT_FIXED)
+		setSize(800, 700, WEBVIEW_HINT_NONE)
 
 		# Bind Ring functions to be callable from JavaScript.
 		# `getSystemData` will fetch and return system information.
@@ -46,39 +46,43 @@ func loadFetchHTML()
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext x="-5" y="90" font-size="90"%3E🚀%3C/text%3E%3C/svg%3E" type="image/svg+xml">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" referrerpolicy="no-referrer" />
 		<style>
-			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap");
+			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap");
 			:root {
-				--bg-color: #000000;
-				--sidebar-bg: transparent;
-				--tab-bg: rgba(30, 30, 32, 0.6);
-				--tab-active-bg: rgba(59, 130, 246, 0.2);
-				--border-color: rgba(255, 255, 255, 0.1);
-				--text-primary: #f8fafc;
-				--text-secondary: #a1a1aa;
-				--accent-cyan: #22d3ee;
-				--accent-purple: #c084fc;
-				--accent-green: #4ade80;
-				--accent-yellow: #facc15;
-				--accent-red: #f87171;
-				--sidebar-width: 20%; /* Changed to percentage for flexibility */
+				--bg-primary: #0f172a;
+				--bg-secondary: #1e293b;
+				--card-bg: rgba(15, 23, 42, 0.8);
+				--card-border: rgba(148, 163, 184, 0.1);
+				--text-primary: #f1f5f9;
+				--text-secondary: #94a3b8;
+				--text-muted: #64748b;
+				--accent-primary: #3b82f6;
+				--accent-secondary: #8b5cf6;
+				--accent-success: #10b981;
+				--accent-warning: #f59e0b;
+				--accent-danger: #ef4444;
+				--accent-cyan: #06b6d4;
+				--shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+				--blur-sm: 4px;
+				--blur-md: 12px;
+				--blur-lg: 16px;
+				--sidebar-width: 280px;
 			}
 			:root.light-mode {
-				--bg-color: #f0f2f5;
-				--sidebar-bg: #ffffff;
-				--tab-bg: rgba(220, 222, 224, 0.6);
-				--tab-active-bg: rgba(147, 197, 253, 0.2);
-				--border-color: rgba(0, 0, 0, 0.1);
-				--text-primary: #1a202c;
-				--text-secondary: #4a5568;
+				--bg-primary: #f8fafc;
+				--bg-secondary: #ffffff;
+				--card-bg: rgba(255, 255, 255, 0.8);
+				--card-border: rgba(148, 163, 184, 0.2);
+				--text-primary: #1e293b;
+				--text-secondary: #475569;
+				--text-muted: #64748b;
+				--accent-primary: #3b82f6;
+				--accent-secondary: #8b5cf6;
+				--accent-success: #10b981;
+				--accent-warning: #f59e0b;
+				--accent-danger: #ef4444;
 				--accent-cyan: #06b6d4;
-				--accent-purple: #9333ea;
-				--accent-green: #10b981;
-				--accent-yellow: #f59e0b;
-				--accent-red: #ef4444;
-				--light-gradient-start: rgba(240, 242, 245, 0.8);
-				--light-gradient-end: rgba(255, 255, 255, 0.8);
 			}
 			:root.dark-mode {
 				--dark-gradient-start: rgba(0, 0, 0, 0.8);
@@ -86,106 +90,151 @@ func loadFetchHTML()
 			}
 			body {
 				font-family: "Inter", sans-serif;
-				background-color: var(--bg-color);
+				background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 				color: var(--text-primary);
 				margin: 0;
+				padding: 0;
 				min-height: 100vh;
 				overflow-x: hidden;
 				position: relative;
-				transition: background-color 0.3s ease, color 0.3s ease;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 			}
 			.background-container {
 				position: fixed; top: 0; left: 0; width: 100%; height: 100%;
 				z-index: -1; overflow: hidden;
 			}
 			.aurora {
-				position: relative; width: 100%; height: 100%;
-				filter: blur(150px); opacity: 0.5;
-				animation: aurora-move 20s infinite alternate;
+				position: relative;
+				width: 100%;
+				height: 100%;
+				filter: blur(120px);
+				opacity: 0.4;
 			}
 			.aurora-shape1 {
-				position: absolute; width: 50vw; height: 50vh;
-				background: radial-gradient(circle, var(--accent-cyan), transparent 60%);
-				top: 5%; left: 5%;
+				position: absolute;
+				width: 60vw;
+				height: 60vh;
+				background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.2) 40%, transparent 70%);
+				top: -10%;
+				left: -15%;
+				animation: aurora-drift 20s ease-in-out infinite;
 			}
 			.aurora-shape2 {
-				position: absolute; width: 40vw; height: 40vh;
-				background: radial-gradient(circle, var(--accent-purple), transparent 60%);
-				bottom: 10%; right: 10%;
+				position: absolute;
+				width: 50vw;
+				height: 50vh;
+				background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.25) 0%, rgba(16, 185, 129, 0.15) 50%, transparent 70%);
+				bottom: -10%;
+				right: -15%;
+				animation: aurora-drift 25s ease-in-out infinite reverse;
 			}
-			@keyframes aurora-move {
-				0% { transform: translate(0, 0); }
-				50% { transform: translate(5%, 5%); }
-				100% { transform: translate(0, 0); }
+			@keyframes aurora-drift {
+				0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+				25% { transform: translate(10px, -15px) rotate(1deg) scale(1.05); }
+				50% { transform: translate(-5px, 10px) rotate(-0.5deg) scale(0.95); }
+				75% { transform: translate(-15px, -5px) rotate(0.5deg) scale(1.02); }
 			}
 			
-			.app-layout { display: flex; min-height: 100vh; }
+			.app-layout { 
+				display: flex; 
+				min-height: 100vh;
+				gap: 0;
+			}
 			.sidebar {
-				/* width: var(--sidebar-width); Removed fixed width for flexibility */
-				background: linear-gradient(to bottom, var(--sidebar-bg), var(--sidebar-bg)),
-							linear-gradient(to bottom, var(--dark-gradient-start, rgba(0,0,0,0.8)), var(--dark-gradient-end, rgba(20,20,25,0.8)));
-				background-blend-mode: overlay;
-				padding: 1.5em;
+				width: var(--sidebar-width);
+				min-width: var(--sidebar-width);
+				background: var(--card-bg);
+				padding: clamp(1rem, 3vw, 2rem);
 				flex-shrink: 0;
 				display: flex;
 				flex-direction: column;
 				box-sizing: border-box;
-				border-right: 1px solid var(--border-color);
-			}
-			.light-mode .sidebar {
-				background: linear-gradient(to bottom, var(--light-gradient-start), var(--light-gradient-end));
+				border-right: 1px solid var(--card-border);
+				backdrop-filter: blur(var(--blur-lg));
+				-webkit-backdrop-filter: blur(var(--blur-lg));
+				box-shadow: var(--shadow-lg);
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 			}
 			.sidebar-header {
-				padding: 0 0.5em; margin-bottom: 2em;
-				display: flex; align-items: center; gap: 0.75em;
+				padding: 0 0.5rem;
+				margin-bottom: 2rem;
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
 			}
-			.sidebar-header i { font-size: 1.8em; color: var(--accent-cyan); }
-			.sidebar-header h1 { font-size: 1.5em; margin: 0; }
+			.sidebar-header i {
+				font-size: clamp(1.5rem, 4vw, 1.8rem);
+				color: var(--accent-cyan);
+			}
+			.sidebar-header h1 {
+				font-size: clamp(1.25rem, 4vw, 1.5rem);
+				margin: 0;
+				font-weight: 700;
+				letter-spacing: -0.025em;
+			}
 			
 			.nav-tabs {
 				display: flex; flex-direction: column; gap: 0.75em;
 				position: relative;
 			}
 			.tab-btn {
-				display: flex; align-items: center; gap: 1em;
-				padding: 0.9em 1.2em;
-				background-color: var(--tab-bg);
-				border: 1px solid var(--border-color);
-				border-radius: 10px;
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.25rem);
+				background: rgba(148, 163, 184, 0.05);
+				border: 1px solid var(--card-border);
+				border-radius: 12px;
 				color: var(--text-secondary);
-				font-size: 1em; font-weight: 500;
-				cursor: pointer; text-align: left;
-				transition: all 0.2s ease-in-out, background-color 0.3s ease;
-				backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+				font-size: clamp(0.9rem, 2.5vw, 1rem);
+				font-weight: 500;
+				cursor: pointer;
+				text-align: left;
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+				backdrop-filter: blur(var(--blur-md));
+				-webkit-backdrop-filter: blur(var(--blur-md));
 				position: relative;
 				z-index: 2;
 			}
 			.tab-btn:hover {
-				transform: translateY(-3px);
+				transform: translateY(-2px);
 				color: var(--text-primary);
-				box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+				background: rgba(59, 130, 246, 0.1);
+				border-color: var(--accent-primary);
+				box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
 			}
 			.tab-btn.active {
 				color: var(--text-primary);
-				box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+				background: rgba(59, 130, 246, 0.15);
+				border-color: var(--accent-primary);
+				box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
 			}
-			.tab-btn i { width: 24px; text-align: center; font-size: 1.1em; }
+			.tab-btn i {
+				width: 24px;
+				text-align: center;
+				font-size: clamp(1rem, 2.5vw, 1.1rem);
+			}
 
 			.active-pill {
 				position: absolute;
 				left: 0;
 				width: 100%;
-				background-color: var(--tab-active-bg);
-				border: 1px solid var(--accent-cyan);
-				border-radius: 10px;
+				background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.1));
+				border: 1px solid var(--accent-primary);
+				border-radius: 12px;
 				z-index: 1;
-				transition: top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
-				box-shadow: 0 4px 15px rgba(34, 211, 238, 0.2); /* Cyan glow */
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
+				backdrop-filter: blur(var(--blur-sm));
 			}
 
 			.content-area {
-				flex-grow: 1; padding: 2em;
-				overflow-y: auto; min-height: 100vh; box-sizing: border-box;
+				flex: 1;
+				padding: clamp(1rem, 3vw, 2rem);
+				overflow-y: auto;
+				min-height: 100vh;
+				box-sizing: border-box;
+				max-width: calc(100vw - var(--sidebar-width));
 			}
 			.content-page { display: none; animation: fadeIn 0.6s ease-out forwards; }
 			.content-page.active { display: block; }
@@ -194,53 +243,126 @@ func loadFetchHTML()
 				to { opacity: 1; transform: translateY(0); }
 			}
  
-			 .section-container {
-				background-color: rgba(0,0,0,0.2);
-				padding: 1.5em;
-				border-radius: 12px;
-				margin-bottom: 2em;
-				border: 1px solid var(--border-color);
-				backdrop-filter: blur(8px);
-				-webkit-backdrop-filter: blur(8px);
-				box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-				transition: transform 0.2s ease, box-shadow 0.2s ease;
+			.section-container {
+				background: var(--card-bg);
+				padding: clamp(1.25rem, 3vw, 2rem);
+				border-radius: 16px;
+				margin-bottom: clamp(1.5rem, 4vw, 2rem);
+				border: 1px solid var(--card-border);
+				backdrop-filter: blur(var(--blur-lg));
+				-webkit-backdrop-filter: blur(var(--blur-lg));
+				box-shadow: var(--shadow-lg);
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+				position: relative;
+				overflow: hidden;
 			}
 			.section-container:hover {
-				transform: translateY(-5px);
-				box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-			}
-			.light-mode .section-container {
-				background-color: rgba(255,255,255,0.7);
-				box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-			}
-			.light-mode .section-container:hover {
-				box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+				transform: translateY(-4px);
+				box-shadow: var(--shadow-lg), 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+				border-color: rgba(59, 130, 246, 0.3);
 			}
 			.section-title {
-				font-size: 1.3em;
+				font-size: clamp(1.1rem, 3vw, 1.4rem);
 				color: var(--text-primary);
-				margin-bottom: 1em;
-				border-bottom: 1px solid var(--border-color);
-				padding-bottom: 0.5em;
+				margin-bottom: 1.5rem;
+				border-bottom: 1px solid var(--card-border);
+				padding-bottom: 0.75rem;
+				font-weight: 600;
+				letter-spacing: -0.025em;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
 			}
-			.info-grid { display: grid; grid-template-columns: 120px 1fr; gap: 0.8em 1.5em; align-items: center; }
-			.info-grid.half-width { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-			.label { font-weight: 500; color: var(--text-secondary); text-align: left; }
-			.value { font-family: "Fira Code", monospace; color: var(--text-primary); overflow-wrap: break-word; }
+			.info-grid {
+				display: grid;
+				grid-template-columns: minmax(120px, auto) 1fr;
+				gap: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+				align-items: center;
+			}
+			.info-grid.half-width {
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			}
+			.label {
+				font-weight: 500;
+				color: var(--text-secondary);
+				text-align: left;
+				font-size: clamp(0.9rem, 2.5vw, 1rem);
+			}
+			.value {
+				font-family: "Fira Code", monospace;
+				color: var(--text-primary);
+				overflow-wrap: break-word;
+				font-size: clamp(0.85rem, 2vw, 0.95rem);
+				padding: 0.5rem 0.75rem;
+				background: rgba(148, 163, 184, 0.05);
+				border-radius: 8px;
+				border: 1px solid var(--card-border);
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+				cursor: pointer;
+				position: relative;
+				user-select: none;
+			}
+			.value:hover {
+				background: rgba(59, 130, 246, 0.1);
+				border-color: var(--accent-primary);
+				transform: translateY(-1px);
+				box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+			}
+			.value::after {
+				content: "Click to copy";
+				position: absolute;
+				top: -2.5rem;
+				left: 50%;
+				transform: translateX(-50%);
+				background: rgba(0, 0, 0, 0.9);
+				color: white;
+				padding: 0.4rem 0.8rem;
+				border-radius: 6px;
+				font-size: 0.75rem;
+				white-space: nowrap;
+				opacity: 0;
+				visibility: hidden;
+				transition: all 0.2s ease;
+				pointer-events: none;
+				z-index: 100;
+				font-family: "Inter", sans-serif;
+			}
+			.value:hover::after {
+				opacity: 1;
+				visibility: visible;
+				transform: translateX(-50%) translateY(-5px);
+			}
 			.progress-bar {
-				background-color: rgba(0,0,0,0.3); border-radius: 8px;
-				height: 1.75em; width: 100%; overflow: hidden;
-				border: 1px solid var(--border-color);
-				position: relative; display: flex; align-items: center; justify-content: center;
+				background: rgba(148, 163, 184, 0.1);
+				border-radius: 12px;
+				height: 2rem;
+				width: 100%;
+				overflow: hidden;
+				border: 1px solid var(--card-border);
+				position: relative;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				backdrop-filter: blur(var(--blur-sm));
 			}
 			.progress-fill {
-				background-color: var(--accent-green);
-				height: 100%; position: absolute; top: 0; left: 0;
-				transition: width 0.5s ease-out, background-color 0.5s ease-out;
+				background: linear-gradient(90deg, var(--accent-success), var(--accent-cyan));
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+				border-radius: 12px;
+				box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
 			}
 			.progress-text {
-				position: relative; z-index: 1; font-size: 0.85em; font-weight: 700;
-				color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+				position: relative;
+				z-index: 1;
+				font-size: clamp(0.8rem, 2vw, 0.9rem);
+				font-weight: 600;
+				color: var(--text-primary);
+				text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+				font-family: "Fira Code", monospace;
 			}
 			.list-item { margin-bottom: 1em; }
 			.list-header {
@@ -274,6 +396,65 @@ func loadFetchHTML()
 				scrollbar-width: thin;
 				scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
 			}
+			@media (max-width: 768px) {
+				.app-layout {
+					flex-direction: column;
+				}
+				.sidebar {
+					width: 100%;
+					min-width: 100%;
+					border-right: none;
+					border-bottom: 1px solid var(--card-border);
+					padding: 1rem;
+				}
+				.nav-tabs {
+					flex-direction: row;
+					gap: 0.5rem;
+					overflow-x: auto;
+					padding: 0.5rem 0;
+				}
+				.tab-btn {
+					flex-shrink: 0;
+					min-width: fit-content;
+					padding: 0.75rem 1rem;
+				}
+				.tab-btn span {
+					display: none;
+				}
+				.content-area {
+					max-width: 100vw;
+					padding: 1rem;
+				}
+				.info-grid {
+					grid-template-columns: 1fr;
+					gap: 0.5rem;
+				}
+				.label {
+					font-weight: 600;
+					margin-bottom: 0.25rem;
+				}
+				.value::after {
+					content: "Tap to copy";
+				}
+			}
+				@media (max-width: 480px) {
+					.sidebar {
+						padding: 0.75rem;
+					}
+					.sidebar-header {
+						margin-bottom: 1rem;
+					}
+					.tab-btn {
+						padding: 0.5rem;
+					}
+					.section-container {
+						padding: 1rem;
+						margin-bottom: 1rem;
+					}
+					.progress-bar {
+						height: 1.5rem;
+					}
+				}
  
 			#loading-overlay {
 				position: fixed;
@@ -281,26 +462,27 @@ func loadFetchHTML()
 				left: 0;
 				width: 100%;
 				height: 100%;
-				background-color: var(--bg-color);
+				background: var(--bg-primary);
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
 				align-items: center;
 				z-index: 1000;
-				transition: opacity 0.5s ease-out;
+				transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 			}
 			#loading-overlay.hidden {
 				opacity: 0;
+				visibility: hidden;
 				pointer-events: none;
 			}
 			.spinner {
-				border: 4px solid rgba(255, 255, 255, 0.3);
-				border-top: 4px solid var(--accent-cyan);
+				border: 4px solid rgba(59, 130, 246, 0.2);
+				border-top: 4px solid var(--accent-primary);
 				border-radius: 50%;
-				width: 40px;
-				height: 40px;
+				width: 48px;
+				height: 48px;
 				animation: spin 1s linear infinite;
-				margin-bottom: 1em;
+				margin-bottom: 1.5rem;
 			}
 			@keyframes spin {
 				0% { transform: rotate(0deg); }
@@ -308,7 +490,32 @@ func loadFetchHTML()
 			}
 			#loading-overlay p {
 				color: var(--text-secondary);
-				font-size: 1.1em;
+				font-size: 1.1rem;
+				font-weight: 500;
+			}
+			.copy-feedback {
+				position: fixed;
+				bottom: 2rem;
+				left: 50%;
+				transform: translateX(-50%);
+				background: var(--accent-success);
+				color: white;
+				padding: 1rem 1.5rem;
+				border-radius: 12px;
+				box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+				opacity: 0;
+				visibility: hidden;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				backdrop-filter: blur(var(--blur-md));
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				font-weight: 500;
+				font-size: 0.9rem;
+				z-index: 1000;
+			}
+			.copy-feedback.show {
+				opacity: 1;
+				visibility: visible;
+				transform: translateX(-50%) translateY(-10px);
 			}
  		</style>
 	</head>
@@ -339,7 +546,7 @@ func loadFetchHTML()
 					</button>
 					<button class="tab-btn" data-tab="usage">
 						<i class="fa-solid fa-heart-pulse"></i>
-						<span>Live Usage</span>
+						<span>Usage</span>
 					</button>
 					<button class="tab-btn" data-tab="storage">
 						<i class="fa-solid fa-database"></i>
@@ -418,6 +625,7 @@ func loadFetchHTML()
 				</div>
 			</main>
 		</div>
+		<div id="copy-feedback" class="copy-feedback">Copied to clipboard!</div>
 
 		<script>
 			function setupTabs() {
@@ -432,7 +640,7 @@ func loadFetchHTML()
 					activePill.style.height = tabButton.offsetHeight + "px";
 				}
 				tabButtons.forEach(button => {
-					if (button.dataset.tab) { // Only apply to tab buttons with data-tab attribute
+					if (button.dataset.tab) {
 						button.addEventListener("click", () => {
 							tabButtons.forEach(btn => btn.classList.remove("active"));
 							contentPages.forEach(page => page.classList.remove("active"));
@@ -445,6 +653,52 @@ func loadFetchHTML()
 				});
 				const initialActiveTab = document.querySelector(".tab-btn.active[data-tab]");
 				if (initialActiveTab) moveToTab(initialActiveTab);
+			}
+
+			function setupCopyToClipboard() {
+				document.querySelectorAll(".value").forEach(element => {
+					element.addEventListener("click", async () => {
+						const text = element.textContent.trim();
+						if (text) {
+							try {
+								if (navigator.clipboard && window.isSecureContext) {
+									await navigator.clipboard.writeText(text);
+								} else {
+									fallbackCopyToClipboard(text);
+								}
+								showCopyFeedback();
+							} catch (err) {
+								console.error("Failed to copy:", err);
+								fallbackCopyToClipboard(text);
+							}
+						}
+					});
+				});
+			}
+
+			function fallbackCopyToClipboard(text) {
+				const textArea = document.createElement("textarea");
+				textArea.value = text;
+				textArea.style.position = "fixed";
+				textArea.style.left = "-999999px";
+				document.body.appendChild(textArea);
+				textArea.focus();
+				textArea.select();
+				try {
+					document.execCommand("copy");
+					showCopyFeedback();
+				} catch (err) {
+					console.error("Fallback copy failed:", err);
+				}
+				document.body.removeChild(textArea);
+			}
+
+			function showCopyFeedback() {
+				const feedback = document.getElementById("copy-feedback");
+				feedback.classList.add("show");
+				setTimeout(() => {
+					feedback.classList.remove("show");
+				}, 2000);
 			}
  
 			function setupThemeSwitcher() {
@@ -480,7 +734,7 @@ func loadFetchHTML()
 				};
 
 				const useLocalStorage = isLocalStorageAvailable();
-				let initialTheme = "dark-mode"; // Default to dark mode
+				let initialTheme = "dark-mode";
 
 				if (useLocalStorage) {
 					const savedTheme = localStorage.getItem("theme");
@@ -490,12 +744,11 @@ func loadFetchHTML()
 						initialTheme = "dark-mode";
 					}
 				} else {
-					// Fallback for insecure contexts (e.g., about:blank)
 					if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
 						initialTheme = "dark-mode";
 					}
 				}
-				applyTheme(initialTheme); // Apply initial theme
+				applyTheme(initialTheme);
 
 				themeToggleBtn.addEventListener("click", () => {
 					const currentTheme = htmlElement.classList.contains("light-mode") ? "light-mode" : "dark-mode";
@@ -528,7 +781,7 @@ func loadFetchHTML()
 					disksList.appendChild(div);
 				});
 
-				// Live Usage Page
+				// Usage Page
 				const cpuFill = document.getElementById("cpu-usage-fill");
 				cpuFill.style.width = data.cpu_usage + "%";
 				cpuFill.style.backgroundColor = getUsageColor(data.cpu_usage);
@@ -564,7 +817,7 @@ func loadFetchHTML()
 				networkInterfacesList.innerHTML = "";
 				data.network_interfaces.forEach(net => {
 					const div = document.createElement("div");
-					div.className = "disk-item"; // Re-using disk-item style for now, can be refined
+					div.className = "disk-item";
 					div.innerHTML = `<strong>${net.name}</strong><br>IP: ${net.ip || "N/A"}<br>Status: ${net.status}`;
 					networkInterfacesList.appendChild(div);
 				});
@@ -576,7 +829,6 @@ func loadFetchHTML()
 				return "var(--accent-green)";
 			}
 
-			// *** FIX 5: Add formatBytes function back to JavaScript ***
 			function formatBytes(bytes, decimals = 2) {
 				if (!bytes || bytes === 0) return "0 Bytes";
 				const k = 1024;
@@ -599,8 +851,9 @@ func loadFetchHTML()
 			window.onload = () => {
 				setupTabs();
 				setupThemeSwitcher();
+				setupCopyToClipboard();
 				fetchData();
-				document.getElementById("loading-overlay").classList.add("hidden"); // Hide loading overlay
+				document.getElementById("loading-overlay").classList.add("hidden");
 			};
 		</script>
 	</body>
