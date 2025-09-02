@@ -3,7 +3,7 @@
 
 load "webview.ring"
 load "jsonlib.ring"
-load "internetlib.ring"
+load "libcurl.ring"
 
 # Global variable to hold the WebView instance.
 oWebView = NULL
@@ -42,9 +42,8 @@ func loadQuoteHTML()
 		<title>Avatar Quotes Generator</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 		<style>
-			@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap');
 			:root {
 				--bg-color: #000000;
 				--panel-bg: rgba(30, 30, 32, 0.6);
@@ -199,7 +198,7 @@ func handleFetchQuote(id, req)
 	cErrorMessage = ""
 
 	try
-		cResponse = download(cQuotesAPI) # Fetch data from the Avatar Quotes API.
+		cResponse = request(cQuotesAPI) # Fetch data from the Avatar Quotes API.
 		aJson = json2list(cResponse)["quotes"][1] # Parse the JSON response.
 		# Structure the result as a list (array) for JSON conversion.
 		aResult = [
@@ -218,3 +217,18 @@ func handleFetchQuote(id, req)
 		# If an error occurred, return an error message.
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json([:error = cErrorMessage]))
 	ok
+
+# Function to make a HTTP request using libcurl
+func request(url)
+	curl = curl_easy_init()
+
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, "RingLibCurl")
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1)
+	curl_easy_setopt(curl, CURLOPT_URL, url)
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false)
+	
+	cOutput = curl_easy_perform_silent(curl)
+
+	curl_easy_cleanup(curl)
+
+	return cOutput
