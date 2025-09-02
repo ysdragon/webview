@@ -70,6 +70,7 @@ aPackageInfo = [
 		"examples/12_unbind.ring",
 		"examples/13_to_do_list.ring",
 		"examples/14_live_markdown_editor.ring",
+		"examples/assets/ring.js",
 		"examples/15_color_palette.ring",
 		"examples/16_qr_code_generator.ring",
 		"examples/17_chart.ring",
