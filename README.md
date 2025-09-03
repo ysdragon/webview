@@ -28,12 +28,12 @@ This project is made possible by the tiny [webview](https://github.com/webview/w
 
 <div align="center">
   <h3>Demo</h3>
-  <a href="examples/06_showcase.ring">
+  <a href="examples/09_showcase.ring">
     <img src="img/showcase.gif" alt="Application Demo" width="600">
   </a>
   <br>
   <sub>
-    <a href="examples/06_showcase.ring">View the source code for this demo</a>
+    <a href="examples/09_showcase.ring">View the source code for this demo</a>
   </sub>
 </div>
 
