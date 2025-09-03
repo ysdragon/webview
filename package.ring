@@ -30,6 +30,11 @@ aPackageInfo = [
 			:providerusername = "ysdragon"
 		],
 		[
+			:name = "ringcurl",
+			:version = "1.0.15",
+			:providerusername = "ringpackages"
+		],
+		[
 			:name = "ringthreads",
 			:version = "1.0.6",
 			:providerusername = "ringpackages"
