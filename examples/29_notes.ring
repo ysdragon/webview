@@ -3,7 +3,7 @@
 load "webview.ring"
 load "jsonlib.ring"
 
-# --- Global Variables ---
+# Global Variables
 oWebView = NULL # Instance of the WebView class
 
 # Bind Ring functions to be callable from JavaScript.
@@ -52,28 +52,34 @@ func loadNotesHTML()
 		<title>Ring Notes App</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 		<style>
-			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500&family=Tajawal:wght@400;500;700&display=swap");
+			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&family=Tajawal:wght@400;500;600;700&display=swap");
 			:root {
-				--bg-color: #000000;
-				--panel-bg: rgba(30, 30, 32, 0.6);
-				--border-color: rgba(255, 255, 255, 0.1);
-				--text-primary: #f8fafc;
-				--text-secondary: #a1a1aa;
-				--accent-blue: #3b82f6;
-				--accent-cyan: #22d3ee;
-				--accent-purple: #c084fc;
-				--accent-green: #4ade80;
-				--accent-yellow: #facc15;
-				--accent-red: #f87171;
+				--bg-primary: #0f172a;
+				--bg-secondary: #1e293b;
+				--card-bg: rgba(15, 23, 42, 0.8);
+				--card-border: rgba(148, 163, 184, 0.1);
+				--text-primary: #f1f5f9;
+				--text-secondary: #94a3b8;
+				--text-muted: #64748b;
+				--accent-primary: #3b82f6;
+				--accent-secondary: #8b5cf6;
+				--accent-success: #10b981;
+				--accent-warning: #f59e0b;
+				--accent-danger: #ef4444;
+				--accent-cyan: #06b6d4;
+				--shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+				--blur-sm: 4px;
+				--blur-md: 12px;
+				--blur-lg: 16px;
 			}
 			html[lang="ar"] body { font-family: "Tajawal", sans-serif; }
 			html[dir="rtl"] body { direction: rtl; }
 
 			body {
 				font-family: "Inter", sans-serif;
-				background-color: var(--bg-color);
+				background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 				color: var(--text-primary);
 				margin: 0;
 				height: 100vh;
@@ -83,103 +89,234 @@ func loadNotesHTML()
 				flex-direction: column;
 				justify-content: center;
 				align-items: center;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 			}
 			.background-container {
-				position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-				z-index: -1; overflow: hidden;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: -1;
+				overflow: hidden;
 			}
 			.aurora {
-				position: relative; width: 100%; height: 100%;
-				filter: blur(150px); opacity: 0.5;
+				position: relative;
+				width: 100%;
+				height: 100%;
+				filter: blur(120px);
+				opacity: 0.4;
 			}
 			.aurora-shape1 {
-				position: absolute; width: 50vw; height: 50vh;
-				background: radial-gradient(circle, var(--accent-cyan), transparent 60%);
-				top: 5%; left: 5%;
+				position: absolute;
+				width: 60vw;
+				height: 60vh;
+				background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.2) 40%, transparent 70%);
+				top: -10%;
+				left: -15%;
+				animation: aurora-drift 20s ease-in-out infinite;
 			}
 			.aurora-shape2 {
-				position: absolute; width: 40vw; height: 40vh;
-				background: radial-gradient(circle, var(--accent-purple), transparent 60%);
-				bottom: 10%; right: 10%;
+				position: absolute;
+				width: 50vw;
+				height: 50vh;
+				background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.25) 0%, rgba(16, 185, 129, 0.15) 50%, transparent 70%);
+				bottom: -10%;
+				right: -15%;
+				animation: aurora-drift 25s ease-in-out infinite reverse;
+			}
+			@keyframes aurora-drift {
+				0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+				25% { transform: translate(10px, -15px) rotate(1deg) scale(1.05); }
+				50% { transform: translate(-5px, 10px) rotate(-0.5deg) scale(0.95); }
+				75% { transform: translate(-15px, -5px) rotate(0.5deg) scale(1.02); }
 			}
 
 			.notes-container {
-				background-color: var(--panel-bg);
-				padding: 30px;
-				border-radius: 15px;
-				box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-				width: 90%;
-				max-width: 500px;
+				background: var(--card-bg);
+				padding: clamp(1.5rem, 4vw, 2.5rem);
+				border-radius: 20px;
+				box-shadow: var(--shadow-lg), 0 0 0 1px var(--card-border);
+				width: min(90vw, 32rem);
 				display: flex;
 				flex-direction: column;
-				position: relative; z-index: 1;
-				border: 1px solid var(--border-color);
-				backdrop-filter: blur(12px);
-				-webkit-backdrop-filter: blur(12px);
-				height: 80vh;
+				position: relative;
+				z-index: 10;
+				border: 1px solid var(--card-border);
+				backdrop-filter: blur(var(--blur-lg));
+				-webkit-backdrop-filter: blur(var(--blur-lg));
+				height: min(85vh, 42rem);
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+			.notes-container:hover {
+				transform: translateY(-4px);
+				box-shadow: var(--shadow-lg), 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+				border-color: rgba(59, 130, 246, 0.3);
 			}
 			.notes-header {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				margin-bottom: 25px;
+				margin-bottom: clamp(1.5rem, 4vw, 2rem);
+				padding-bottom: clamp(0.75rem, 2vw, 1rem);
+				border-bottom: 1px solid var(--card-border);
+			}
+			html[dir="rtl"] .notes-header {
+				flex-direction: row-reverse;
+			}
+			.notes-header h1 {
+				order: 1;
+			}
+			.notes-header .control-btn {
+				order: 2;
+			}
+			html[dir="rtl"] .notes-header h1 {
+				order: 2;
+			}
+			html[dir="rtl"] .notes-header .control-btn {
+				order: 1;
 			}
 			h1 {
-				text-align: center;
-				color: var(--accent-yellow);
+				color: var(--text-primary);
 				margin: 0;
-				font-size: 2em;
-				text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+				font-size: clamp(1.5rem, 5vw, 2rem);
+				font-weight: 700;
+				letter-spacing: -0.025em;
+				text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				text-align: left;
+				flex-direction: row;
 			}
-			html[dir="rtl"] h1 { text-align: right; }
-
+			h1 i {
+				color: var(--accent-warning);
+				font-size: clamp(1.2rem, 4vw, 1.6rem);
+				order: 1;
+			}
+			.title-text {
+				order: 2;
+			}
+			html[dir="rtl"] h1 {
+				text-align: right;
+				flex-direction: row-reverse;
+			}
+			html[dir="rtl"] h1 i {
+				order: 2;
+			}
+			html[dir="rtl"] .title-text {
+				order: 1;
+			}
 			.control-btn {
-				background: none;
-				border: none;
-				font-size: 1.2em;
+				background: rgba(148, 163, 184, 0.05);
+				border: 1px solid var(--card-border);
+				border-radius: 10px;
+				padding: clamp(0.5rem, 2vw, 0.75rem);
+				font-size: clamp(0.9rem, 2.5vw, 1.1rem);
 				cursor: pointer;
 				color: var(--text-primary);
-				transition: transform 0.2s;
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+				backdrop-filter: blur(var(--blur-sm));
+				font-weight: 600;
+				min-width: 44px;
+				min-height: 44px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: inherit;
+			}
+			html[lang="en"] .control-btn {
+				font-family: "Inter", sans-serif;
+			}
+			html[lang="ar"] .control-btn {
+				font-family: "Tajawal", sans-serif;
 			}
 			.control-btn:hover {
-				transform: scale(1.1);
+				transform: translateY(-2px);
+				background: rgba(59, 130, 246, 0.1);
+				border-color: var(--accent-primary);
+				box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 			}
 
 			.input-group {
 				display: flex;
-				margin-bottom: 20px;
-				gap: 10px;
+				margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+				gap: clamp(0.75rem, 2vw, 1rem);
+				align-items: stretch;
+				flex-direction: row;
 			}
-			html[dir="rtl"] .input-group { flex-direction: row-reverse; }
+			html[dir="rtl"] .input-group {
+				flex-direction: row-reverse;
+			}
+			.input-group button {
+				order: 2;
+			}
+			.input-group textarea {
+				order: 1;
+			}
+			html[dir="rtl"] .input-group button {
+				order: 1;
+			}
+			html[dir="rtl"] .input-group textarea {
+				order: 2;
+			}
 			textarea {
 				flex-grow: 1;
-				padding: 12px;
-				border: 1px solid var(--border-color);
-				border-radius: 8px;
-				font-size: 1em;
+				padding: clamp(0.75rem, 2vw, 1rem);
+				border: 1px solid var(--card-border);
+				border-radius: 12px;
+				font-size: clamp(0.9rem, 2.5vw, 1rem);
 				outline: none;
-				background-color: rgba(255, 255, 255, 0.05);
+				background: rgba(148, 163, 184, 0.05);
 				color: var(--text-primary);
 				resize: vertical;
-				min-height: 60px;
+				min-height: clamp(3.5rem, 8vw, 4rem);
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+				backdrop-filter: blur(var(--blur-sm));
+				font-family: inherit;
+				line-height: 1.5;
 			}
 			textarea:focus {
-				border-color: var(--accent-cyan);
+				border-color: var(--accent-primary);
+				box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+				background: rgba(59, 130, 246, 0.05);
+				transform: translateY(-1px);
 			}
 			button {
-				padding: 12px 20px;
+				padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
 				border: none;
-				border-radius: 8px;
-				background-color: var(--accent-blue);
+				border-radius: 12px;
+				background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
 				color: white;
-				font-size: 1em;
+				font-size: clamp(0.9rem, 2.5vw, 1rem);
+				font-weight: 600;
 				cursor: pointer;
-				transition: all 0.2s ease-in-out;
-				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+				box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+				backdrop-filter: blur(var(--blur-sm));
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				white-space: nowrap;
+				min-height: 44px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.5rem;
+				font-family: inherit;
+			}
+			html[lang="en"] button {
+				font-family: "Inter", sans-serif;
+			}
+			html[lang="ar"] button {
+				font-family: "Tajawal", sans-serif;
 			}
 			button:hover {
 				transform: translateY(-2px);
-				box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+				box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+				background: linear-gradient(135deg, #60a5fa, #a78bfa);
+			}
+			button:active {
+				transform: translateY(0);
+				box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 			}
 			.notes-list {
 				list-style: none;
@@ -188,56 +325,160 @@ func loadNotesHTML()
 				flex-grow: 1;
 				overflow-y: auto;
 				color: var(--text-primary);
+				border-radius: 12px;
+				background: rgba(148, 163, 184, 0.02);
+				border: 1px solid var(--card-border);
+				padding: clamp(0.75rem, 2vw, 1rem);
+				min-height: clamp(12rem, 30vh, 20rem);
+				backdrop-filter: blur(var(--blur-sm));
+				-webkit-backdrop-filter: blur(var(--blur-sm));
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 			}
 			.note-item {
-				background-color: rgba(255, 255, 255, 0.05);
-				padding: 15px;
-				border-radius: 10px;
-				margin-bottom: 10px;
-				border: 1px solid var(--border-color);
+				background: rgba(148, 163, 184, 0.05);
+				padding: clamp(0.75rem, 2vw, 1rem);
+				border-radius: 12px;
+				margin-bottom: clamp(0.75rem, 2vw, 1rem);
+				border: 1px solid var(--card-border);
 				display: flex;
 				flex-direction: column;
-				gap: 8px;
+				gap: clamp(0.5rem, 1.5vw, 0.75rem);
+				backdrop-filter: blur(var(--blur-sm));
+				-webkit-backdrop-filter: blur(var(--blur-sm));
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+				position: relative;
+				overflow: hidden;
+			}
+			.note-item:hover {
+				transform: translateY(-2px);
+				background: rgba(59, 130, 246, 0.08);
+				border-color: rgba(59, 130, 246, 0.3);
+				box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+			}
+			.note-item:last-child {
+				margin-bottom: 0;
 			}
 			html[dir="rtl"] .note-item { flex-direction: column; }
 
 			.note-content {
 				flex-grow: 1;
-				font-size: 1.1em;
+				font-size: clamp(1rem, 2.5vw, 1.1rem);
 				white-space: pre-wrap;
+				color: var(--text-primary);
+				line-height: 1.6;
+				font-weight: 400;
+				word-wrap: break-word;
+				margin: 0;
 			}
 			html[dir="rtl"] .note-content { text-align: right; }
 
 			.note-timestamp {
-				font-size: 0.85em;
-				color: var(--text-secondary);
+				font-size: clamp(0.8rem, 2vw, 0.85rem);
+				color: var(--text-muted);
 				text-align: right;
+				font-weight: 500;
+				font-family: "Fira Code", monospace;
+				opacity: 0.8;
+				letter-spacing: 0.025em;
+			}
+			html[lang="en"] .note-timestamp {
+				font-family: "Fira Code", "Inter", monospace, sans-serif;
+			}
+			html[lang="ar"] .note-timestamp {
+				font-family: "Fira Code", "Tajawal", monospace, sans-serif;
+				direction: ltr;
 			}
 			html[dir="rtl"] .note-timestamp { text-align: left; }
 
 			.note-actions {
 				display: flex;
 				justify-content: flex-end;
-				gap: 10px;
+				gap: clamp(0.5rem, 1.5vw, 0.75rem);
+				margin-top: clamp(0.5rem, 1.5vw, 0.75rem);
+				padding-top: clamp(0.5rem, 1.5vw, 0.75rem);
+				border-top: 1px solid var(--card-border);
+				flex-direction: row;
 			}
-			html[dir="rtl"] .note-actions { justify-content: flex-start; }
-			.note-actions button {
-				padding: 8px 12px;
-				font-size: 0.9em;
-				margin-left: 0;
+			html[dir="rtl"] .note-actions {
+				justify-content: flex-start;
+				flex-direction: row-reverse;
 			}
 			.note-actions .edit-btn {
-				background-color: var(--accent-green);
-			}
-			.note-actions .edit-btn:hover {
-				background-color: #22c55e;
+				order: 1;
 			}
 			.note-actions .delete-btn {
-				background-color: var(--accent-red);
+				order: 2;
+			}
+			html[dir="rtl"] .note-actions .edit-btn {
+				order: 2;
+			}
+			html[dir="rtl"] .note-actions .delete-btn {
+				order: 1;
+			}
+			.note-actions button {
+				padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.75rem, 2vw, 1rem);
+				font-size: clamp(0.8rem, 2vw, 0.9rem);
+				margin: 0;
+				min-height: auto;
+				font-weight: 600;
+				border-radius: 8px;
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+				backdrop-filter: blur(var(--blur-sm));
+				-webkit-backdrop-filter: blur(var(--blur-sm));
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				text-transform: none;
+				letter-spacing: normal;
+				white-space: nowrap;
+				font-family: inherit;
+			}
+			html[lang="en"] .note-actions button {
+				font-family: "Inter", sans-serif;
+			}
+			html[lang="ar"] .note-actions button {
+				font-family: "Tajawal", sans-serif;
+			}
+			.note-actions .edit-btn {
+				background: linear-gradient(135deg, var(--accent-success), #22c55e);
+				box-shadow: 0 3px 8px rgba(16, 185, 129, 0.25);
+			}
+			.note-actions .edit-btn:hover {
+				background: linear-gradient(135deg, #22c55e, #16a34a);
+				box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+				transform: translateY(-1px);
+			}
+			.note-actions .delete-btn {
+				background: linear-gradient(135deg, var(--accent-danger), #dc2626);
+				box-shadow: 0 3px 8px rgba(239, 68, 68, 0.25);
 			}
 			.note-actions .delete-btn:hover {
-				background-color: #dc2626;
+				background: linear-gradient(135deg, #dc2626, #b91c1c);
+				box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+				transform: translateY(-1px);
 			}
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+			::-webkit-scrollbar-track {
+				background: rgba(148, 163, 184, 0.05);
+				border-radius: 8px;
+				margin: 4px;
+			}
+			::-webkit-scrollbar-thumb {
+				background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+				border-radius: 8px;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				transition: all 0.3s ease;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: linear-gradient(45deg, var(--accent-secondary), var(--accent-cyan));
+				box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+			}
+			::-webkit-scrollbar-corner {
+				background: rgba(148, 163, 184, 0.05);
+			}
+
+
 		</style>
 	</head>
 	<body>
@@ -245,9 +486,10 @@ func loadNotesHTML()
 			<div class="aurora"><div class="aurora-shape1"></div><div class="aurora-shape2"></div></div>
 		</div>
 		
+
 		<div class="notes-container">
 			<div class="notes-header">
-				<h1 id="ui-title"><i class="fa-solid fa-note-sticky"></i> My Notes</h1>
+				<h1 id="ui-title"><i class="fa-solid fa-note-sticky"></i><span class="title-text">My Notes</span></h1>
 				<button id="lang-toggle" class="control-btn"></button>
 			</div>
 			<div class="input-group">
@@ -263,7 +505,7 @@ func loadNotesHTML()
 			const noteInput = document.getElementById("new-note-input");
 			const addNoteBtn = document.getElementById("add-note-btn");
 			const notesList = document.getElementById("notes-list");
-			let editingIndex = -1; // -1 means no note is being edited
+			let editingIndex = -1;
 			let currentLang;
 
 			const uiStrings = {
@@ -293,14 +535,16 @@ func loadNotesHTML()
 				document.documentElement.lang = lang;
 				document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
 
-				document.getElementById("ui-title").innerHTML = `<i class="fa-solid fa-note-sticky"></i> ${strings.title}`;
+				document.getElementById("ui-title").innerHTML = `<i class="fa-solid fa-note-sticky"></i><span class="title-text">${strings.title}</span>`;
 				noteInput.placeholder = strings.placeholder;
 				addNoteBtn.innerHTML = strings.addNote;
 				document.getElementById("lang-toggle").textContent = lang === "en" ? "AR" : "EN";
-				
-				// Re-render notes to update "Edit" and "Delete" button texts
-				// This assumes renderNotes can be called safely without data loss, which it can.
-				window.getInitialNotes().then(notes => renderNotes(notes));
+			}
+
+			async function setLanguageAndLoadNotes(lang) {
+				setLanguage(lang);
+				const notes = await window.getInitialNotes();
+				renderNotes(notes);
 			}
 
 			function renderNotes(notes) {
@@ -318,6 +562,7 @@ func loadNotesHTML()
 					`;
 					notesList.appendChild(li);
 				});
+				notesList.scrollTop = notesList.scrollHeight;
 			}
 
 			function escapeHTML(str) {
@@ -329,17 +574,21 @@ func loadNotesHTML()
 			async function addNoteItem() {
 				const text = noteInput.value.trim();
 				if (text) {
-					let updatedNotes;
-					if (editingIndex === -1) {
-						updatedNotes = await window.addNote(text);
-					} else {
-						updatedNotes = await window.editNote(editingIndex, text);
-						editingIndex = -1; // Reset editing state
-						addNoteBtn.innerHTML = uiStrings[currentLang].addNote;
-						addNoteBtn.classList.remove("edit-mode");
+					try {
+						let updatedNotes;
+						if (editingIndex === -1) {
+							updatedNotes = await window.addNote(text);
+						} else {
+							updatedNotes = await window.editNote(editingIndex, text);
+							editingIndex = -1;
+							addNoteBtn.innerHTML = uiStrings[currentLang].addNote;
+							addNoteBtn.classList.remove("edit-mode");
+						}
+						noteInput.value = "";
+						renderNotes(updatedNotes);
+					} catch (error) {
+						console.error("Error saving note:", error);
 					}
-					noteInput.value = "";
-					renderNotes(updatedNotes);
 				}
 			}
 
@@ -353,27 +602,35 @@ func loadNotesHTML()
 
 			async function deleteNoteItem(index) {
 				if (confirm(uiStrings[currentLang].confirmDelete)) {
-					const updatedNotes = await window.deleteNote(index);
-					renderNotes(updatedNotes);
-					if (editingIndex === index) { // If the deleted note was being edited
-						editingIndex = -1;
-						noteInput.value = "";
-						addNoteBtn.innerHTML = uiStrings[currentLang].addNote;
-						addNoteBtn.classList.remove("edit-mode");
-					} else if (editingIndex > index) { // Adjust index if a preceding note was deleted
-						editingIndex--;
+					try {
+						const updatedNotes = await window.deleteNote(index);
+						renderNotes(updatedNotes);
+						if (editingIndex === index) {
+							editingIndex = -1;
+							noteInput.value = "";
+							addNoteBtn.innerHTML = uiStrings[currentLang].addNote;
+							addNoteBtn.classList.remove("edit-mode");
+						} else if (editingIndex > index) {
+							editingIndex--;
+						}
+					} catch (error) {
+						console.error("Error deleting note:", error);
 					}
 				}
 			}
 
 			window.onload = async () => {
-				const initialSettings = await window.getInitialSettings();
-				setLanguage(initialSettings.language);
-				document.getElementById("lang-toggle").addEventListener("click", () => {
-					const newLang = currentLang === "en" ? "ar" : "en";
-					setLanguage(newLang);
-					window.saveSettings(newLang);
-				});
+				try {
+					const initialSettings = await window.getInitialSettings();
+					await setLanguageAndLoadNotes(initialSettings.language);
+					document.getElementById("lang-toggle").addEventListener("click", async () => {
+						const newLang = currentLang === "en" ? "ar" : "en";
+						await setLanguageAndLoadNotes(newLang);
+						window.saveSettings(newLang);
+					});
+				} catch (error) {
+					console.error("Error initializing app:", error);
+				}
 			};
 		</script>
 	</body>
@@ -381,7 +638,7 @@ func loadNotesHTML()
 	'
 	oWebView.setHtml(cHTML)
 
-# --- Ring Callback Handlers (Bound to JavaScript) ---
+# Ring Callback Handlers (Bound to JavaScript)
 
 # Handles requests from JavaScript to get the initial list of notes.
 func handleGetInitialNotes(id, req)
@@ -448,7 +705,7 @@ func handleDeleteNote(id, req)
 	ok
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, build_notes_json())
 
-# --- Helper Functions ---
+# Helper Functions
 
 func build_notes_json()
 	cJson = "["
