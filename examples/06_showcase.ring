@@ -15,7 +15,7 @@ func main()
 	# Set the title of the webview window.
 	oWebView.setTitle("Ring WebView Example")
 	# Set the size of the webview window. WEBVIEW_HINT_NONE means no size constraint.
-	oWebView.setSize(500, 400, WEBVIEW_HINT_NONE)
+	oWebView.setSize(600, 500, WEBVIEW_HINT_NONE)
 
 	# Bind Ring functions to be callable from JavaScript.
 	# `greet` will be called when JS invokes `window.greet()`.
@@ -33,9 +33,8 @@ func main()
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<!-- Font Awesome for icons -->
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 		<style>
-			@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap');
 			:root {
 				--bg-color: #000000;
 				--panel-bg: rgba(30, 30, 32, 0.6);

@@ -77,7 +77,7 @@ func loadChartHTML()
 					const ctx = document.getElementById('salesChart').getContext('2d');
 					
 					new Chart(ctx, {
-						type: 'bar', // Type of chart
+						type: 'bar',
 						data: {
 							labels: chartData.labels,
 							datasets: chartData.datasets

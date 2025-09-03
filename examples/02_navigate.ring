@@ -6,10 +6,10 @@ load "webview.ring"
 # Create a new WebView instance.
 oWebView = new WebView()
 
-# Configure the WebView properties using the object-oriented approach.
+# Configure the WebView properties.
 oWebView {
     # Set the title of the webview window.
-    setTitle("Ring Webview Test")
+    setTitle("Ring Webview Navigate Example")
     # Set the size of the webview window (width, height, hint).
     # WEBVIEW_HINT_NONE means no size constraint.
     setSize(800, 600, WEBVIEW_HINT_NONE)

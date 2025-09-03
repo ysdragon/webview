@@ -16,7 +16,7 @@ func main()
 	# Set the window title.
 	oWebView.setTitle("QR Code Generator")
 	# Set the window size (no size constraint).
-	oWebView.setSize(450, 550, WEBVIEW_HINT_NONE)
+	oWebView.setSize(400, 500, WEBVIEW_HINT_NONE)
 
 	# Bind the `generateQrCode` function to be callable from JavaScript.
 	# This function receives the text from the JS frontend and instructs the webview to generate the QR.

@@ -30,114 +30,288 @@ func main()
 
 	# Define the HTML and inline JavaScript content for the webview.
 	cHTML = '
-	<!DOCTYPE html>
-	<html>
-	<head>
-		<title>Ring WebView Inject/Eval/Callback Demo</title>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-		<style>
-			body { font-family: sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; color: #333; }
-			.container { max-width: 960px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-			h1 { color: #0056b3; text-align: center; margin-bottom: 30px; }
-			.section { background-color: #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #dee2e6; }
-			.section h2 { margin-top: 0; color: #0056b3; font-size: 1.2em; border-bottom: 1px solid #ced4da; padding-bottom: 8px; margin-bottom: 15px; }
-			.input-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; align-items: center; }
-			.input-group label { flex-shrink: 0; font-weight: bold; }
-			.input-group input[type="text"], .input-group input[type="number"], .input-group textarea, .input-group select {
-				flex-grow: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9em; min-width: 150px;
-			}
-			.input-group textarea { height: 80px; resize: vertical; }
-			.input-group button { padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
-			.input-group button:hover { background-color: #0056b3; }
-			.output { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 10px; border-radius: 4px; min-height: 30px; white-space: pre-wrap; word-break: break-all; font-family: monospace; font-size: 0.85em; }
-			.output.error { color: red; }
-			.note { font-size: 0.8em; color: #6c757d; margin-top: 5px; }
-		</style>
-	</head>
-	<body>
-		<div class="container">
-			<h1>Ring WebView Inject, Eval, Callback Demo</h1>
+<!DOCTYPE html>
+<html>
 
-			<div class="section">
-				<h2><i class="fa-solid fa-handshake"></i> bind() & wreturn() (Callback)</h2>
-				<div class="input-group">
-					<label for="boundFuncInput">Message:</label>
-					<input type="text" id="boundFuncInput" value="Hello from JS!">
-					<button onclick="callBoundFunc()">Call Bound Function (ring_echo)</button>
-				</div>
-				<div id="boundFuncOutput" class="output"></div>
-				<div class="note">This calls Ring function "ring_echo" with the message and expects a return.</div>
+<head>
+	<title>Ring WebView Inject/Eval/Callback Demo</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+	<style>
+		:root {
+			--bg-color: #000000;
+			--panel-bg: rgba(30, 30, 32, 0.6);
+			--border-color: rgba(255, 255, 255, 0.1);
+			--text-primary: #f8fafc;
+			--text-secondary: #a1a1aa;
+			--accent-blue: #3b82f6;
+			--accent-cyan: #22d3ee;
+			--accent-purple: #c084fc;
+			--accent-green: #4ade80;
+			--accent-yellow: #facc15;
+			--accent-red: #f87171;
+			--output-bg: rgba(255, 255, 255, 0.05);
+		}
+
+		body {
+			font-family: "Inter", sans-serif;
+			background-color: var(--bg-color);
+			color: var(--text-primary);
+			margin: 0;
+			height: 100vh;
+			overflow: auto;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-start;
+			align-items: center;
+		}
+
+		.background-container {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: -1;
+			overflow: hidden;
+		}
+
+		.aurora {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			filter: blur(150px);
+			opacity: 0.5;
+		}
+
+		.aurora-shape1 {
+			position: absolute;
+			width: 50vw;
+			height: 50vh;
+			background: radial-gradient(circle, var(--accent-cyan), transparent 60%);
+			top: 5%;
+			left: 5%;
+		}
+
+		.aurora-shape2 {
+			position: absolute;
+			width: 40vw;
+			height: 40vh;
+			background: radial-gradient(circle, var(--accent-purple), transparent 60%);
+			bottom: 10%;
+			right: 10%;
+		}
+
+		.main-card {
+			background-color: var(--panel-bg);
+			border: 1px solid var(--border-color);
+			border-radius: 15px;
+			padding: 30px;
+			max-width: 800px;
+			width: 90%;
+			box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
+			position: relative;
+			z-index: 1;
+			margin: 20px 0;
+		}
+
+		h1 {
+			color: var(--text-primary);
+			margin-bottom: 25px;
+			font-size: 2.2em;
+			text-align: center;
+			text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+		}
+
+		.section {
+			background-color: rgba(255, 255, 255, 0.03);
+			padding: 20px;
+			border-radius: 12px;
+			margin-bottom: 25px;
+			border: 1px solid var(--border-color);
+		}
+
+		.section h2 {
+			margin-top: 0;
+			color: var(--text-primary);
+			font-size: 1.4em;
+			border-bottom: 1px solid var(--border-color);
+			padding-bottom: 12px;
+			margin-bottom: 18px;
+		}
+
+		.input-group {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+			margin-bottom: 15px;
+			align-items: center;
+		}
+
+		.input-group label {
+			flex-shrink: 0;
+			font-weight: 500;
+			color: var(--text-secondary);
+			min-width: 100px;
+		}
+
+		.input-group input[type="text"] {
+			flex-grow: 1;
+			padding: 12px 15px;
+			border-radius: 8px;
+			border: 1px solid var(--border-color);
+			background-color: rgba(255, 255, 255, 0.05);
+			color: var(--text-primary);
+			font-size: 1em;
+			min-width: 200px;
+			transition: border-color 0.2s ease;
+		}
+
+		.input-group input:focus {
+			outline: none;
+			border-color: var(--accent-cyan);
+		}
+
+		.input-group button {
+			background-color: var(--accent-blue);
+			color: white;
+			border: none;
+			border-radius: 8px;
+			padding: 12px 20px;
+			font-size: 1em;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s ease-in-out;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+		}
+
+		.input-group button:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+			background-color: #2563eb;
+		}
+
+		.output {
+			background-color: var(--output-bg);
+			border: 1px solid var(--border-color);
+			padding: 15px;
+			border-radius: 8px;
+			min-height: 50px;
+			white-space: pre-wrap;
+			word-break: break-all;
+			font-family: "Fira Code", monospace;
+			font-size: 0.9em;
+			color: var(--text-secondary);
+			margin-top: 15px;
+		}
+
+		.output.error {
+			color: var(--accent-red);
+			border-color: rgba(248, 113, 113, 0.3);
+		}
+
+		.note {
+			font-size: 0.85em;
+			color: var(--text-secondary);
+			margin-top: 10px;
+			font-style: italic;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="background-container">
+		<div class="aurora">
+			<div class="aurora-shape1"></div>
+			<div class="aurora-shape2"></div>
+		</div>
+	</div>
+
+	<div class="main-card">
+		<h1><i class="fa-solid fa-code"></i> Ring WebView Inject, Eval, Callback Demo</h1>
+
+		<div class="section">
+			<h2><i class="fa-solid fa-handshake"></i> bind() & wreturn() (Callback)</h2>
+			<div class="input-group">
+				<label for="boundFuncInput">Message:</label>
+				<input type="text" id="boundFuncInput" value="Hello from JS!">
+				<button onclick="callBoundFunc()">Call Bound Function (ring_echo)</button>
 			</div>
-
-			<div class="section">
-				<h2><i class="fa-solid fa-terminal"></i> eval()</h2>
-				<div class="input-group">
-					<label for="evalInput">JS Code:</label>
-					<input type="text" id="evalInput" value="alert(`Evaluated from Ring!`);">
-					<button onclick="evalJs()">Evaluate JS</button>
-				</div>
-				<div id="evalOutput" class="output"></div>
-				<div class="note">This demonstrates Ring calling JS code.</div>
-			</div>
-
-			<div class="section">
-				<h2><i class="fa-solid fa-code-compare"></i> inject()</h2>
-				<div class="input-group">
-					<label for="initInput">JS Init Code:</label>
-					<input type="text" id="initInput" value="window.myInjectedVar = `Injected!`; console.log(`Init JS executed!`);">
-					<button onclick="initJs()">Initialize JS</button>
-				</div>
-				<div id="initOutput" class="output"></div>
-				<div class="note">Executes JS code before page load. Works best on initial load or after set_html.</div>
-			</div>
-
+			<div id="boundFuncOutput" class="output"></div>
+			<div class="note">This calls Ring function "ring_echo" with the message and expects a return.</div>
 		</div>
 
-		<script>
-			function updateOutput(elementId, message, isError = false) {
-				const outputDiv = document.getElementById(elementId);
-				outputDiv.textContent = message;
-				if (isError) {
-					outputDiv.classList.add("error");
-				} else {
-					outputDiv.classList.remove("error");
-				}
-			}
+		<div class="section">
+			<h2><i class="fa-solid fa-terminal"></i> eval()</h2>
+			<div class="input-group">
+				<label for="evalInput">JS Code:</label>
+				<input type="text" id="evalInput" value="alert(`Evaluated from Ring!`);">
+				<button onclick="evalJs()">Evaluate JS</button>
+			</div>
+			<div id="evalOutput" class="output"></div>
+			<div class="note">This demonstrates Ring calling JS code.</div>
+		</div>
 
-			async function callBoundFunc() {
-				const message = document.getElementById("boundFuncInput").value;
-				try {
-					const response = await window.ring_echo(message);
-					updateOutput("boundFuncOutput", "Ring Response: " + response);
-				} catch (e) {
-					updateOutput("boundFuncOutput", "Error calling bound function (ring_echo): " + e, true);
-				}
-			}
+		<div class="section">
+			<h2><i class="fa-solid fa-code-compare"></i> inject()</h2>
+			<div class="input-group">
+				<label for="initInput">JS Init Code:</label>
+				<input type="text" id="initInput"
+					value="window.myInjectedVar = `Injected!`; console.log(`Init JS executed!`);">
+				<button onclick="initJs()">Initialize JS</button>
+			</div>
+			<div id="initOutput" class="output"></div>
+			<div class="note">Executes JS code before page load. Works best on initial load or after setHtml.</div>
+		</div>
+	</div>
 
-			async function evalJs() {
-				const jsCode = document.getElementById("evalInput").value;
-				try {
-					await window.ring_evalJs(jsCode);
-					updateOutput("evalOutput", "JavaScript evaluated. Check browser console or alert for effects.");
-				} catch (e) {
-					updateOutput("evalOutput", "Error evaluating JS: " + e, true);
-				}
+	<script>
+		function updateOutput(elementId, message, isError = false) {
+			const outputDiv = document.getElementById(elementId);
+			outputDiv.textContent = message;
+			if (isError) {
+				outputDiv.classList.add("error");
+			} else {
+				outputDiv.classList.remove("error");
 			}
+		}
 
-			async function initJs() {
-				const jsInitCode = document.getElementById("initInput").value;
-				try {
-					await window.ring_initJs(jsInitCode);
-					updateOutput("initOutput", "JS init code sent. It will execute when the next page loads or when set_html is called.");
-				} catch (e) {
-					updateOutput("initOutput", "Error initializing JS: " + e, true);
-				}
+		async function callBoundFunc() {
+			const message = document.getElementById("boundFuncInput").value;
+			try {
+				const response = await window.ring_echo(message);
+				updateOutput("boundFuncOutput", "Ring Response: " + response);
+			} catch (e) {
+				updateOutput("boundFuncOutput", "Error calling bound function (ring_echo): " + e, true);
 			}
-		</script>
-	</body>
-	</html>
+		}
+
+		async function evalJs() {
+			const jsCode = document.getElementById("evalInput").value;
+			try {
+				await window.ring_evalJs(jsCode);
+				updateOutput("evalOutput", "JavaScript evaluated.");
+			} catch (e) {
+				updateOutput("evalOutput", "Error evaluating JS: " + e, true);
+			}
+		}
+
+		async function initJs() {
+			const jsInitCode = document.getElementById("initInput").value;
+			try {
+				await window.ring_initJs(jsInitCode);
+				updateOutput("initOutput", "JS init code sent. It will execute when the next page loads or when setHtml is called.");
+			} catch (e) {
+				updateOutput("initOutput", "Error initializing JS: " + e, true);
+			}
+		}
+	</script>
+</body>
+
+</html>
 	'
 	# Load the defined HTML content into the webview.
 	see "2. Loading custom HTML content into the webview..." + nl

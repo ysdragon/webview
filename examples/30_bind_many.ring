@@ -37,7 +37,7 @@ func main
 	oWebView {
 		# Set the title and size of the webview window.
 		setTitle("bindMany() - Global List")
-		setSize(780, 500, 0) # 0 = WEBVIEW_HINT_NONE
+		setSize(780, 650, 0) # 0 = WEBVIEW_HINT_NONE
 		
 		# You can also use bindMany(BindList) to explicitly bind the list.
 		# Like this: 
@@ -71,7 +71,7 @@ func getHtmlContent()
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 		:root {

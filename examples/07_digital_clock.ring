@@ -14,7 +14,7 @@ func main()
 		# Set the title of the webview window.
 		setTitle("Ring Digital Clock")
 		# Set the size of the webview window. WEBVIEW_HINT_NONE means no size constraint.
-		setSize(450, 180, WEBVIEW_HINT_NONE)
+		setSize(400, 150, WEBVIEW_HINT_NONE)
 
 		# Bind the `requestTime` function to handle time requests from JavaScript.
 		# When JS calls `window.requestTime()`, this anonymous Ring function will execute.
@@ -40,9 +40,7 @@ func loadClockHTML()
 	<head>
 		<title>Digital Clock</title>
 		<meta charset="UTF-8">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 		<style>
-			@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;500;700&display=swap');
 			:root {
 				--bg-color: #000000;
 				--panel-bg: rgba(30, 30, 32, 0.6);

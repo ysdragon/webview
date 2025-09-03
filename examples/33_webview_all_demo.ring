@@ -51,7 +51,7 @@ func main()
 	<title>WebView Interactive Demo</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -328,7 +328,7 @@ func main()
 					<button onclick="initJs()">Initialize JS</button>
 				</div>
 				<div id="initOutput" class="output"></div>
-				<div class="note">Executes JS code before page load. Works best on initial load or after set_html.</div>
+				<div class="note">Executes JS code before page load. Works best on initial load or after setHtml.</div>
 			</div>
 
 			<div class="section">
@@ -461,7 +461,7 @@ func main()
 				const jsInitCode = document.getElementById("initInput").value;
 				try {
 					await window.ring_initJs(jsInitCode);
-					updateOutput("initOutput", "JS init code sent. It will execute when the next page loads or when set_html is called.");
+					updateOutput("initOutput", "JS init code sent. It will execute when the next page loads or when setHtml is called.");
 				} catch (e) {
 					updateOutput("initOutput", "Error initializing JS: " + e, true);
 				}

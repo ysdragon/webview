@@ -44,9 +44,8 @@ func loadDrawingHTML()
 		<title>Ring Drawing App with Undo/Redo</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
 		<style>
-			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap");
 			:root {
 				--bg-color: #000000;
 				--panel-bg: rgba(30, 30, 32, 0.6);
@@ -186,7 +185,8 @@ func loadDrawingHTML()
 
 			// Function to redraw the entire canvas from history
 			function redrawCanvas(history) {
-				ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear everything
+				// Clear everything
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				history.forEach(stroke => {
 					ctx.strokeStyle = stroke.color;
 					ctx.lineWidth = stroke.width;
@@ -204,7 +204,7 @@ func loadDrawingHTML()
 			function updateButtonStates(canUndo, canRedo) {
 				undoBtn.disabled = !canUndo;
 				redoBtn.disabled = !canRedo;
-				clearBtn.disabled = !canUndo; // Can only clear if there"s something to undo
+				clearBtn.disabled = !canUndo;
 			}
 
 			canvas.addEventListener("mousedown", (e) => {
