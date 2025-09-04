@@ -94,6 +94,11 @@ try
 		makeDir(exefolder() + ".." + cPathSep + "samples")
 	ok
 
+	# Delete the UsingWebView directory if it exists 
+	if direxists(cSamplesPath)
+		remove(cSamplesPath)
+	ok
+
 	# Create the UsingWebView directory
 	makeDir(cSamplesPath)
 
