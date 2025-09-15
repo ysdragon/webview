@@ -395,6 +395,7 @@ func loadFetchHTML()
 			html {
 				scrollbar-width: thin;
 				scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+				background: var(--bg-primary);
 			}
 			@media (max-width: 768px) {
 				.app-layout {
@@ -708,8 +709,8 @@ func loadFetchHTML()
 				const htmlElement = document.documentElement;
 
 				const applyTheme = (theme) => {
-					htmlElement.classList.remove("light-mode", "dark-mode"); // Ensure only one is active
 					htmlElement.classList.add(theme);
+					htmlElement.classList.remove(theme === "light-mode" ? "dark-mode" : "light-mode");
 					if (theme === "light-mode") {
 						themeToggleIcon.classList.remove("fa-moon");
 						themeToggleIcon.classList.add("fa-sun");
@@ -741,11 +742,11 @@ func loadFetchHTML()
 					if (savedTheme) {
 						initialTheme = savedTheme;
 					} else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
-						initialTheme = "dark-mode";
+						initialTheme = "light-mode";
 					}
 				} else {
 					if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
-						initialTheme = "dark-mode";
+						initialTheme = "light-mode";
 					}
 				}
 				applyTheme(initialTheme);

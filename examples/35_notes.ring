@@ -76,6 +76,9 @@ func loadNotesHTML()
 			}
 			html[lang="ar"] body { font-family: "Tajawal", sans-serif; }
 			html[dir="rtl"] body { direction: rtl; }
+			html {
+				background: var(--bg-primary);
+			}
 
 			body {
 				font-family: "Inter", sans-serif;

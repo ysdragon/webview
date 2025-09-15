@@ -62,6 +62,9 @@ func loadPrayerTimesHTML()
 			--blur-md: 12px;
 			--blur-lg: 16px;
 		}
+		html {
+			background: var(--bg-primary);
+		}
 		body {
 			font-family: "Tajawal", "Inter", sans-serif;
 			background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
@@ -291,6 +294,7 @@ func loadPrayerTimesHTML()
 			transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 			backdrop-filter: blur(var(--blur-sm));
 			box-sizing: border-box;
+			font-family: "Tajawal", sans-serif;
 		}
 		.input-group input:focus {
 			border-color: var(--accent-primary);
@@ -313,6 +317,7 @@ func loadPrayerTimesHTML()
 			border: 1px solid rgba(255, 255, 255, 0.1);
 			white-space: nowrap;
 			min-width: fit-content;
+			font-family: "Tajawal", sans-serif;
 		}
 		.input-group button:hover {
 			transform: translateY(-2px);

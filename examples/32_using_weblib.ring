@@ -42,6 +42,9 @@ myPage = new HtmlPage {
 			--blur-md: 12px;
 			--blur-lg: 16px;
 		}
+		html {
+			background: var(--bg-primary);
+		}
 		body {
 			font-family: 'Inter', sans-serif;
 			background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
