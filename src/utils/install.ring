@@ -96,7 +96,7 @@ try
 
 	# Delete the UsingWebView directory if it exists 
 	if direxists(cSamplesPath)
-		remove(cSamplesPath)
+		OSDeleteFolder(cSamplesPath)
 	ok
 
 	# Create the UsingWebView directory
