@@ -97,6 +97,7 @@ aPackageInfo = [
 		"examples/33_adhkar_counter.ring",
 		"examples/34_ring_playground.ring",
 		"examples/35_notes.ring",
+		"examples/36_file_explorer.ring",
 		"README.md",
 		"docs/REFERENCE.md",
 		"docs/USAGE.md",
