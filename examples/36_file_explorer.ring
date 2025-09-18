@@ -385,7 +385,11 @@ func loadExplorerHTML()
 			currentPathDiv.value = data.path;
 			fileListUl.innerHTML = "";
 
-			data.items.forEach(item => {
+			data.items.sort((a, b) => {
+				if (a.is_dir && !b.is_dir) return -1;
+				if (!a.is_dir && b.is_dir) return 1;
+				return a.name.localeCompare(b.name);
+			}).forEach(item => {
 				const li = document.createElement("li");
 				li.className = "file-item";
 				li.onclick = () => {
@@ -491,27 +495,23 @@ func handleGetDirectoryContents(id, req)
 		])
 	ok
 
-	# Process directories first
+	# Process files and directories
 	for cItem in aFiles
 		cFullPath = cPath + "/" + cItem[1]
-		if cItem[1] != "." and cItem[1] != ".." and direxists(cFullPath)
-			add(aItems, [
-				:name = cItem[1],
-				:is_dir = true,
-				:size = 0
-			])
-		ok
-	next
-
-	# Process files
-	for cItem in aFiles
-		cFullPath = cPath + "/" + cItem[1]
-		if not direxists(cFullPath)
-			add(aItems, [
-				:name = cItem[1],
-				:is_dir = false,
-				:size = getfilesize(cFullPath)
-			])
+		if cItem[1] != "." and cItem[1] != ".."
+			if cItem[2] = 1
+				aItems + [
+					:name = cItem[1],
+					:is_dir = true,
+					:size = 0
+				]
+			else
+				aItems + [
+					:name = cItem[1],
+					:is_dir = false,
+					:size = getfilesize(cFullPath)
+				]
+			ok
 		ok
 	next
 
