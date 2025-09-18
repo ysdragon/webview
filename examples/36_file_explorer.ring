@@ -11,7 +11,8 @@ oWebView = NULL
 # Bind Ring functions to be callable from JavaScript.
 aBindList = [
 	["getInitialPath", :handleGetInitialPath],
-	["getDirectoryContents", :handleGetDirectoryContents]
+	["getDirectoryContents", :handleGetDirectoryContents],
+	["openFile", :handleOpenFile]
 ]
 
 # Main Function
@@ -396,12 +397,17 @@ func loadExplorerHTML()
 					if (item.is_dir) {
 						let newPath;
 						if (item.name === "..") {
-							newPath = data.path.substring(0, data.path.lastIndexOf("/"));
-							if (newPath === "") newPath = "/";
+							let parentPath = data.path.substring(0, data.path.lastIndexOf("/"));
+							if (parentPath.endsWith(":") && parentPath.length === 2) {
+								parentPath += "/";
+							}
+							newPath = parentPath || "/";
 						} else {
 							newPath = data.path + (data.path.endsWith("/") ? "" : "/") + item.name;
 						}
 						navigateTo(newPath);
+					} else {
+						window.openFile(data.path + (data.path.endsWith("/") ? "" : "/") + item.name);
 					}
 				};
 
@@ -523,6 +529,24 @@ func handleGetDirectoryContents(id, req)
 	cJson = list2json(aResult)
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson)
 
+# Handles opening a file.
+func handleOpenFile(id, req)
+	cPath = json2list(req)[1][1]
+	see "Ring: JavaScript requested to open file: " + cPath + nl
+
+	if fexists(cPath)
+		if isLinux() or isFreeBSD()
+			system('xdg-open "' + cPath + '"')
+		but isWindows()
+			system('start "" "' + cPath + '"')
+		but isMacOSX()
+			system('open "' + cPath + '"')
+		ok
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, NULL)
+	else
+		oWebView.wreturn(id, WEBVIEW_ERROR_INVALID_ARGUMENT, '"File not found"')
+	ok
+	
 # Utility function to normalize paths (convert backslashes to slashes)
 func normalizePath(cPath)
 	return substr(cPath, "\", "/")
