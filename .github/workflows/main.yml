@@ -8,12 +8,16 @@ on:
     - '**.h'
     - '**/CMakeLists.txt'
     - '.github/workflows/**'
+    - '.gitmodules'
+    - 'src/webview/**'
   pull_request:
     paths:
     - '**.c'
     - '**.h'
     - '**/CMakeLists.txt'
     - '.github/workflows/**'
+    - '.gitmodules'
+    - 'src/webview/**'
 
 jobs:
   freebsd:
