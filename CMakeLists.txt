@@ -1,61 +1,81 @@
 cmake_minimum_required(VERSION 3.16)
-project(RingWebview)
+project(RingWebView)
 
 include(FetchContent)
 
-# Get the Ring source directory from environment or use default
-if(NOT DEFINED ENV{RING})
-	set(RING "${CMAKE_CURRENT_SOURCE_DIR}/../..")
-	message(STATUS "RING not defined, using default: ${RING}")
-else()
-	set(RING $ENV{RING})
-	message(STATUS "Using RING from environment: ${RING}")
+set(RING_ROOT_DEFAULT "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+if(DEFINED ENV{RING})
+    set(RING_ROOT_DEFAULT "$ENV{RING}")
+endif()
+set(RING_ROOT "${RING_ROOT_DEFAULT}" CACHE PATH "Path to the Ring project root directory.")
+message(STATUS "Using Ring from: ${RING_ROOT}")
+
+if(NOT TARGET Ring::Ring)
+    add_library(Ring::Ring UNKNOWN IMPORTED)
+    find_path(RING_INCLUDE_DIR ring.h PATHS "${RING_ROOT}/language/include")
+
+    # Check if RING_STATE_VERSION is "1.23" to use ringstatic for Windows
+    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        file(STRINGS "${RING_INCLUDE_DIR}/state.h" RING_STATE_VERSION_LINE REGEX "RING_STATE_VERSION")
+        if(RING_STATE_VERSION_LINE MATCHES "\"1\\.23\"")
+            find_library(RING_LIBRARY_PATH NAMES ringstatic PATHS "${RING_ROOT}/lib")
+        else()
+            find_library(RING_LIBRARY_PATH NAMES ring PATHS "${RING_ROOT}/lib")
+        endif()
+    else()
+        find_library(RING_LIBRARY_PATH NAMES ring PATHS "${RING_ROOT}/lib")
+    endif()
+
+    if(NOT RING_INCLUDE_DIR OR NOT RING_LIBRARY_PATH)
+        message(FATAL_ERROR "Could not find Ring headers or library in ${RING_ROOT}. "
+                            "Please set the RING_ROOT cache variable correctly.")
+    endif()
+
+    set_target_properties(Ring::Ring PROPERTIES
+        IMPORTED_LOCATION "${RING_LIBRARY_PATH}"
+        INTERFACE_INCLUDE_DIRECTORIES "${RING_INCLUDE_DIR}"
+    )
 endif()
 
 # Set paths
-set(RING_INCLUDE "${RING}/language/include")
-set(RING_LIB "${RING}/lib")
-set(RING_BIN "${RING}/bin")
+set(RING_INCLUDE "${RING_ROOT}/language/include")
+set(RING_LIB "${RING_ROOT}/lib")
+set(RING_BIN "${RING_ROOT}/bin")
 
 set(RING_WEBVIEW_C_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/ring_webview.c")
 
 # Determine OS and Architecture specific paths
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(OS_DIR "linux")
-elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-    set(OS_DIR "freebsd")
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    set(OS_DIR "windows")
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+string(TOLOWER "${CMAKE_SYSTEM_NAME}" OS_DIR)
+if(OS_DIR STREQUAL "darwin")
     set(OS_DIR "macos")
-else()
-    message(FATAL_ERROR "Unsupported operating system: ${CMAKE_SYSTEM_NAME}")
 endif()
 
-# Determine architecture
+string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" ARCH_DIR_RAW)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND DEFINED CMAKE_GENERATOR_PLATFORM)
     if(CMAKE_GENERATOR_PLATFORM STREQUAL "Win32")
-        set(ARCH_DIR "i386")
+        set(ARCH_DIR_RAW "i386")
     elseif(CMAKE_GENERATOR_PLATFORM STREQUAL "x64")
-        set(ARCH_DIR "amd64")
+        set(ARCH_DIR_RAW "amd64")
     elseif(CMAKE_GENERATOR_PLATFORM STREQUAL "ARM64")
-        set(ARCH_DIR "arm64")
+        set(ARCH_DIR_RAW "arm64")
     else()
         message(WARNING "Unsupported CMAKE_GENERATOR_PLATFORM: ${CMAKE_GENERATOR_PLATFORM}, falling back to CMAKE_SYSTEM_PROCESSOR")
     endif()
 endif()
 
-# Fallback to CMAKE_SYSTEM_PROCESSOR if ARCH_DIR is not set
 if(NOT DEFINED ARCH_DIR)
-    string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" CMAKE_SYSTEM_PROCESSOR_LC)
-    if(CMAKE_SYSTEM_PROCESSOR_LC MATCHES "x86_64|amd64")
+    if(ARCH_DIR_RAW MATCHES "x86_64|amd64")
         set(ARCH_DIR "amd64")
-    elseif(CMAKE_SYSTEM_PROCESSOR_LC MATCHES "aarch64|arm64")
+    elseif(ARCH_DIR_RAW MATCHES "aarch64|arm64")
         set(ARCH_DIR "arm64")
-    elseif(CMAKE_SYSTEM_PROCESSOR_LC MATCHES "i386|i686|x86")
+    elseif(ARCH_DIR_RAW MATCHES "riscv64")
+        set(ARCH_DIR "riscv64")
+    elseif(ARCH_DIR_RAW MATCHES "i386|i686|x8x")
         set(ARCH_DIR "i386")
     else()
-        message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+        set(ARCH_DIR "${ARCH_DIR_RAW}")
+        message(WARNING "Unsupported architecture: ${ARCH_DIR_RAW}. Using as directory name.")
     endif()
 endif()
 
@@ -63,13 +83,8 @@ endif()
 set(LIB_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/${OS_DIR}/${ARCH_DIR}")
 
 # Configure webview build options
-set(WEBVIEW_BUILD ON)
 set(WEBVIEW_BUILD_SHARED_LIBRARY OFF)
-set(WEBVIEW_BUILD_STATIC_LIBRARY ON)
-set(WEBVIEW_BUILD_EXAMPLES OFF)
-set(WEBVIEW_BUILD_TESTS OFF)
-set(WEBVIEW_INSTALL_TARGETS OFF)
-set(WEBVIEW_ENABLE_PACKAGING OFF)
+set(BUILD_TESTING OFF CACHE BOOL "Disable building tests for webview")
 
 # Add webview as a subdirectory to build it
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/webview/CMakeLists.txt")
@@ -81,6 +96,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/webview/CMakeLists.txt")
     )
     FetchContent_MakeAvailable(webview)
 else()
+    message(STATUS "webview found locally, adding as subdirectory.")
     add_subdirectory(src/webview)
 endif()
 
@@ -92,20 +108,20 @@ add_library(ring_webview SHARED
 # Include directories
 target_include_directories(ring_webview PRIVATE
 	${RING_INCLUDE}
-	${webview_SOURCE_DIR}/core/include
 )
 
-# Determine Ring library based on OS
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-	set(RING_LIB_NAME "${RING_LIB}/ringstatic.lib")
-else()
-	set(RING_LIB_NAME "${RING_LIB}/libring${CMAKE_SHARED_LIBRARY_SUFFIX}")
-endif()
-
-# Link libraries - now linking against our locally built static webview
-target_link_libraries(ring_webview
-	${RING_LIB_NAME}
+# Link libraries
+target_link_libraries(ring_webview PRIVATE
+	Ring::Ring
 	webview::core_static
+)
+
+target_compile_options(ring_webview PRIVATE
+    $<$<CONFIG:Release,RelWithDebInfo,MinSizeRel>:
+        $<$<C_COMPILER_ID:MSVC>:/O2>
+        $<$<NOT:$<C_COMPILER_ID:MSVC>>:-O3>
+        -DNDEBUG
+    >
 )
 
 # Set target properties for output name and prefix
@@ -120,36 +136,35 @@ else()
 	)
 endif()
 
-# Move the built library to the OS/architecture-specific directory after build
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    add_custom_command(
-        TARGET ring_webview
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${LIB_DEST_DIR}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${RING_BIN}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:ring_webview> ${RING_BIN}/
-        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:ring_webview> ${LIB_DEST_DIR}/$<TARGET_FILE_NAME:ring_webview>
-        COMMENT "Moving library to ${LIB_DEST_DIR} and copying to ${RING_BIN}"
-        VERBATIM
-    )
-else()
-    add_custom_command(
-        TARGET ring_webview
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${LIB_DEST_DIR}
-        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:ring_webview> ${LIB_DEST_DIR}/$<TARGET_FILE_NAME:ring_webview>
-        COMMENT "Moving built library to ${LIB_DEST_DIR}"
-        VERBATIM
-    )
-endif()
+# Set the destination directory for the built library
+set(LIB_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/${OS_DIR}/${ARCH_DIR}")
 
-# Install rule
-get_filename_component(NORMALIZED_RING_LIB "${RING_LIB}" ABSOLUTE)
-install(TARGETS ring_webview
-	LIBRARY DESTINATION ${NORMALIZED_RING_LIB}
+# Move built library to lib directory
+add_custom_command(
+	TARGET ring_webview
+	POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${LIB_DEST_DIR}
+	COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:ring_webview> ${LIB_DEST_DIR}/$<TARGET_FILE_NAME:ring_webview>
+	COMMENT "Moving built library to ${LIB_DEST_DIR}"
+	VERBATIM
 )
 
-# Print info message
+# Copy to bin directory on Windows
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	add_custom_command(
+		TARGET ring_webview
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${RING_BIN}
+		COMMAND ${CMAKE_COMMAND} -E copy ${LIB_DEST_DIR}/$<TARGET_FILE_NAME:ring_webview> ${RING_BIN}/$<TARGET_FILE_NAME:ring_webview>
+		COMMENT "Copying built library to bin directory"
+		VERBATIM
+	)
+endif()
+
+install(TARGETS ring_webview
+    LIBRARY DESTINATION "${RING_ROOT}/lib"
+)
+
 message(STATUS "Ring Webview Extension Configuration:")
-message(STATUS "  - Ring Include Dir: ${RING_INCLUDE}")
-message(STATUS "  - Ring Library Dir: ${RING_LIB}")
+message(STATUS "  - Ring Include Dir: ${RING_INCLUDE_DIR}")
+message(STATUS "  - Ring Library Path: ${RING_LIBRARY_PATH}")
