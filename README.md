@@ -58,11 +58,11 @@ Follow these instructions to get the WebView library up and running on your syst
 
 The compiled Linux library in this package requires GTK 4 and WebkitGTK 6.
 
-*   **<img width="16" height="16" src="https://www.debian.org/favicon.ico" />Debian-based:** `sudo apt install libgtk-4-1 libwebkitgtk-6.0-4`
-*   **<img width="16" height="16" src="https://archlinux.org/static/favicon.png" />Arch-based:** `sudo pacman -S gtk4 webkitgtk-6.0`
-*   **<img width="16" height="16" src="https://fedoraproject.org/favicon.ico" />Fedora:** `sudo dnf install gtk4 webkitgtk6.0`
-*   **<img width="16" height="16" src="https://voidlinux.org/assets/img/favicon.png" />Void Linux:** `sudo xbps-install gtk4 libwebkitgtk60`
-*   **<img width="16" height="16" src="https://www.alpinelinux.org/alpine-logo.ico" />Alpine Linux:** `sudo apk add webkit2gtk-6.0`
+*   **<img width="16" height="16" src="https://www.debian.org/favicon.ico" /> Debian-based:** `sudo apt install libgtk-4-1 libwebkitgtk-6.0-4`
+*   **<img width="16" height="16" src="https://archlinux.org/static/favicon.png" /> Arch-based:** `sudo pacman -S gtk4 webkitgtk-6.0`
+*   **<img width="16" height="16" src="https://fedoraproject.org/favicon.ico" /> Fedora:** `sudo dnf install gtk4 webkitgtk6.0`
+*   **<img width="16" height="16" src="https://voidlinux.org/assets/img/favicon.png" /> Void Linux:** `sudo xbps-install gtk4 libwebkitgtk60`
+*   **<img width="16" height="16" src="https://www.alpinelinux.org/alpine-logo.ico" /> Alpine Linux:** `sudo apk add webkit2gtk-6.0`
 
 </details>
 
@@ -81,6 +81,15 @@ The [Microsoft Edge WebView2](https://developer.microsoft.com/en-us/microsoft-ed
 The compiled FreeBSD library in this package requires WebKitGTK 6.
 
 *   **FreeBSD systems:** `sudo pkg install webkit2-gtk_60`
+
+</details>
+
+<details>
+<summary>Click here for instructions on <img width="20" height="20" src="https://developer.apple.com/favicon.ico" /> macOS</summary>
+
+The compiled macOS library in this package uses the built-in WebKit framework.
+
+*   **macOS systems:** No additional dependencies required. The WebKit framework is included with macOS.
 
 </details>
 
