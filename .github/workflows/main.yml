@@ -2,7 +2,7 @@ name: Build and Update
 
 on:
   push:
-    branches: [ main ]
+    branches: [ dev ]
     paths:
     - '**.c'
     - '**.h'
@@ -23,27 +23,27 @@ jobs:
   freebsd:
     uses: ./.github/workflows/freebsd_build.yml
     with:
-      ring-version: v1.23
+      ring-version: master
 
   macos:
     uses: ./.github/workflows/macos_build.yml
     with:
-      ring-version: v1.23
+      ring-version: master
 
   ubuntu:
     uses: ./.github/workflows/ubuntu_build.yml
     with:
-      ring-version: v1.23
+      ring-version: master
 
   windows:
     uses: ./.github/workflows/windows_build.yml
     with:
-      ring-version: v1.23
+      ring-version: master
 
   update-libs:
     runs-on: ubuntu-latest
     needs: [ freebsd, macos, ubuntu, windows ]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
 
     permissions:
       contents: write
