@@ -9,15 +9,13 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-latest' || 'ubuntu-24.04-arm' }}
     strategy:
       matrix:
         include:
-        - os: ubuntu-24.04
-          arch: amd64
+        - arch: amd64
           name: ubuntu-24.04-amd64
-        - os: ubuntu-24.04-arm
-          arch: arm64
+        - arch: arm64
           name: ubuntu-24.04-arm64
 
     steps:
