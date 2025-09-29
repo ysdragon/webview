@@ -1,7 +1,7 @@
 # Simple Notes Application
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # Global Variables
 oWebView = NULL # Instance of the WebView class
@@ -652,20 +652,19 @@ func handleGetInitialNotes(id, req)
 # Handles requests from JavaScript to get the initial application settings.
 func handleGetInitialSettings(id, req)
 	see "Ring: JavaScript requested initial settings." + nl
-	# Manually construct the settings JSON to ensure it's a JSON object
-	cJson = '{'
+	# Create a Ring object structure instead of building JSON manually
+	aSettingsObj = []
 	for aSetting in aSettings
-		cKey = escape_json_string(aSetting[1])
-		cValue = escape_json_string(aSetting[2])
-		cJson += '"' + cKey + '":"' + cValue + '",'
+		# Add each setting as a key-value pair in the object
+		add(aSettingsObj, [aSetting[1], aSetting[2]])
 	next
-	if len(cJson) > 1 cJson = left(cJson, len(cJson) - 1) ok # Remove trailing comma
-	cJson += '}'
+	# Convert the Ring list to JSON using json_encode
+	cJson = json_encode(aSettingsObj)
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson) # Return settings as a JSON object.
 
 # Handles requests from JavaScript to save updated settings.
 func handleSaveSettings(id, req)
-	req = json2list(req)[1] # Parse the request data.
+	req = json_decode(req) # Parse the request data.
 	cLang = req[1] # Extract the language setting.
 	see "Ring: JavaScript requested to save settings. New language: '" + cLang + "'" + nl
 
@@ -677,7 +676,7 @@ func handleSaveSettings(id, req)
 
 # Handles requests from JavaScript to add a new note.
 func handleAddNote(id, req)
-	cNoteText = json2list(req)[1][1] # Extract the note text.
+	cNoteText = json_decode(req)[1] # Extract the note text.
 	cTimestamp = currentdatetime() # Get the current timestamp for the note.
 	see "Ring: Adding new note: '" + cNoteText + "' at " + cTimestamp + nl
 	add(aNotes, [cNoteText, cTimestamp]) # Add the new note to the in-memory list.
@@ -686,7 +685,7 @@ func handleAddNote(id, req)
 
 # Handles requests from JavaScript to edit an existing note.
 func handleEditNote(id, req)
-	aReq = json2list(req)[1] # Parse the request data.
+	aReq = json_decode(req) # Parse the request data.
 	nIndex = aReq[1] # Extract the index of the note to edit.
 	cNewText = aReq[2] # Extract the new text for the note.
 	cTimestamp = currentdatetime() # Update timestamp on edit.
@@ -700,7 +699,7 @@ func handleEditNote(id, req)
 
 # Handles requests from JavaScript to delete a note.
 func handleDeleteNote(id, req)
-	nIndex = json2list(req)[1][1] # Extract the index of the note to delete.
+	nIndex = json_decode(req)[1] # Extract the index of the note to delete.
 	see "Ring: Deleting note at index: " + nIndex + nl
 	if nIndex >= 0 and nIndex < len(aNotes)
 		del(aNotes, nIndex + 1) # Delete the note from the in-memory list.
@@ -711,29 +710,18 @@ func handleDeleteNote(id, req)
 # Helper Functions
 
 func build_notes_json()
-	cJson = "["
+	# Create a Ring list structure instead of building JSON manually
+	aNotesList = []
 	for i = 1 to len(aNotes)
 		aNote = aNotes[i]
-		cNoteText = escape_json_string(aNote[1])
-		cTimestamp = escape_json_string(aNote[2])
-		cJson += '{"text":"' + cNoteText + '","timestamp":"' + cTimestamp + '"}'
-		if i < len(aNotes)
-			cJson += ","
-		ok
+		# Add each note as an object with text and timestamp properties
+		add(aNotesList, [
+			:text = aNote[1],
+			:timestamp = aNote[2]
+		])
 	next
-	cJson += "]"
-	return cJson
-
-# Escapes special characters in a string to be safely embedded in a JSON string.
-func escape_json_string(cText)
-	cText = substr(cText, "\", "\\")
-	cText = substr(cText, '"', '\"')
-	cText = substr(cText, nl, "\n")
-	cText = substr(cText, char(13), "\r")
-	cText = substr(cText, char(9), "\t")
-	cText = substr(cText, char(8), "\b")
-	cText = substr(cText, char(12), "\f")
-	return cText
+	# Convert the Ring list to JSON using json_encode
+	return json_encode(aNotesList)
 
 # Loads application settings from `notes_settings.json`.
 func loadSettings()
@@ -741,7 +729,7 @@ func loadSettings()
 	if fexists(cNotesSettingsFile)
 		try
 			cJson = read(cNotesSettingsFile) # Read the JSON string from the file.
-			tempSettings = json2list(cJson) # Parse the JSON into a Ring list.
+			tempSettings = json_decode(cJson) # Parse the JSON into a Ring list.
 			see "Settings loaded successfully." + nl
 			return tempSettings
 		catch
@@ -755,13 +743,14 @@ func loadSettings()
 
 # Creates and returns a default set of application settings.
 func createDefaultSettings()
+	# Default language is English.
 	return [
-		["language", "en"] # Default language is English.
+		:language = "en"
 	]
 
 # Saves the current application settings to `notes_settings.json`.
 func saveSettings()
-	cJson = list2json(aSettings) # Convert settings list to JSON string.
+	cJson = json_encode(aSettings) # Convert settings list to JSON string.
 	write(cNotesSettingsFile, cJson) # Write JSON string to file.
 	see "Settings saved to file: " + cNotesSettingsFile + nl
 
@@ -771,12 +760,12 @@ func loadNotes()
 	if fexists(cNotesFile)
 		try
 			cJson = read(cNotesFile) # Read the JSON string from the file.
-			aLoadedNotes = json2list(cJson)[1] # Parse the JSON into a Ring list.
+			aLoadedNotes = json_decode(cJson) # Parse the JSON into a Ring list.
 			if islist(aLoadedNotes)
 				aNotes = [] # Clear existing in-memory notes before loading.
 				for aItem in aLoadedNotes
 					if islist(aItem) and len(aItem) > 0
-						add(aNotes, [aItem["text"], aItem["timestamp"]]) # Add loaded notes to in-memory list.
+						add(aNotes, [aItem[:text], aItem[:timestamp]]) # Add loaded notes to in-memory list.
 					ok
 				next
 			else

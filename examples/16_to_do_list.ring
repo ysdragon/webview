@@ -3,7 +3,7 @@
 # categorization, and persistence of data using a JSON file.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # --- Global Variables ---
 oWebView = NULL
@@ -350,11 +350,11 @@ func handleGetInitialTodos(id, req)
 		:todos = aJsonTodos,
 		:categories = getUniqueCategories()
 	]
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json(aResult)) # Return the data as a JSON string.
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aResult)) # Return the data as a JSON string.
 
 # Handles requests from JavaScript to add a new to-do item.
 func handleAddTodo(id, req)
-	aReq = json2list(req)[1] # Parse the request data.
+	aReq = json_decode(req) # Parse the request data.
 	cTaskText = aReq[1] # Extract the task text.
 	cCategory = aReq[2] # Extract the category.
 	see "Ring: Adding new todo: '" + cTaskText + "' in category '" + cCategory + "'" + nl
@@ -365,7 +365,7 @@ func handleAddTodo(id, req)
 
 # Handles requests from JavaScript to toggle the completion status of a to-do item.
 func handleToggleTodo(id, req)
-	nIndex = json2list(req)[1][1] # Extract the index of the to-do item.
+	nIndex = json_decode(req)[1] # Extract the index of the to-do item.
 	see "Ring: Toggling todo at index: " + nIndex + nl
 	if nIndex >= 0 and nIndex < len(aTodos)
 		aTodos[nIndex + 1][2] = not aTodos[nIndex + 1][2] # Toggle the boolean completed status.
@@ -376,7 +376,7 @@ func handleToggleTodo(id, req)
 
 # Handles requests from JavaScript to delete a to-do item.
 func handleDeleteTodo(id, req)
-	nIndex = json2list(req)[1][1] # Extract the index of the to-do item.
+	nIndex = json_decode(req)[1] # Extract the index of the to-do item.
 	see "Ring: Deleting todo at index: " + nIndex + nl
 	if nIndex >= 0 and nIndex < len(aTodos)
 		del(aTodos, nIndex + 1) # Delete the item from the list.
@@ -388,7 +388,7 @@ func handleDeleteTodo(id, req)
 # Handles requests from JavaScript to get the list of unique categories.
 func handleGetCategories(id, req)
 	see "Ring: JavaScript requested categories." + nl
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json(getUniqueCategories())) # Return unique categories as JSON.
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(getUniqueCategories())) # Return unique categories as JSON.
 
 # --- Helper Functions ---
 
@@ -404,7 +404,7 @@ func updateUI()
 		:todos = aJsonTodos,
 		:categories = getUniqueCategories()
 	]
-	cJsonResult = list2json(aResult)
+	cJsonResult = json_encode(aResult)
 	# Construct JavaScript code to update the frontend's data and re-render.
 	cJsCode = "allTodos = " + cJsonResult + ".todos; allCategories = " + cJsonResult + ".categories; updateCategorySelects(); renderTodos();"
 	oWebView.evalJS(cJsCode) # Execute the JavaScript in the webview.
@@ -415,7 +415,7 @@ func loadTodos()
 	if fexists(cTodosFile)
 		try
 			cJson = read(cTodosFile) # Read the JSON string from the file.
-			aLoadedTodos = json2list(cJson)[1] # Parse the JSON into a Ring list.
+			aLoadedTodos = json_decode(cJson) # Parse the JSON into a Ring list.
 			aTodos = [] # Clear existing in-memory todos before loading.
 			for aItem in aLoadedTodos
 				cTaskText = aItem["text"]
@@ -442,11 +442,9 @@ func saveTodos()
 	for aTodo in aTodos
 		add(aJsonList, [:text = aTodo[1], :completed = aTodo[2], :category = aTodo[3]])
 	next
-	cJson = list2json(aJsonList) # Convert the list of todos to a JSON string.
-	# Ensure the JSON is an array, not a single object if only one item exists.
-	if left(cJson, 1) = "{"
-		cJson = "[" + substr(cJson, 2, len(cJson)-2) + "]"
-	ok
+	
+	cJson = json_encode(aJsonList) # Convert the list of todos to a JSON string.
+
 	write(cTodosFile, cJson) # Write the JSON string to the file.
 	see "Todos saved successfully." + nl
 

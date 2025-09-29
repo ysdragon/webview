@@ -5,7 +5,7 @@
 */
 load "webview.ring"
 load "SysInfo.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # Global variable to hold the WebView instance.
 oWebView = NULL
@@ -597,7 +597,7 @@ func loadFetchHTML()
 				</div>
 				<div id="page-usage" class="content-page">
 					<div class="section-container">
-						<h2 class="section-title">Live Resource Usage</h2>
+						<h2 class="section-title">Resource Usage</h2>
 						<div class="info-grid" style="grid-template-columns: 60px 1fr;">
 							<span class="label">CPU</span>
 							<div class="progress-bar">
@@ -865,8 +865,7 @@ func loadFetchHTML()
 # Handles requests from JavaScript to get all system data.
 func handleGetSystemData(id, req)
 	aData = buildSystemDataList()
-	cJson = substr(list2json(aData), char(13), "")
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson)
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aData))
 
 # --- Helper Functions ---
 

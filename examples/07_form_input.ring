@@ -1,7 +1,7 @@
 # Simple Form Input Example
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # --- Global variable to hold the webview instance ---
 oWebView = NULL
@@ -214,7 +214,7 @@ func loadFormHTML()
 # Handles calls from JavaScript's `window.processInput()`.
 # It receives an ID for returning a value and a request object (JSON string containing the input).
 func handleProcessInput(id, req)
-	cName = json2list(req)[1][1] # Extract the name from the request.
+	cName = json_decode(req)[1] # Extract the name from the request.
 	see "Ring: Received name from JavaScript: '" + cName + "'" + nl
 	
 	cResponse = "Hello, " + cName + "! Your name was processed by Ring."

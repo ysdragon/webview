@@ -1,7 +1,7 @@
 # Adhkar Counter App
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 oWebView = NULL
 nCount = 0
@@ -234,7 +234,7 @@ func handleGetInitialCount(id, req)
 		:count = nCount,
 		:zikr = aAzkar[nCurrentZikrIndex][1]
 	]
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json(aResponse))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aResponse))
 
 # Handles requests from JavaScript to increment the counter.
 func handleIncrementCounter(id, req)

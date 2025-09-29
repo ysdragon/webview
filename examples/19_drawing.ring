@@ -1,7 +1,7 @@
 # Drawing example with Undo/Redo
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # --- Global State ---
 oWebView = NULL
@@ -272,8 +272,8 @@ func loadDrawingHTML()
 # --- Ring Callback Handlers (Bound to JavaScript) ---
 
 func handleAddStroke(id, req)
-	cStrokeJson = json2list(req)[1][1]
-	aStroke = json2list(cStrokeJson)
+	cStrokeJson = json_decode(req)[1]
+	aStroke = json_decode(cStrokeJson)
 	if nCurrentHistoryIndex < len(aDrawingHistory) - 1
 		aNewHistory = []
 		for i = 1 to nCurrentHistoryIndex + 1
@@ -325,7 +325,7 @@ func handleGetDrawingHistory(id, req)
 		:canUndo = bCanUndo,
 		:canRedo = bCanRedo
 	]
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json(aResult))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aResult))
 
 func updateDrawingUI()
 	see "Ring: Pushing drawing update to UI." + nl
@@ -345,9 +345,12 @@ func updateDrawingUI()
 			:points = aStroke[:points]
 		])
 	next
-	cHistoryJson = list2json(aHistoryList)
-	if left(cHistoryJson, 1) = "{"
-		cHistoryJson = "[" + substr(cHistoryJson, 2, len(cHistoryJson)-2) + "]"
-	ok
+
+	# Convert the history to JSON for JavaScript
+	cHistoryJson = json_encode(aHistoryList)
+
+	# Call the JavaScript function to update the canvas and buttons
 	cJsCode = "updateDrawingUI(" + cHistoryJson + ", " + string(bCanUndo) + ", " + string(bCanRedo) + ");"
+	
+	# Execute the JavaScript code in the WebView
 	oWebView.evalJS(cJsCode)

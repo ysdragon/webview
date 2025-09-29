@@ -3,7 +3,7 @@
 # It demonstrates product listing, adding items to a cart, calculating totals, and checkout.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # Global variables
 oWebView = NULL
@@ -427,7 +427,7 @@ func handleGetInitialData(id, req)
 
 # Handles requests from JavaScript to add a product to the cart.
 func handleAddToCart(id, req)
-	req = json2list(req)[1] # Parse the request data.
+	req = json_decode(req) # Parse the request data.
 	nProductIndex = req[1] + 1 # Get the product index (adjust for 1-based indexing in Ring).
 	if nProductIndex >= 1 and nProductIndex <= len(aProducts)
 		add(aCart, aProducts[nProductIndex]) # Add the selected product to the cart.
@@ -437,7 +437,7 @@ func handleAddToCart(id, req)
 
 # Handles requests from JavaScript to remove a product from the cart.
 func handleRemoveFromCart(id, req)
-	req = json2list(req)[1] # Parse the request data.
+	req = json_decode(req)[1] # Parse the request data.
 	nCartIndex = req[1] + 1 # Get the cart item index (adjust for 1-based indexing in Ring).
 	if nCartIndex >= 1 and nCartIndex <= len(aCart)
 		del(aCart, nCartIndex) # Delete the item from the cart.
@@ -489,4 +489,4 @@ func buildStateJSON()
 	]
 
 	# Convert to JSON string.
-	return list2json(aState)
+	return json_encode(aState)

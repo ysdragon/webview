@@ -3,7 +3,7 @@
 # The Ring backend captures user input and passes the text to the WebView for QR code generation.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # Global variable to hold the WebView instance.
 oWebView = NULL
@@ -21,7 +21,7 @@ func main()
 	# Bind the `generateQrCode` function to be callable from JavaScript.
 	# This function receives the text from the JS frontend and instructs the webview to generate the QR.
 	oWebView.bind("generateQrCode", func(id, req) {
-			cText = json2list(req)[1][1] # Extract the text to encode from the request.
+			cText = json_decode(req)[1] # Extract the text to encode from the request.
 			see "Ring: JavaScript requested QR code for text: '" + cText + "'" + nl
 	
 			# Execute JavaScript in the webview to call its `updateQrCode` function

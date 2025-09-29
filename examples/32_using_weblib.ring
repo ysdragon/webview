@@ -358,7 +358,7 @@ myPage = new HtmlPage {
 }
 
 # Set the dynamically generated HTML content in the webview.
-w.setHtml(mypage.output())
+w.setHtml(myPage.output())
 
 # Run the webview's main event loop. This is a blocking call.
 w.run()

@@ -3,7 +3,7 @@
 # is handled by the Ring backend, and the UI is rendered in the webview.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # --- Global Variables ---
 oWebView = NULL
@@ -169,7 +169,7 @@ func loadGameHTML()
 # --- Ring Callback Handlers ---
 
 func handlePlayerMove(id, req)
-	nIndex = json2list(req)[1][1]
+	nIndex = json_decode(req)[1]
 
 	if aBoard[nIndex + 1] = "" and not checkWinner()
 		aBoard[nIndex + 1] = cCurrentPlayer
@@ -239,7 +239,7 @@ func updateGame()
 
 func buildStateJSON()
 	cStatus = "Player " + cCurrentPlayer + "'s turn"
-	return list2json([
+	return json_encode([
 		:board = aBoard,
 		:status = cStatus
 	])
@@ -249,4 +249,4 @@ func buildBoardJson()
 	for i = 1 to len(aBoard)
 		add(aJsonList, aBoard[i])
 	next
-	return list2json(aJsonList)
+	return json_encode(aJsonList)

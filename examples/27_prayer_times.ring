@@ -1,7 +1,7 @@
 # Prayer Times Example
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 load "internetlib.ring"
 
 # Global variable to hold the WebView instance.
@@ -636,7 +636,7 @@ func handleGetPrayerTimes(id, req)
 	cCity = "القاهرة"
 	cCountry = "مصر"
 	
-	aReq = json2list(req)[1]
+	aReq = json_decode(req)
 	cCity = aReq[1]
 	if len(aReq) > 1
 		cCountry = aReq[2]
@@ -660,28 +660,28 @@ func handleGetPrayerTimes(id, req)
 		cResponse = download(cUrl)
 	catch
 		see "HTTP GET Error: " + ccatcherror + nl
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json([:error = "Failed to fetch data: " + ccatcherror]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = "Failed to fetch data: " + ccatcherror]))
 		return
 	done
 	
-	aJson = json2list(cResponse)
+	aJson = json_decode(cResponse)
 	
 	# Check if the API response indicates success (code 200) and contains timings data.
-	if isList(aJson) and aJson["code"] = 200
-		aTimings = aJson["data"]["timings"]
+	if isList(aJson) and aJson[:code] = 200
+		aTimings = aJson[:data][:timings]
 
 		aReturn = [
 			:times = aTimings,
 			:city = cCity,
 			:country = cCountry
 		]
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json(aReturn))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aReturn))
 	else
 		cErrorMsg = "Failed to get prayer times."
-		if isList(aJson) and isString(aJson["status"])
-			cErrorMsg += " Status: " + aJson["status"]
+		if isList(aJson) and isString(aJson[:status])
+			cErrorMsg += " Status: " + aJson[:status]
 		ok
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json([:error = cErrorMsg]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMsg]))
 	ok
 
 # Handles requests from JavaScript to get location using ip-api.com
@@ -692,20 +692,20 @@ func handleGetLocation(id, req)
 	cCountry = ""
 	try
 		cResponse = download(cUrl)
-		aJson = json2list(cResponse)
+		aJson = json_decode(cResponse)
 		if isList(aJson)
-			if isString(aJson["city"])
-				cCity = aJson["city"]
+			if isString(aJson[:city])
+				cCity = aJson[:city]
 			ok
-			if isString(aJson["country"])
-				cCountry = aJson["country"]
+			if isString(aJson[:country])
+				cCountry = aJson[:country]
 			ok
 		ok
 	catch
 		cCity = ""
 		cCountry = ""
 	done
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json([:city = cCity, :country = cCountry]))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:city = cCity, :country = cCountry]))
 
 
 func getCalculationMethods()

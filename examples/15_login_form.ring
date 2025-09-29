@@ -2,7 +2,7 @@
 # This example demonstrates a simple login form using Ring and WebView.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # Global aBindList to hold the Ring functions that can be called from JavaScript.
 # This list is automatically detected by the WebView class.
@@ -242,7 +242,7 @@ see "Application finished." + nl
 # It receives the username and password, simulates authentication, and returns a JSON response.
 func handleLogin(id, req)
 	see "Ring: `handleLogin` function called from JavaScript." + nl
-	req = json2list(req)[1] # Parse the request data.
+	req = json_decode(req) # Parse the request data.
 	cUser = req[1]
 	cPass = req[2]
 
@@ -254,7 +254,7 @@ func handleLogin(id, req)
 		cResult = [
 			:status = "success"
 		]
-		cResultJson = list2json(cResult)
+		cResultJson = json_encode(cResult)
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, cResultJson) # Return success.
 	else
 		see "  Login failed. Returning error status to JavaScript." + nl
@@ -262,7 +262,7 @@ func handleLogin(id, req)
 			:status = "error",
 			:message = "Invalid username or password."
 		]
-		cResultJson = list2json(cResult)
+		cResultJson = json_encode(cResult)
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, cResultJson) # Return error message.
 	ok
 

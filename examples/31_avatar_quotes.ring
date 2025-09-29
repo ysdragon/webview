@@ -2,7 +2,7 @@
 # This script fetches and displays random quotes from the Avatar: The Last Airbender Quotes API.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 load "libcurl.ring"
 
 # Global variable to hold the WebView instance.
@@ -199,13 +199,13 @@ func handleFetchQuote(id, req)
 
 	try
 		cResponse = request(cQuotesAPI) # Fetch data from the Avatar Quotes API.
-		aJson = json2list(cResponse)["quotes"][1] # Parse the JSON response.
+		aJson = json_decode(cResponse)[:quotes][1] # Parse the JSON response.
 		# Structure the result as a list (array) for JSON conversion.
 		aResult = [
-			:quote = aJson["quote"],
-			:character = aJson["character"]
+			:quote = aJson[:quote],
+			:character = aJson[:character]
 		]
-		cJsonResult = list2json(aResult) # Convert to JSON string.
+		cJsonResult = json_encode(aResult) # Convert to JSON string.
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult) # Return success with the quote data.
 	catch
 		bError = true
@@ -215,7 +215,7 @@ func handleFetchQuote(id, req)
 		
 	if bError
 		# If an error occurred, return an error message.
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json([:error = cErrorMessage]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMessage]))
 	ok
 
 # Function to make a HTTP request using libcurl

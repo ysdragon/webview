@@ -2,7 +2,6 @@
 # This example demonstrates how to create a synchronized counter application using Ring and WebView.
 
 load "webview.ring"
-load "jsonlib.ring"
 
 # Global variables
 oWebView = NULL

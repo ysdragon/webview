@@ -1,7 +1,7 @@
 # Digital Clock Example
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # --- Global variable to hold the webview instance ---
 oWebView = NULL
@@ -21,7 +21,7 @@ func main()
 		bind("requestTime", func (id, req) {
 			cCurrentTime = time() # Get the current system time.
 			# Return the current time as a JSON string to JavaScript.
-			oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json([cCurrentTime]))
+			oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([cCurrentTime]))
 		})
 
 		# Load the HTML content that defines the clock UI.

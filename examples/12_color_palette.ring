@@ -3,7 +3,7 @@
 # It generates random hex color codes and displays them.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # Global variable to hold the WebView instance.
 oWebView = NULL
@@ -21,14 +21,14 @@ func main()
 		bind("getInitialPalette", func (id, req) {
 			see "Ring: JavaScript requested initial color palette." + nl
 			Palette = generatePalette() # Generate the initial palette.
-			oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json(Palette)) # Return the palette as JSON.
+			oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(Palette)) # Return the palette as JSON.
 		})
 
 		# `generateNewPalette` generates and returns a new palette on demand.
 		bind("generateNewPalette", func (id, req) {
 			see "Ring: JavaScript requested a new color palette." + nl
 			Palette = generatePalette() # Generate a new palette.
-			oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json(Palette)) # Return the new palette as JSON.
+			oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(Palette)) # Return the new palette as JSON.
 		})
 
 		# Load the HTML content for the color palette UI.
