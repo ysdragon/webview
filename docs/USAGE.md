@@ -1,238 +1,449 @@
-# Usage Guide
+# Ring WebView Usage Guide
 
-This guide provides practical examples of how to use the Ring WebView library to build your applications.
+This comprehensive guide demonstrates how to use the Ring WebView library to build desktop applications with HTML/CSS/JavaScript frontends and Ring backends.
 
-## Basic Setup
+## Quick Start
 
-Every WebView application starts with creating a `WebView` instance, setting its properties, and running the event loop.
+Every WebView application follows this basic pattern:
 
-```ring
-# Load the webview library
-load "webview.ring"
-
-# To customize, modify the global config before creating the instance
-aWebViewConfig[:debug] = false
-
-# Create a new WebView instance using the global configuration
-oWebView = new WebView()
-
-# Set the window title
-oWebView.setTitle("My App")
-
-# Set the window size
-oWebView.setSize(800, 600, WEBVIEW_HINT_NONE)
-
-# Load your HTML content
-oWebView.setHtml("<h1>Hello, World!</h1>")
-
-# Run the main event loop
-oWebView.run()
-```
-
-## Loading External HTML
-
-Instead of embedding HTML directly, you can load it from a local file or a remote URL.
-
-### Loading a Local File
-
-```ring
-# Load HTML from a local file
-my_html = read("path/to/your/index.html")
-oWebView.setHtml(my_html)
-```
-
-### Navigating to a URL
-
-```ring
-# Navigate to a remote URL
-oWebView.navigate("https://www.google.com")
-```
-
-## Two-Way Binding: Ring and JavaScript
-
-One of the most powerful features of WebView is the ability to communicate between your Ring backend and JavaScript frontend.
-
-### Calling Ring from JavaScript
-
-You can expose Ring functions to your JavaScript code using the `bind()` method.
-
-**Ring Code:**
-```ring
-load "jsonlib.ring" # Required for JSON parsing
-
-# Define a global list of functions to bind
-aBindList = [
-    ["sayHello", :greet]
-]
-
-# The new WebView() constructor automatically binds the global `aBindList`.
-oWebView = new WebView()
-
-# You can also bind more functions later
-oWebView.bind("anotherFunc", :anotherHandler)
-
-func greet(id, req)
-    # `id` is the callback ID for wreturn()
-    # `req` is a JSON string containing arguments from JavaScript
-    aArgs = json2list(req) # Parse the JSON string into a Ring list
-    cName = aArgs[1][1] # Assuming a single string argument
-
-    see "Hello, " + cName + " from Ring!" + nl
-
-    # Return a response to JavaScript
-    oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Greeting received by Ring!"')
-
-```
-
-**JavaScript Code:**
-```html
-<script>
-async function callGreet() {
-    const response = await window.sayHello('World'); // Calls Ring function
-    alert(response); // Displays "Greeting received by Ring!"
-}
-</script>
-<button onclick="callGreet()">Say Hello</button>
-```
-When the button is clicked, the `greet` function in your Ring code will be called with the argument `'World'`, and the alert will show the response from Ring.
-
-### Binding Object Methods
-
-You can bind specific methods of a Ring object to JavaScript functions.
-
-**Ring Code:**
 ```ring
 load "webview.ring"
 
-oCounter = new Counter
+# Create and configure the webview
 oWebView = new WebView()
-
-oWebView.bind(oCounter, [
-			["getValue", :getValue],
-			["increment", :increment]
-		])
-
-oWebView.setHtml(`
-	<h1>Counter: <span id="counter">0</span></h1>
-	<button onclick="window.increment()">Increment</button>
-	<script>
-		async function updateValue() {
-			const value = await window.getValue();
-			document.getElementById('counter').innerText = value;
-		}
-		updateValue();
-	</script>
-`)
-oWebView.run()
-
-class Counter
-	value = 0
-
-	func getValue(id, req)
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, "" + self.value)
-
-	func increment(id, req)
-		self.value++
-		oWebView.evalJS("document.getElementById('counter').innerText = " + self.value)
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '""')
-```
-
-### Using `bindMany`
-
-You can use `bindMany` to bind multiple functions and object methods at once.
-
-```ring
-aBindList = [
-    # Simple function binding
-    ["showAlert", :showAlert],
-    # Object method binding
-    [oCounter, [
-        ["increment", :increment],
-        ["getValue", :getValue]
-    ]]
-]
-
-# This will be called automatically if `aBindList` is global,
-# or you can call it manually:
-oWebView.bindMany(aBindList)
-```
-
-### Calling JavaScript from Ring
-
-You can execute JavaScript from your Ring code using the `evalJS()` method. This is useful for dynamic UI updates or triggering client-side logic.
-
-```ring
-# This will execute the alert in the webview
-oWebView.evalJS("alert('This is called from Ring!');")
-```
-
-### Injecting JavaScript (`injectJS`)
-
-Use `injectJS()` to run JavaScript code *before* the main document content loads. This is ideal for setting up global variables, listeners, or utility functions that should be available as soon as the page is ready.
-
-```ring
-oWebView.injectJS("window.myGlobalVar = 'Hello from injected JS!'; console.log(window.myGlobalVar);")
-```
-
-### Dispatching Ring Code to Main Thread (`dispatch`)
-
-The `dispatch()` method allows you to execute a Ring function on the main UI thread of the webview. This is crucial when you need to update the UI or perform operations that require the main thread context, especially if your Ring logic is running asynchronously or in a separate thread.
-
-**Ring Code:**
-```ring
-# To call it:
-oWebView.dispatch("updateUiFromThread()")
-
-func updateUiFromThread()
-    oWebView.evalJS("document.getElementById('status').innerText = 'UI Updated from Dispatched Call!';")
-```
-
-### Unbinding Functions (`unbind`)
-
-If you no longer need a JavaScript-to-Ring binding, you can remove it using `unbind()`. This frees up resources and prevents further calls to the Ring function from JavaScript.
-
-```ring
-# Assuming 'sayHello' was previously bound
-oWebView.unbind("sayHello")
-```
-
-## Advanced Example: Counter
-
-Here is an example of a simple counter application that demonstrates two-way binding.
-
-**Ring Code (`counter.ring`):**
-```ring
-load "webview.ring"
-
-# Create a new WebView instance
-oWebView = new WebView()
-
 oWebView {
-    setTitle("Counter Example")
-    setSize(300, 200, WEBVIEW_HINT_FIXED)
-    bind("increment", :increment)
+    setTitle("My Application")
+    setSize(800, 600, WEBVIEW_HINT_NONE)
     setHtml(`
         <!DOCTYPE html>
         <html>
-            <head><title>Counter</title></head>
-            <body>
-                <h1>Counter</h1>
-                <p id="counter">0</p>
-                <button onclick="window.increment(document.getElementById('counter').innerText)">
-                    Increment
-                </button>
-            </body>
+        <head><title>My App</title></head>
+        <body>
+            <h1>Hello, Ring WebView!</h1>
+            <button onclick="alert('Hello from JavaScript!')">Click Me</button>
+        </body>
         </html>
     `)
     run()
 }
-
-func increment(id, req)
-	# req is a string representing the current value, e.g., ["0"]
-	current_value = number(substr(req, 3, len(req)-4))
-	new_value = current_value + 1
-	oWebView.evalJS("document.getElementById('counter').innerText = " + new_value)
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '""')
 ```
 
-This example shows how JavaScript can call a Ring function (`increment`) to perform a calculation, and how Ring can then call JavaScript (`evalJS`) to update the UI. It also demonstrates how to pass data from JavaScript to Ring and receive an acknowledgment using `wreturn()`.
+## Configuration
+
+### Global Configuration
+
+The WebView library uses a global configuration object that you can customize before creating instances:
+
+```ring
+# Customize global configuration before creating instances
+aWebViewConfig = [
+    :debug = false,    # Enable/disable debug mode (default: true)
+    :window = NULL    # Parent window handle (default: NULL for new window)
+]
+```
+
+### Window Management
+
+```ring
+oWebView = new WebView()
+
+# Window properties
+oWebView.setTitle("My Application")
+oWebView.setSize(800, 600, WEBVIEW_HINT_NONE)  # width, height, hints
+
+# Get native window handle (for platform integration)
+nativeWindow = oWebView.getWindow()
+```
+
+## Content Loading
+
+### HTML Content
+
+Set HTML content directly:
+
+```ring
+oWebView.setHtml(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>My App</title></head>
+    <body>
+        <h1>Welcome to Ring WebView</h1>
+        <p>This content is generated by Ring!</p>
+    </body>
+    </html>
+`)
+```
+
+### Local Files
+
+Load HTML from local files:
+
+```ring
+# Load HTML content from file
+htmlContent = read("assets/index.html")
+oWebView.setHtml(htmlContent)
+```
+
+Navigate to local files:
+
+```ring
+# Navigate to a local file URL
+oWebView.navigate("file:///path/to/your/file.html")
+```
+
+### Remote URLs
+
+Navigate to websites:
+
+```ring
+# Navigate to a URL
+oWebView.navigate("https://www.example.com")
+```
+
+## JavaScript Integration
+
+### Calling Ring from JavaScript
+
+Expose Ring functions to JavaScript using the `bind()` method:
+
+```ring
+load "webview.ring"
+load "simplejson.ring"
+
+# Global variables
+oWebView = NULL
+# Define functions to expose to JavaScript
+aBindList = [
+    ["sayHello", :handleGreeting],
+    ["calculate", :doMath]
+]
+
+func main()
+    oWebView = new WebView()
+    
+    oWebView {
+        setTitle("Ring-JavaScript Communication")
+        setSize(600, 400, WEBVIEW_HINT_NONE)
+        
+        setHtml(`
+            <!DOCTYPE html>
+            <html>
+            <head><title>Communication Demo</title></head>
+            <body>
+                <h1>Ring-JavaScript Communication</h1>
+                <button onclick="callRingHello()">Say Hello</button>
+                <button onclick="callRingCalc()">Calculate</button>
+                <div id="result"></div>
+                
+                <script>
+                async function callRingHello() {
+                    try {
+                        const response = await window.sayHello('World');
+                        document.getElementById('result').innerText = response;
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+                
+                async function callRingCalc() {
+                    try {
+                        const result = await window.calculate(5, 3, 'add');
+                        document.getElementById('result').innerText = 'Result: ' + result;
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+                </script>
+            </body>
+            </html>
+        `)
+        
+        run()
+    }
+
+# Ring functions called from JavaScript
+func handleGreeting(id, req)
+    # req is a JSON string: ["World"]
+    see "Greeting requested: " + req + nl
+    
+    # Send response back to JavaScript
+    oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello from Ring!"')
+
+func doMath(id, req)
+    # Parse arguments from JSON
+    aArgs = json_decode(req)  # Expected format: [5, 3, "add"]
+    n1 = number(aArgs[1])
+    n2 = number(aArgs[2])
+    operation = aArgs[3]
+    
+    switch operation
+    on "add"
+        result = n1 + n2
+    on "subtract"
+        result = n1 - n2
+    on "multiply"
+        result = n1 * n2
+    on "divide"
+        result = n1 / n2
+    off
+    
+    oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(result))
+```
+
+### Binding Object Methods
+
+Bind methods from Ring objects to JavaScript:
+
+```ring
+# Usage
+oCounter = new Counter()
+oWebView.bind(oCounter, [
+    ["increment", :increment],
+    ["decrement", :decrement],
+    ["getValue", :getValue]
+])
+
+class Counter
+    value = 0
+    
+    func increment(id, req)
+        self.value++
+        oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(self.value))
+    
+    func decrement(id, req)
+        self.value--
+        oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(self.value))
+    
+    func getValue(id, req)
+        oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(self.value))
+```
+
+### Anonymous Function Binding
+
+Bind anonymous functions directly:
+
+```ring
+# Bind an anonymous function
+oWebView.bind("showAlert", func (id, req) {
+    see "Anonymous function called: " + req + nl
+    oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Message received!"')
+})
+```
+
+### Using `bindMany()`
+
+The `bindMany()` method allows binding multiple functions at once:
+
+```ring
+# Global binding list (automatically used if it exists)
+aBindList = [
+    ["simpleFunc", :simpleFunction],
+    [oMyObject, [
+        ["objMethod1", :method1],
+        ["objMethod2", :method2]
+    ]]
+]
+
+# Or bind manually
+oWebView.bindMany(aBindList)
+```
+
+## JavaScript from Ring
+
+### Executing JavaScript
+
+Execute JavaScript code from Ring:
+
+```ring
+# Simple JavaScript execution
+oWebView.evalJS("alert('Hello from Ring!');")
+
+# Update DOM elements
+oWebView.evalJS("document.getElementById('status').innerText = 'Updated!';")
+
+# Call JavaScript functions
+oWebView.evalJS("myJavaScriptFunction('argument');")
+```
+
+### Injecting JavaScript
+
+Inject JavaScript to run before page loads:
+
+```ring
+# Inject JavaScript that runs before the main content
+oWebView.injectJS("
+    window.myGlobalVar = 'Hello from injected JS!';
+    console.log('Injected JS executed');
+")
+```
+
+### Main Thread Dispatch
+
+Execute Ring code on the main UI thread:
+
+```ring
+# Dispatch code to main thread
+oWebView.dispatch("updateUI()")
+
+func updateUI()
+    # This runs on the main thread
+    oWebView.evalJS("document.getElementById('counter').innerText = 'Updated';")
+```
+
+## Function Parameters and Return Values
+
+### Parameter Passing
+
+JavaScript calls to Ring functions receive two parameters:
+
+- `id`: Callback ID for sending responses back to JavaScript
+- `req`: JSON string containing arguments from JavaScript
+
+```ring
+func myFunction(id, req)
+    # Parse JSON arguments
+    aArgs = json_decode(req)  # Converts JSON string to Ring list
+    
+    # Access arguments
+    arg1 = aArgs[1]
+    arg2 = aArgs[2]
+    
+    # Process the request...
+    
+    # Send response back to JavaScript
+    oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Response from Ring"')
+```
+
+### Return Values
+
+Always use `wreturn()` to send responses back to JavaScript:
+
+```ring
+# String response
+oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello from Ring!"')
+
+# Number response
+oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(42))
+
+# JSON response
+oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{"success": true, "data": "value"}')
+```
+
+## Complete Examples
+
+### Counter Application
+
+```ring
+load "webview.ring"
+
+oWebView = NULL
+
+func main()
+    oWebView = new WebView()
+    oWebView {
+        setTitle("Counter Example")
+        setSize(400, 300, WEBVIEW_HINT_NONE)
+        
+        # Bind counter methods
+        bind(new Counter, [
+            ["increment", :increment]
+        ])
+        
+        setHtml(`
+            <!DOCTYPE html>
+            <html>
+            <head><title>Counter</title></head>
+            <body>
+                <h1>Counter: <span id="counter">0</span></h1>
+                <button onclick="window.increment()">Increment</button>
+            </body>
+            </html>
+        `)
+        
+        run()
+    }
+
+class Counter
+    value = 0
+    
+    func increment(id, req)
+        self.value++
+        # Update UI and send response
+        oWebView.evalJS("document.getElementById('counter').innerText = " + string(self.value))
+        oWebView.wreturn(id, WEBVIEW_ERROR_OK, "")
+```
+
+### Form Handler
+
+```ring
+load "webview.ring"
+load "simplejson.ring"
+
+# Global variable to hold the WebView instance.
+oWebView = NULL
+
+func main()
+    oWebView = new WebView()
+    oWebView {
+        setTitle("Form Example")
+        setSize(500, 400, WEBVIEW_HINT_NONE)
+        
+        bind("submitForm", :handleForm)
+        
+        setHtml(`
+            <!DOCTYPE html>
+            <html>
+            <head><title>Contact Form</title></head>
+            <body>
+                <h1>Contact Us</h1>
+                <form name="contactForm">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <button type="button" onclick="submitFormData()">Submit</button>
+                </form>
+                <div id="response"></div>
+                
+                <script>
+                async function submitFormData() {
+                    const form = document.forms.contactForm;
+                    const formData = [
+                        form.name.value,
+                        form.email.value
+                    ];
+                    
+                    try {
+                        const result = await window.submitForm(formData);
+                        document.getElementById('response').innerText = result;
+                    } catch (error) {
+                        document.getElementById('response').innerText = 'Error: ' + error;
+                    }
+                }
+                </script>
+            </body>
+            </html>
+        `)
+        
+        run()
+    }
+
+func handleForm(id, req)
+    # Parse form data from JSON
+    aData = json_decode(req)
+    ? aData
+    name = aData[1][1]
+    email = aData[1][2]
+    
+    see "Form submitted - Name: " + name + ", Email: " + email + nl
+    
+    # Process form (save to database, send email, etc.)
+    
+    oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Form submitted successfully!"')
+```
+
+### Debug Mode
+
+Enable debug mode to get detailed logging:
+
+```ring
+aWebViewConfig[:debug] = true
+```
