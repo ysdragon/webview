@@ -2,7 +2,7 @@
 # of the Ring WebView library to interact between Ring code and JavaScript running in the webview.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # --- Global variable to hold the webview instance ---
 oWebView = NULL
@@ -329,21 +329,21 @@ func main()
 
 # Handles calls from JavaScript's `window.ring_echo()`.
 func handle_echo(id, req)
-	cMessage = json2list(req)[1][1] # Extract the message from the JSON request.
+	cMessage = json_decode(req)[1] # Extract the message from the JSON request.
 	see "Ring: `handle_echo` received message: '" + cMessage + "'" + nl
 	# Return a success status and an echoed message back to JavaScript.
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Echo: ' + cMessage + '"')
 
 # Handles calls from JavaScript's `window.ring_evalJs()`.
 func handle_evalJs(id, req)
-	cJsCode = json2list(req)[1][1] # Extract the JavaScript code string.
+	cJsCode = json_decode(req)[1] # Extract the JavaScript code string.
 	see "Ring: `handle_evalJs` executing JavaScript: '" + cJsCode + "'" + nl
 	oWebView.evalJS(cJsCode) # Execute the JavaScript code in the webview.
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}') # Acknowledge the call.
 
 # Handles calls from JavaScript's `window.ring_initJs()`.
 func handle_initJs(id, req)
-	cJsInitCode = json2list(req)[1][1] # Extract the JavaScript initialization code.
+	cJsInitCode = json_decode(req)[1] # Extract the JavaScript initialization code.
 	see "Ring: `handle_initJs` injecting JavaScript for initialization: '" + cJsInitCode + "'" + nl
 	oWebView.injectJS(cJsInitCode) # Inject the JavaScript code into the webview.
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}') # Acknowledge the call.

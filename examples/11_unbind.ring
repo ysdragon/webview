@@ -1,7 +1,6 @@
 # Unbind Example
 
 load "webview.ring"
-load "jsonlib.ring"
 
 oWebView = NULL
 

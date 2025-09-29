@@ -1,9 +1,9 @@
 # Mock Chat Bot Application using Ring and WebView
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
-# -- Global Variables --
+# Global Variables
 # Variable to hold the WebView instance.
 oWebView = NULL
 # Variable to hold the settings file path.
@@ -41,11 +41,11 @@ func main()
 # Handles requests from JavaScript to get the initial application settings.
 func handleGetInitialSettings(id, req)
 	see "Ring: JavaScript requested initial settings." + nl
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json(aSettings)) # Return settings as a JSON object.
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aSettings)) # Return settings as a JSON object.
 
 # Handles incoming messages from the JavaScript frontend.
 func handleSendMessage(id, req)
-	req = json2list(req)[1] # Parse the request data.
+	req = json_decode(req) # Parse the request data.
 	cUserMessage = req[1] # Extract the user's message.
 	cLang = req[2] # Extract the current language from JS.
 	see "User (" + cLang + ")> " + cUserMessage + nl
@@ -60,7 +60,7 @@ func handleSendMessage(id, req)
 
 # Handles requests from JavaScript to save updated application settings.
 func handleSaveSettings(id, req)
-	req = json2list(req)[1] # Parse the request data.
+	req = json_decode(req) # Parse the request data.
 	cTheme = req[1] # Extract the new theme.
 	cLang = req[2] # Extract the new language.
 	
@@ -79,7 +79,7 @@ func loadSettings()
 	if fexists(cSettingsFile)
 		try
 			cJson = read(cSettingsFile) # Read the JSON string from the file.
-			tempSettings = json2list(cJson) # Parse the JSON into a Ring list.
+			tempSettings = json_decode(cJson) # Parse the JSON into a Ring list.
 			see "Settings loaded successfully." + nl
 			return tempSettings
 		catch
@@ -100,7 +100,7 @@ func createDefaultSettings()
 
 # Saves the current application settings to `chat_settings.json`.
 func saveSettings()
-	cJson = list2json(aSettings) # Convert settings list to JSON string.
+	cJson = json_encode(aSettings) # Convert settings list to JSON string.
 	write(cSettingsFile, cJson) # Write JSON string to file.
 	see "Settings saved to file: " + cSettingsFile + nl
 

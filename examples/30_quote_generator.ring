@@ -2,7 +2,7 @@
 # This example fetches and displays a random quote from an external API.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 load "libcurl.ring"
 load "threads.ring"
 
@@ -209,15 +209,15 @@ func fetchQuote(id)
 
 	try
 		cResponse = request(cQuoteAPI) # Fetch data from the external quote API.
-		aJson = json2list(cResponse) # Parse the JSON response.
+		aJson = json_decode(cResponse) # Parse the JSON response.
 		# Check if the expected 'text' and 'author' fields exist in the response.
-		if isList(aJson) and aJson["text"] and aJson["author"]
+		if isList(aJson) and aJson[:text] and aJson[:author]
 			# Structure the result as a list (array) for JSON conversion.
 			aResult = [
-				:quote = aJson["text"],
-				:author = aJson["author"]
+				:quote = aJson[:text],
+				:author = aJson[:author]
 			]
-			cJsonResult = list2json(aResult) # Convert to JSON string.
+			cJsonResult = json_encode(aResult) # Convert to JSON string.
 			oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult) # Return success with the quote data.
 		else
 			bError = true
@@ -231,7 +231,7 @@ func fetchQuote(id)
 		
 	if bError
 		# If an error occurred (either network or invalid format), return an error message.
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, list2json([:error = cErrorMessage]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMessage]))
 	ok
 
 # Function to make a HTTP request using libcurl

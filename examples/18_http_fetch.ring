@@ -3,7 +3,7 @@
 # and display the fetched response (e.g., JSON data) within the WebView UI.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 load "internetlib.ring"
 
 # Global variable to hold the WebView instance.
@@ -216,7 +216,7 @@ func loadFetchHTML()
 
 # Handles requests from JavaScript to fetch content from a given URL.
 func handleFetchURL(id, req)
-	cURL = json2list(req)[1][1]
+	cURL = json_decode(req)[1]
 	see "Ring: Attempting to fetch URL: " + cURL + nl
 	
 	cResponse = ""
@@ -236,7 +236,7 @@ func handleFetchURL(id, req)
 		aResult[:error] = cErrorMessage
 	else
 		try
-			aResult[:content] = json2list(cResponse)
+			aResult[:content] = json_decode(cResponse)
 		catch
 			bError = true
 			cErrorMessage = "JSON Error: " + cCatchError
@@ -245,7 +245,7 @@ func handleFetchURL(id, req)
 	ok
 
 	 # Convert the result to a JSON string.
-	cJsonResult = list2json(aResult)
+	cJsonResult = json_encode(aResult)
 
 	# Return the JSON result to JavaScript.
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult)

@@ -2,7 +2,7 @@
 # This example demonstrates how to create a simple theme switcher application using Ring and WebView.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 oWebView = NULL
 cCurrentTheme = "light"
@@ -253,8 +253,7 @@ func handleGetInitialTheme(id, req)
 
 # Handles requests from JavaScript to set a new theme.
 func handleSetTheme(id, req)
-	req = json2list(req)[1] # Parse the request data.
-	cNewTheme = req[1] # Extract the new theme name.
+	cNewTheme = json_decode(req)[1] # Extract the new theme name.
 	see "Ring: JavaScript requested to set theme to: '" + cNewTheme + "'" + nl
 	
 	cCurrentTheme = cNewTheme # Update the global current theme.

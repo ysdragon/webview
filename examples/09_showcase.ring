@@ -3,7 +3,7 @@
 # with JavaScript communication, DOM manipulation, and main thread dispatching
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # --- Global variable to hold the webview instance ---
 oWebView = NULL
@@ -201,10 +201,10 @@ func main()
 func greet(id, req)
 	see "Ring function 'greet' called from JavaScript!" + nl
 	see "  Binding ID: " + id + nl
-	cName = json2list(req)[1][1] # Extract the name from the request.
+	cName = json_decode(req)[1] # Extract the name from the request.
 
 	cResponse = "Hello, " + cName + "! Greetings from the Ring language."
-	cResultJson = list2json([cResponse]) # Prepare the response as a JSON string.
+	cResultJson = json_encode([cResponse]) # Prepare the response as a JSON string.
 
 	# Return the result to JavaScript. Status 0 indicates success.
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cResultJson)

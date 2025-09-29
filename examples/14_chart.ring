@@ -3,7 +3,7 @@
 # into a WebView application, with data provided dynamically from the Ring backend.
 
 load "webview.ring"
-load "jsonlib.ring"
+load "simplejson.ring"
 
 # Global variable to hold the WebView instance.
 oWebView = NULL
@@ -133,7 +133,7 @@ func handleGetSalesData(id, req)
 	aChartData = buildChartData()
 	
 	# Convert the Ring list (array) to a JSON string.
-	cJson = list2json(aChartData)
+	cJson = json_encode(aChartData)
 	
 	# Return the JSON data to the JavaScript `await` call.
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson)
