@@ -20,9 +20,9 @@ aPackageInfo = [
 			:providerusername = "ysdragon"
 		],
 		[
-			:name = "jsonlib",
-			:version = "1.0.18",
-			:providerusername = "ringpackages"
+			:name = "simplejson",
+			:version = "1.0.0",
+			:providerusername = "ysdragon"
 		],
 		[
 			:name = "markdown",
