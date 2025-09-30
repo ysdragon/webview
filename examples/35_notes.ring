@@ -652,7 +652,7 @@ func handleGetInitialNotes(id, req)
 # Handles requests from JavaScript to get the initial application settings.
 func handleGetInitialSettings(id, req)
 	see "Ring: JavaScript requested initial settings." + nl
-	# Create a Ring object structure instead of building JSON manually
+	# Create a Ring list structure
 	aSettingsObj = []
 	for aSetting in aSettings
 		# Add each setting as a key-value pair in the object
@@ -710,7 +710,7 @@ func handleDeleteNote(id, req)
 # Helper Functions
 
 func build_notes_json()
-	# Create a Ring list structure instead of building JSON manually
+	# Create a Ring list structure
 	aNotesList = []
 	for i = 1 to len(aNotes)
 		aNote = aNotes[i]
