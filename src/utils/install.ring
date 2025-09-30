@@ -142,18 +142,23 @@ done
 
 
 func getRing2EXEContent
-	return `aLibrary = [:name = :webview,
-	 :title = "WebView",
-	 :windowsfiles = [
+	return `aLibrary = [
+	:name = :webview,
+	:title = "WebView",
+	:windowsfiles = [
 		"ring_webview.dll"
-	 ],
-	 :linuxfiles = [
+	],
+	:linuxfiles = [
 		"libring_webview.so"
-	 ],
-	 :macosxfiles = [
+	],
+	:macosxfiles = [
 		"libring_webview.dylib"
-	 ],
-	 :ubuntudep = "libgtk-4-1 libwebkitgtk-6.0-4",
-	 :fedoradep = "gtk4 webkitgtk6.0",
-	 :macosxdep = ""
-	]`
+	],
+	:freebsdfiles = [
+		"libring_webview.so"
+	],
+	:ubuntudep = "libgtk-4-1 libwebkitgtk-6.0-4",
+	:fedoradep = "gtk4 webkitgtk6.0",
+	:macosxdep = "",
+	:freebsddep = "webkit2-gtk_60"
+]`
