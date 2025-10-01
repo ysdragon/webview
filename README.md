@@ -50,7 +50,7 @@ Follow these instructions to get the WebView library up and running on your syst
 
 ### Prerequisites
 
-- **[Ring](https://ring-lang.github.io/download.html):** Ensure you have Ring language version 1.23 or higher installed.
+- **[Ring](https://ring-lang.github.io/download.html):** Ensure you have Ring language version 1.24 or higher installed.
 
 ### Installation
 <details>

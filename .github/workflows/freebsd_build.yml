@@ -17,10 +17,10 @@ jobs:
           arch: amd64
           arch_name: amd64
           name: freebsd-amd64
-        # - release: "14.3"
-        #   arch: aarch64
-        #   arch_name: arm64
-        #   name: freebsd-arm64
+        - release: "14.3"
+          arch: aarch64
+          arch_name: arm64
+          name: freebsd-arm64
 
     steps:
     - uses: actions/checkout@v4
