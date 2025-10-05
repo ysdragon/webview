@@ -16,6 +16,7 @@ aBindList = [
 	["getForecast", :handleGetForecast],
 	["getLocation", :handleGetLocation]
 ]
+
 # ==================================================
 # Main Application Flow
 # ==================================================
