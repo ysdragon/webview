@@ -99,6 +99,7 @@ aPackageInfo = [
 		"examples/35_notes.ring",
 		"examples/36_file_explorer.ring",
 		"examples/37_weather_app.ring",
+		"examples/38_using_htmx.ring",
 		"README.md",
 		"docs/REFERENCE.md",
 		"docs/USAGE.md",
