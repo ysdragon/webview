@@ -6,20 +6,27 @@
 
 #include "ring.h"
 
-#include "webview/webview.h"
 #include "webview/version.h"
+#include "webview/webview.h"
+
+// Wrapper structure for webview that stores the main RingState
+typedef struct RingWebView
+{
+	webview_t webview;
+	RingState *pMainRingState;
+} RingWebView;
 
 // Helper structure for webview_bind
 typedef struct RingWebViewBind
 {
-	VM *pVM;
+	RingState *pMainRingState;
 	char *cFunc;
 } RingWebViewBind;
 
 // Helper structure for webview_dispatch
 typedef struct RingWebViewDispatch
 {
-	VM *pVM;
+	RingState *pRingState;
 	char *cCode;
 } RingWebViewDispatch;
 
@@ -39,13 +46,17 @@ static char *ring_webview_string_strdup(void *pState, const char *cStr)
 void ring_webview_bind_callback(const char *id, const char *req, void *arg)
 {
 	RingWebViewBind *pBind = (RingWebViewBind *)arg;
-	if (!pBind || !pBind->pVM || !pBind->cFunc)
+	if (!pBind || !pBind->pMainRingState || !pBind->cFunc)
 	{
 		return;
 	}
 
-	VM *pVM = pBind->pVM;
-	RingState *pRingState = pVM->pRingState;
+	RingState *pRingState = pBind->pMainRingState;
+	VM *pVM = pRingState->pVM;
+	if (pVM == NULL)
+	{
+		return;
+	}
 
 	// Mutex Lock
 	ring_vm_mutexlock(pVM);
@@ -110,30 +121,37 @@ void ring_webview_dispatch_callback(webview_t w, void *arg)
 	}
 
 	RingWebViewDispatch *pDispatch = (RingWebViewDispatch *)arg;
+	RingState *pRingState = pDispatch->pRingState;
 
-	// Execute the Ring code
-	ring_vm_runcodefromthread(pDispatch->pVM, pDispatch->cCode);
+	// Use the main VM from RingState
+	if (pRingState == NULL || pRingState->pVM == NULL)
+	{
+		return;
+	}
+
+	// Execute the Ring code using the main VM
+	ring_vm_runcodefromthread(pRingState->pVM, pDispatch->cCode);
 
 	// Free the allocated memory
-	ring_state_free(pDispatch->pVM->pRingState, pDispatch->cCode);
-	ring_state_free(pDispatch->pVM->pRingState, pDispatch);
+	ring_state_free(pRingState, pDispatch->cCode);
+	ring_state_free(pRingState, pDispatch);
 }
 
 // Helper to destroy webview and free resources to avoid duplication.
-void ring_webview_destroy_internal(webview_t *pWebView)
+void ring_webview_destroy_internal(RingWebView *pRingWebView)
 {
-	if (pWebView && *pWebView)
+	if (pRingWebView && pRingWebView->webview)
 	{
-		webview_destroy(*pWebView);
-		*pWebView = NULL;
+		webview_destroy(pRingWebView->webview);
+		pRingWebView->webview = NULL;
 	}
 }
 
-// Custom free function for the webview_t object, called by the GC.
+// Custom free function for the RingWebView object, called by the GC.
 void ring_webview_free(void *pState, void *pPointer)
 {
-	webview_t *pWebView = (webview_t *)pPointer;
-	ring_webview_destroy_internal(pWebView);
+	RingWebView *pRingWebView = (RingWebView *)pPointer;
+	ring_webview_destroy_internal(pRingWebView);
 	ring_state_free(pState, pPointer);
 }
 
@@ -151,31 +169,33 @@ RING_FUNC(ring_webview_dispatch)
 		return;
 	}
 
-	webview_t w = *(webview_t *)RING_API_GETCPOINTER(1, "webview_t");
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
 	const char *cCodeToRun = RING_API_GETSTRING(2);
 
-	RingWebViewDispatch *pDispatch = (RingWebViewDispatch *)RING_API_MALLOC(sizeof(RingWebViewDispatch));
+	RingWebViewDispatch *pDispatch =
+		(RingWebViewDispatch *)ring_state_malloc(pRingWebView->pMainRingState, sizeof(RingWebViewDispatch));
 	if (pDispatch == NULL)
 	{
 		RING_API_ERROR(RING_OOM);
 		return;
 	}
-	pDispatch->pVM = (VM *)pPointer;
-	pDispatch->cCode = ring_webview_string_strdup(RING_API_STATE, cCodeToRun);
+	// Use the main RingState stored when webview was created
+	pDispatch->pRingState = pRingWebView->pMainRingState;
+	pDispatch->cCode = ring_webview_string_strdup(pRingWebView->pMainRingState, cCodeToRun);
 	if (pDispatch->cCode == NULL)
 	{
-		RING_API_FREE(pDispatch);
+		ring_state_free(pRingWebView->pMainRingState, pDispatch);
 		RING_API_ERROR(RING_OOM);
 		return;
 	}
 
-	webview_error_t result = webview_dispatch(w, ring_webview_dispatch_callback, pDispatch);
+	webview_error_t result = webview_dispatch(pRingWebView->webview, ring_webview_dispatch_callback, pDispatch);
 
 	// Free memory if dispatch fails to avoid leaks.
 	if (result != WEBVIEW_ERROR_OK)
 	{
-		ring_state_free(RING_API_STATE, pDispatch->cCode);
-		ring_state_free(RING_API_STATE, pDispatch);
+		ring_state_free(pRingWebView->pMainRingState, pDispatch->cCode);
+		ring_state_free(pRingWebView->pMainRingState, pDispatch);
 	}
 
 	RING_API_RETNUMBER(result);
@@ -195,7 +215,7 @@ RING_FUNC(ring_webview_bind)
 		return;
 	}
 
-	webview_t w = *(webview_t *)RING_API_GETCPOINTER(1, "webview_t");
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
 	const char *js_name = RING_API_GETSTRING(2);
 	const char *ring_func_name = RING_API_GETSTRING(3);
 
@@ -206,7 +226,8 @@ RING_FUNC(ring_webview_bind)
 		return;
 	}
 
-	pBind->pVM = (VM *)pPointer;
+	// Use the main RingState stored when webview was created
+	pBind->pMainRingState = pRingWebView->pMainRingState;
 	pBind->cFunc = ring_webview_string_strdup(RING_API_STATE, ring_func_name);
 	if (pBind->cFunc == NULL)
 	{
@@ -215,7 +236,7 @@ RING_FUNC(ring_webview_bind)
 		return;
 	}
 
-	webview_error_t result = webview_bind(w, js_name, ring_webview_bind_callback, pBind);
+	webview_error_t result = webview_bind(pRingWebView->webview, js_name, ring_webview_bind_callback, pBind);
 
 	if (result == WEBVIEW_ERROR_OK)
 	{
@@ -244,11 +265,11 @@ RING_FUNC(ring_webview_unbind)
 		return;
 	}
 
-	webview_t w = *(webview_t *)RING_API_GETCPOINTER(1, "webview_t");
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
 	const char *js_name = RING_API_GETSTRING(2);
 
 	// Note: This only unbinds the JS function; the RingWebViewBind object is not freed.
-	webview_error_t result = webview_unbind(w, js_name);
+	webview_error_t result = webview_unbind(pRingWebView->webview, js_name);
 	RING_API_RETNUMBER(result);
 }
 
@@ -281,11 +302,18 @@ RING_FUNC(ring_webview_create)
 		pWindow = RING_API_GETCPOINTER(2, "void");
 	}
 
-	webview_t *pValue;
-	pValue = (webview_t *)RING_API_MALLOC(sizeof(webview_t));
-	*pValue = webview_create((int)RING_API_GETNUMBER(1), pWindow);
+	RingWebView *pRingWebView;
+	pRingWebView = (RingWebView *)RING_API_MALLOC(sizeof(RingWebView));
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_OOM);
+		return;
+	}
+	pRingWebView->webview = webview_create((int)RING_API_GETNUMBER(1), pWindow);
+	// Store the main RingState
+	pRingWebView->pMainRingState = RING_API_STATE;
 
-	RING_API_RETMANAGEDCPOINTER(pValue, "webview_t", ring_webview_free);
+	RING_API_RETMANAGEDCPOINTER(pRingWebView, "webview_t", ring_webview_free);
 }
 
 RING_FUNC(ring_webview_destroy)
@@ -296,8 +324,8 @@ RING_FUNC(ring_webview_destroy)
 		return;
 	}
 
-	webview_t *pWebView = (webview_t *)RING_API_GETCPOINTER(1, "webview_t");
-	ring_webview_destroy_internal(pWebView);
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	ring_webview_destroy_internal(pRingWebView);
 	RING_API_SETNULLPOINTER(1);
 }
 
@@ -308,7 +336,8 @@ RING_FUNC(ring_webview_run)
 		RING_API_ERROR(RING_API_MISS1PARA);
 		return;
 	}
-	webview_run(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"));
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	webview_run(pRingWebView->webview);
 }
 
 RING_FUNC(ring_webview_terminate)
@@ -318,7 +347,8 @@ RING_FUNC(ring_webview_terminate)
 		RING_API_ERROR(RING_API_MISS1PARA);
 		return;
 	}
-	webview_terminate(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"));
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	webview_terminate(pRingWebView->webview);
 }
 
 RING_FUNC(ring_webview_get_window)
@@ -328,7 +358,8 @@ RING_FUNC(ring_webview_get_window)
 		RING_API_ERROR(RING_API_MISS1PARA);
 		return;
 	}
-	RING_API_RETCPOINTER(webview_get_window(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t")), "void");
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	RING_API_RETCPOINTER(webview_get_window(pRingWebView->webview), "void");
 }
 
 RING_FUNC(ring_webview_get_native_handle)
@@ -343,7 +374,10 @@ RING_FUNC(ring_webview_get_native_handle)
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	RING_API_RETCPOINTER(webview_get_native_handle(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"), (webview_native_handle_kind_t)(int)RING_API_GETNUMBER(2)), "void");
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	RING_API_RETCPOINTER(
+		webview_get_native_handle(pRingWebView->webview, (webview_native_handle_kind_t)(int)RING_API_GETNUMBER(2)),
+		"void");
 }
 
 RING_FUNC(ring_webview_set_title)
@@ -358,7 +392,8 @@ RING_FUNC(ring_webview_set_title)
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	webview_set_title(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"), RING_API_GETSTRING(2));
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	webview_set_title(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
 RING_FUNC(ring_webview_set_size)
@@ -383,7 +418,9 @@ RING_FUNC(ring_webview_set_size)
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	webview_set_size(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"), (int)RING_API_GETNUMBER(2), (int)RING_API_GETNUMBER(3), (webview_hint_t)(int)RING_API_GETNUMBER(4));
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	webview_set_size(pRingWebView->webview, (int)RING_API_GETNUMBER(2), (int)RING_API_GETNUMBER(3),
+					 (webview_hint_t)(int)RING_API_GETNUMBER(4));
 }
 
 RING_FUNC(ring_webview_navigate)
@@ -398,7 +435,8 @@ RING_FUNC(ring_webview_navigate)
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	webview_navigate(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"), RING_API_GETSTRING(2));
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	webview_navigate(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
 RING_FUNC(ring_webview_set_html)
@@ -413,7 +451,8 @@ RING_FUNC(ring_webview_set_html)
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	webview_set_html(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"), RING_API_GETSTRING(2));
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	webview_set_html(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
 RING_FUNC(ring_webview_init)
@@ -428,7 +467,8 @@ RING_FUNC(ring_webview_init)
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	webview_init(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"), RING_API_GETSTRING(2));
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	webview_init(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
 RING_FUNC(ring_webview_eval)
@@ -443,7 +483,8 @@ RING_FUNC(ring_webview_eval)
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	webview_eval(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"), RING_API_GETSTRING(2));
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	webview_eval(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
 RING_FUNC(ring_webview_return)
@@ -468,7 +509,8 @@ RING_FUNC(ring_webview_return)
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	webview_return(*(webview_t *)RING_API_GETCPOINTER(1, "webview_t"), RING_API_GETSTRING(2), (int)RING_API_GETNUMBER(3), RING_API_GETSTRING(4));
+	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	webview_return(pRingWebView->webview, RING_API_GETSTRING(2), (int)RING_API_GETNUMBER(3), RING_API_GETSTRING(4));
 }
 
 RING_FUNC(ring_get_webview_hint_none)
@@ -586,7 +628,8 @@ RING_LIBINIT
 	RING_API_REGISTER("get_webview_hint_fixed", ring_get_webview_hint_fixed);
 	RING_API_REGISTER("get_webview_native_handle_kind_ui_window", ring_get_webview_native_handle_kind_ui_window);
 	RING_API_REGISTER("get_webview_native_handle_kind_ui_widget", ring_get_webview_native_handle_kind_ui_widget);
-	RING_API_REGISTER("get_webview_native_handle_kind_browser_controller", ring_get_webview_native_handle_kind_browser_controller);
+	RING_API_REGISTER("get_webview_native_handle_kind_browser_controller",
+					  ring_get_webview_native_handle_kind_browser_controller);
 	RING_API_REGISTER("get_webview_error_ok", ring_get_webview_error_ok);
 	RING_API_REGISTER("get_webview_error_unspecified", ring_get_webview_error_unspecified);
 	RING_API_REGISTER("get_webview_error_invalid_argument", ring_get_webview_error_invalid_argument);
