@@ -29,13 +29,15 @@ jobs:
 
     - name: Build in FreeBSD VM
       id: freebsd_build
-      uses: vmactions/freebsd-vm@v1.2.1
+      uses: vmactions/freebsd-vm@v1.2.8
       with:
         release: ${{ matrix.release }}
         arch: ${{ matrix.arch }}
         usesh: true
-        sync: sshfs
+        sync: rsync
+        mem: 4096
         prepare: |
+          pkg update
           pkg install -y cmake git ninja pkgconf webkit2-gtk_60
 
         run: |
