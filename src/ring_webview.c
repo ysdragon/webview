@@ -66,6 +66,13 @@ void ring_webview_bind_callback(const char *id, const char *req, void *arg)
 	int nFuncSP_before = pVM->nFuncSP;
 	int nCallListSize_before = RING_VM_FUNCCALLSCOUNT;
 
+	// Validate parameters before calling Ring function
+	if (id == NULL || req == NULL)
+	{
+		ring_vm_mutexunlock(pVM);
+		return;
+	}
+
 	// Load the function by name.
 	if (!ring_vm_loadfunc2(pVM, pBind->cFunc, RING_FALSE))
 	{
