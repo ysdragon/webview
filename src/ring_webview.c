@@ -242,6 +242,8 @@ RING_FUNC(ring_webview_bind)
 		RING_API_ERROR(RING_OOM);
 		return;
 	}
+	// Ring function names are stored in lowercase internally
+	ring_general_lower(pBind->cFunc);
 
 	webview_error_t result = webview_bind(pRingWebView->webview, js_name, ring_webview_bind_callback, pBind);
 
