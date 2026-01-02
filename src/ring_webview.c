@@ -181,6 +181,11 @@ RING_FUNC(ring_webview_dispatch)
 	}
 
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	const char *cCodeToRun = RING_API_GETSTRING(2);
 
 	RingWebViewDispatch *pDispatch =
@@ -227,6 +232,11 @@ RING_FUNC(ring_webview_bind)
 	}
 
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	const char *js_name = RING_API_GETSTRING(2);
 	const char *ring_func_name = RING_API_GETSTRING(3);
 
@@ -279,9 +289,13 @@ RING_FUNC(ring_webview_unbind)
 	}
 
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	const char *js_name = RING_API_GETSTRING(2);
 
-	// Note: This only unbinds the JS function; the RingWebViewBind object is not freed.
 	webview_error_t result = webview_unbind(pRingWebView->webview, js_name);
 	RING_API_RETNUMBER(result);
 }
@@ -323,6 +337,12 @@ RING_FUNC(ring_webview_create)
 		return;
 	}
 	pRingWebView->webview = webview_create((int)RING_API_GETNUMBER(1), pWindow);
+	if (pRingWebView->webview == NULL)
+	{
+		RING_API_FREE(pRingWebView);
+		RING_API_ERROR("Failed to create webview instance");
+		return;
+	}
 	// Store the main RingState
 	pRingWebView->pMainRingState = RING_API_STATE;
 
@@ -338,6 +358,11 @@ RING_FUNC(ring_webview_destroy)
 	}
 
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	ring_webview_destroy_internal(pRingWebView);
 	RING_API_SETNULLPOINTER(1);
 }
@@ -350,6 +375,11 @@ RING_FUNC(ring_webview_run)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	webview_run(pRingWebView->webview);
 }
 
@@ -361,6 +391,11 @@ RING_FUNC(ring_webview_terminate)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	webview_terminate(pRingWebView->webview);
 }
 
@@ -372,6 +407,11 @@ RING_FUNC(ring_webview_get_window)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	RING_API_RETCPOINTER(webview_get_window(pRingWebView->webview), "void");
 }
 
@@ -388,6 +428,11 @@ RING_FUNC(ring_webview_get_native_handle)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	RING_API_RETCPOINTER(
 		webview_get_native_handle(pRingWebView->webview, (webview_native_handle_kind_t)(int)RING_API_GETNUMBER(2)),
 		"void");
@@ -406,6 +451,11 @@ RING_FUNC(ring_webview_set_title)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	webview_set_title(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
@@ -432,6 +482,11 @@ RING_FUNC(ring_webview_set_size)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	webview_set_size(pRingWebView->webview, (int)RING_API_GETNUMBER(2), (int)RING_API_GETNUMBER(3),
 					 (webview_hint_t)(int)RING_API_GETNUMBER(4));
 }
@@ -449,6 +504,11 @@ RING_FUNC(ring_webview_navigate)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	webview_navigate(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
@@ -465,6 +525,11 @@ RING_FUNC(ring_webview_set_html)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	webview_set_html(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
@@ -481,6 +546,11 @@ RING_FUNC(ring_webview_init)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	webview_init(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
@@ -497,6 +567,11 @@ RING_FUNC(ring_webview_eval)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	webview_eval(pRingWebView->webview, RING_API_GETSTRING(2));
 }
 
@@ -523,6 +598,11 @@ RING_FUNC(ring_webview_return)
 		return;
 	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
+	if (pRingWebView == NULL)
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
 	webview_return(pRingWebView->webview, RING_API_GETSTRING(2), (int)RING_API_GETNUMBER(3), RING_API_GETSTRING(4));
 }
 
