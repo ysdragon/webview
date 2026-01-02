@@ -37,6 +37,10 @@ static char *ring_webview_string_strdup(void *pState, const char *cStr)
 	unsigned int x, nSize;
 	nSize = strlen(cStr);
 	cString = (char *)ring_state_malloc(pState, nSize + RING_ONE);
+	if (cString == NULL)
+	{
+		return NULL;
+	}
 	RING_MEMCPY(cString, cStr, nSize);
 	cString[nSize] = '\0';
 	return cString;
