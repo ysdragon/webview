@@ -30,7 +30,7 @@ jobs:
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
           alpine:latest /bin/sh -c "
-            apk add --no-cache cmake make gcc g++ musl-dev linux-headers git webkit2gtk-6.0
+            apk add --no-cache cmake make gcc g++ musl-dev linux-headers git webkit2gtk-6.0-dev
             
             # Clone Ring Language
             git clone --branch ${{ inputs.ring-version }} --depth 1 https://github.com/ring-lang/ring.git ring
