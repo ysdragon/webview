@@ -23,22 +23,22 @@ jobs:
   freebsd:
     uses: ./.github/workflows/freebsd_build.yml
     with:
-      ring-version: v1.24
+      ring-version: master
 
   macos:
     uses: ./.github/workflows/macos_build.yml
     with:
-      ring-version: v1.24
+      ring-version: master
 
   ubuntu:
     uses: ./.github/workflows/ubuntu_build.yml
     with:
-      ring-version: v1.24
+      ring-version: master
 
   windows:
     uses: ./.github/workflows/windows_build.yml
     with:
-      ring-version: v1.24
+      ring-version: master
 
   update-libs:
     runs-on: ubuntu-latest

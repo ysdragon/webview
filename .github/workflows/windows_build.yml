@@ -30,7 +30,7 @@ jobs:
     - name: Clone Ring Language
       uses: actions/checkout@v4
       with:
-        repository: ring-lang/ring
+        repository: ringpackages/ringsrc
         path: ring
         ref: ${{ inputs.ring-version }}
 
