@@ -68,8 +68,30 @@ if(NOT DEFINED ARCH_DIR)
     endif()
 endif()
 
+# Detect musl libc
+option(MUSL "Build for musl libc" OFF)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Auto-detect musl if not explicitly set
+    if(NOT MUSL)
+        execute_process(
+            COMMAND ldd --version
+            OUTPUT_VARIABLE LDD_OUTPUT
+            ERROR_VARIABLE LDD_OUTPUT
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if(LDD_OUTPUT MATCHES "musl")
+            set(MUSL ON)
+            message(STATUS "Detected musl libc")
+        endif()
+    endif()
+endif()
+
 # Set the destination directory for the built library
-set(LIB_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/${OS_DIR}/${ARCH_DIR}")
+if(MUSL AND OS_DIR STREQUAL "linux")
+    set(LIB_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/${OS_DIR}/musl/${ARCH_DIR}")
+else()
+    set(LIB_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/${OS_DIR}/${ARCH_DIR}")
+endif()
 
 # Configure webview build options
 set(WEBVIEW_BUILD_SHARED_LIBRARY OFF)
@@ -129,9 +151,6 @@ else()
 		OUTPUT_NAME "ring_webview"
 	)
 endif()
-
-# Set the destination directory for the built library
-set(LIB_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/${OS_DIR}/${ARCH_DIR}")
 
 # Move built library to lib directory
 add_custom_command(
