@@ -13,18 +13,7 @@ message(STATUS "Using Ring from: ${RING_ROOT}")
 if(NOT TARGET Ring::Ring)
     add_library(Ring::Ring UNKNOWN IMPORTED)
     find_path(RING_INCLUDE_DIR ring.h PATHS "${RING_ROOT}/language/include")
-
-    # Check if RING_STATE_VERSION is "1.23" to use ringstatic for Windows
-    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-        file(STRINGS "${RING_INCLUDE_DIR}/state.h" RING_STATE_VERSION_LINE REGEX "RING_STATE_VERSION")
-        if(RING_STATE_VERSION_LINE MATCHES "\"1\\.23\"")
-            find_library(RING_LIBRARY_PATH NAMES ringstatic PATHS "${RING_ROOT}/lib")
-        else()
-            find_library(RING_LIBRARY_PATH NAMES ring PATHS "${RING_ROOT}/lib")
-        endif()
-    else()
-        find_library(RING_LIBRARY_PATH NAMES ring PATHS "${RING_ROOT}/lib")
-    endif()
+    find_library(RING_LIBRARY_PATH NAMES ring PATHS "${RING_ROOT}/lib")
 
     if(NOT RING_INCLUDE_DIR OR NOT RING_LIBRARY_PATH)
         message(FATAL_ERROR "Could not find Ring headers or library in ${RING_ROOT}. "
@@ -85,6 +74,11 @@ set(LIB_DEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/${OS_DIR}/${ARCH_DIR}")
 # Configure webview build options
 set(WEBVIEW_BUILD_SHARED_LIBRARY OFF)
 set(BUILD_TESTING OFF CACHE BOOL "Disable building tests for webview")
+
+# Explicitly set WebKitGTK API version for Linux (6.0 = webkitgtk-6.0/GTK4)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(WEBVIEW_WEBKITGTK_API "6.0" CACHE STRING "WebKitGTK API version")
+endif()
 
 # Add webview as a subdirectory to build it
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/webview/CMakeLists.txt")
