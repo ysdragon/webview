@@ -20,6 +20,11 @@ on:
     - 'src/webview/**'
 
 jobs:
+  alpine:
+    uses: ./.github/workflows/alpine_build.yml
+    with:
+      ring-version: master
+
   freebsd:
     uses: ./.github/workflows/freebsd_build.yml
     with:
@@ -42,7 +47,7 @@ jobs:
 
   update-libs:
     runs-on: ubuntu-latest
-    needs: [ freebsd, macos, ubuntu, windows ]
+    needs: [ alpine, freebsd, macos, ubuntu, windows ]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     permissions:

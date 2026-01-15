@@ -1,0 +1,54 @@
+name: Alpine Build
+
+on:
+  workflow_call:
+    inputs:
+      ring-version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-latest' || 'ubuntu-24.04-arm' }}
+    strategy:
+      matrix:
+        include:
+        - arch: amd64
+          name: alpine-amd64
+        - arch: arm64
+          name: alpine-arm64
+
+    steps:
+    - name: Checkout ring-webview
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Build in Alpine container
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          alpine:latest /bin/sh -c "
+            apk add --no-cache cmake make gcc g++ musl-dev linux-headers git webkit2gtk-6.0
+            
+            # Clone Ring Language
+            git clone --branch ${{ inputs.ring-version }} --depth 1 https://github.com/ring-lang/ring.git ring
+            
+            # Build Ring Language
+            cd ring/language
+            cmake . -DCMAKE_BUILD_TYPE=Release
+            make install
+            cd /workspace
+            
+            # Build ring-webview lib
+            rm -rf lib
+            cmake . -DCMAKE_BUILD_TYPE=Release -DRING_ROOT=/workspace/ring -DMUSL=ON
+            make
+          "
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ring-webview-${{ matrix.name }}
+        path: lib
