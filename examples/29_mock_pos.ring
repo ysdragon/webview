@@ -437,7 +437,7 @@ func handleAddToCart(id, req)
 
 # Handles requests from JavaScript to remove a product from the cart.
 func handleRemoveFromCart(id, req)
-	req = json_decode(req)[1] # Parse the request data.
+	req = json_decode(req) # Parse the request data.
 	nCartIndex = req[1] + 1 # Get the cart item index (adjust for 1-based indexing in Ring).
 	if nCartIndex >= 1 and nCartIndex <= len(aCart)
 		del(aCart, nCartIndex) # Delete the item from the cart.
