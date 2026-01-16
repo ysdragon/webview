@@ -4,11 +4,12 @@
 load "webview.ring"
 load "simplejson.ring"
 load "libcurl.ring"
+load "threads.ring"
 
 # Global variable to hold the WebView instance.
 oWebView = NULL
-# API endpoint for fetching Avatar quotes.
-cQuotesAPI = "https://avatarquotes.xyz/api/quotes"
+# API endpoint for fetching a single random Avatar quote.
+cQuotesAPI = "https://avatar.istan.to/api/quotes/random"
 
 # ==================================================
 # Main Application Flow
@@ -192,14 +193,21 @@ func loadQuoteHTML()
 # Handles requests from JavaScript to fetch a new Avatar quote.
 func handleFetchQuote(id, req)
 	see "Ring: JavaScript requested a new Avatar quote." + nl
-	
+
+	# Create a new thread to fetch the quote asynchronously.
+	oThread = new_thrd_t()
+	thrd_create(oThread, "fetchQuote('" + id + "')")
+	thrd_detach(oThread)
+
+# Handles requests from handleFetchQuote.
+func fetchQuote(id)
 	cResponse = ""
 	bError = false
 	cErrorMessage = ""
 
 	try
-		cResponse = request(cQuotesAPI) # Fetch data from the Avatar Quotes API.
-		aJson = json_decode(cResponse)[:quotes][1] # Parse the JSON response.
+		cResponse = request(cQuotesAPI) # Fetch a random quote from the Avatar Quotes API.
+		aJson = json_decode(cResponse) # Parse the JSON response.
 		# Structure the result as a list (array) for JSON conversion.
 		aResult = [
 			:quote = aJson[:quote],
@@ -212,7 +220,7 @@ func handleFetchQuote(id, req)
 		cErrorMessage = "Network Error: " + ccatcherror # Capture network errors.
 		see "Error fetching quote: " + cErrorMessage + nl
 	end
-		
+
 	if bError
 		# If an error occurred, return an error message.
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMessage]))
