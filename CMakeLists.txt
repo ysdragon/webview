@@ -31,7 +31,8 @@ set(RING_INCLUDE "${RING_ROOT}/language/include")
 set(RING_LIB "${RING_ROOT}/lib")
 set(RING_BIN "${RING_ROOT}/bin")
 
-set(RING_WEBVIEW_C_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/ring_webview.c")
+set(RING_WEBVIEW_C_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/c_src/ring_webview.c")
+set(RING_WEBVIEW_MACOS_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/c_src/ring_webview_macos.m")
 
 # Determine OS and Architecture specific paths
 string(TOLOWER "${CMAKE_SYSTEM_NAME}" OS_DIR)
@@ -117,9 +118,16 @@ else()
 endif()
 
 # Create the Ring webview extension shared library
-add_library(ring_webview SHARED
-	${RING_WEBVIEW_C_SOURCE}
-)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+	add_library(ring_webview SHARED
+		${RING_WEBVIEW_C_SOURCE}
+		${RING_WEBVIEW_MACOS_SOURCE}
+	)
+else()
+	add_library(ring_webview SHARED
+		${RING_WEBVIEW_C_SOURCE}
+	)
+endif()
 
 # Include directories
 target_include_directories(ring_webview PRIVATE
@@ -131,6 +139,21 @@ target_link_libraries(ring_webview PRIVATE
 	Ring::Ring
 	webview::core_static
 )
+
+# Add libadwaita for Linux
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(LIBADWAITA REQUIRED libadwaita-1)
+	target_include_directories(ring_webview PRIVATE ${LIBADWAITA_INCLUDE_DIRS})
+	target_link_libraries(ring_webview PRIVATE ${LIBADWAITA_LIBRARIES})
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+	target_link_libraries(ring_webview PRIVATE
+		"-framework Cocoa"
+		"-framework WebKit"
+	)
+endif()
 
 target_compile_options(ring_webview PRIVATE
     $<$<CONFIG:Release,RelWithDebInfo,MinSizeRel>:
