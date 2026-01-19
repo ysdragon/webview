@@ -1,3 +1,3 @@
-[submodule "src/webview"]
-	path = src/webview
+[submodule "src/c_src/webview"]
+	path = src/c_src/webview
 	url = https://github.com/webview/webview.git

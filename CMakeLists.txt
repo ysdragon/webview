@@ -104,7 +104,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux"  OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 endif()
 
 # Add webview as a subdirectory to build it
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/webview/CMakeLists.txt")
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/c_src/webview/CMakeLists.txt")
     message(STATUS "webview source not found, fetching from GitHub...")
     FetchContent_Declare(
         webview
@@ -114,7 +114,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/webview/CMakeLists.txt")
     FetchContent_MakeAvailable(webview)
 else()
     message(STATUS "webview found locally, adding as subdirectory.")
-    add_subdirectory(src/webview)
+    add_subdirectory(src/c_src/webview)
 endif()
 
 # Create the Ring webview extension shared library
