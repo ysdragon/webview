@@ -98,8 +98,8 @@ endif()
 set(WEBVIEW_BUILD_SHARED_LIBRARY OFF)
 set(BUILD_TESTING OFF CACHE BOOL "Disable building tests for webview")
 
-# Explicitly set WebKitGTK API version for Linux (6.0 = webkitgtk-6.0/GTK4)
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+# Explicitly set WebKitGTK API version for Linux and FreeBSD (6.0 = webkitgtk-6.0/GTK4)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux"  OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     set(WEBVIEW_WEBKITGTK_API "6.0" CACHE STRING "WebKitGTK API version")
 endif()
 
@@ -140,12 +140,11 @@ target_link_libraries(ring_webview PRIVATE
 	webview::core_static
 )
 
-# Add libadwaita for Linux
+# Add libadwaita for Linux and FreeBSD
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(LIBADWAITA REQUIRED libadwaita-1)
-	target_include_directories(ring_webview PRIVATE ${LIBADWAITA_INCLUDE_DIRS})
-	target_link_libraries(ring_webview PRIVATE ${LIBADWAITA_LIBRARIES})
+	pkg_check_modules(LIBADWAITA REQUIRED IMPORTED_TARGET libadwaita-1)
+	target_link_libraries(ring_webview PRIVATE PkgConfig::LIBADWAITA)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
