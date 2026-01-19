@@ -21,7 +21,7 @@ aPackageInfo = [
 		],
 		[
 			:name = "simplejson",
-			:version = "1.0.0",
+			:version = "1.2.0",
 			:providerusername = "ysdragon"
 		],
 		[
@@ -51,7 +51,7 @@ aPackageInfo = [
 		]
 	],
 	:files = 	[
-		"src/ring_webview.c",
+		"src/c_src/ring_webview.c",
 		"CMakeLists.txt",
 		"lib.ring",
 		"main.ring",
@@ -136,6 +136,8 @@ aPackageInfo = [
 		"lib/freebsd/arm64/libring_webview.so"
 	],
 	:macosfiles = 	[
+		"src/c_src/ring_webview_macos.h",
+		"src/c_src/ring_webview_macos.m",
 		"lib/macos/amd64/libring_webview.dylib",
 		"lib/macos/arm64/libring_webview.dylib"
 	],
