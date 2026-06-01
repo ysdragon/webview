@@ -132,8 +132,7 @@ aPackageInfo = [
 
 	],
 	:freebsdfiles = 	[
-		"lib/freebsd/amd64/libring_webview.so",
-		"lib/freebsd/arm64/libring_webview.so"
+		"lib/freebsd/amd64/libring_webview.so"
 	],
 	:macosfiles = 	[
 		"src/c_src/ring_webview_macos.h",
