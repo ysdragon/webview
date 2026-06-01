@@ -16,17 +16,17 @@ aPackageInfo = [
 	:libs = 	[
 		[
 			:name = "dialog",
-			:version = "1.0.0",
+			:version = "1.0.4",
 			:providerusername = "ysdragon"
 		],
 		[
 			:name = "simplejson",
-			:version = "1.2.0",
+			:version = "1.3.1",
 			:providerusername = "ysdragon"
 		],
 		[
 			:name = "markdown",
-			:version = "1.1.0",
+			:version = "1.1.2",
 			:providerusername = "ysdragon"
 		],
 		[
@@ -46,7 +46,7 @@ aPackageInfo = [
 		],
 		[
 			:name = "weblib",
-			:version = "1.0.7",
+			:version = "1.0.9",
 			:providerusername = "ringpackages"
 		]
 	],
