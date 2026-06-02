@@ -175,5 +175,9 @@ aPackageInfo = [
 	:linuxremove = "",
 	:macosremove = "",
 	:ubunturemove = "",
-	:fedoraremove = ""
+	:fedoraremove = "",
+	:remotefolder = "webview",
+	:branch = "main",
+	:providerusername = "ysdragon",
+	:providerwebsite = "github.com"
 ]
