@@ -1,0 +1,63 @@
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(60vw 60vh at 20% 10%, rgba(59, 130, 246, 0.25), transparent 60%),
+    radial-gradient(50vw 50vh at 80% 90%, rgba(74, 222, 128, 0.18), transparent 60%),
+    #0b0b0f;
+  color: #f1f5f9;
+}
+
+.counter {
+  background: rgba(30, 30, 32, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 40px 48px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.counter h1 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+  color: #4ade80;
+}
+
+.count {
+  margin: 8px 0 24px;
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #3b82f6;
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+button {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  background: #2563eb;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+button:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
