@@ -132,6 +132,27 @@ This code snippet creates a window, sets its title and size, loads some HTML, an
 
 For more advanced examples, see the [`examples/`](examples/) directory.
 
+## 📦 Templates
+
+Ready-to-use starter projects pairing a Ring backend with a modern framework frontend — each built with Vite + TypeScript and bundled to a **single HTML file**, loaded by `main.ring`:
+
+| | | |
+|---|---|---|
+| [React](examples/templates/react/) | [Vue](examples/templates/vue/) | [Angular](examples/templates/angular/) |
+| [Svelte](examples/templates/svelte/) | [Preact](examples/templates/preact/) | [SolidJS](examples/templates/solid/) |
+| [Lit](examples/templates/lit/) | | |
+
+Build the frontend with bun, then run with Ring:
+
+```sh
+cd examples/templates/<framework>/frontend
+bun install && bun run build
+cd ..
+ring main.ring
+```
+
+See [`examples/templates/`](examples/templates/) for details.
+
 ## 📚 API Reference
 
 For a detailed list of all available functions, classes, and methods, please refer to our [API reference documentation](docs/REFERENCE.md).

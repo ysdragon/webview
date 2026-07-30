@@ -77,3 +77,18 @@ Examples organized by learning curve - start from basics and progress to advance
 | setClickThrough | ✅ | ❌ | ❌ |
 | setForceDark | ❌ | ✅ | ❌ |
 | Event callbacks | ⏳ | ✅ | ⏳ |
+
+## 📦 Templates
+
+Full starter projects with a framework frontend (Vite + TypeScript, bundled to
+a single HTML file) and a Ring backend — see [`templates/`](templates/):
+
+| Template | Stack |
+|----------|-------|
+| [templates/react/](templates/react/) | React + Ring |
+| [templates/vue/](templates/vue/) | Vue + Ring |
+| [templates/svelte/](templates/svelte/) | Svelte + Ring |
+| [templates/angular/](templates/angular/) | Angular + Ring |
+| [templates/preact/](templates/preact/) | Preact + Ring |
+| [templates/solid/](templates/solid/) | SolidJS + Ring |
+| [templates/lit/](templates/lit/) | Lit + Ring |
