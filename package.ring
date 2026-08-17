@@ -52,6 +52,7 @@ aPackageInfo = [
 	],
 	:files = 	[
 		"src/c_src/ring_webview.c",
+		"src/c_src/ring_webview_json.h",
 		"CMakeLists.txt",
 		"lib.ring",
 		"main.ring",
