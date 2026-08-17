@@ -96,6 +96,11 @@ Class WebView
 	/**
 	 * Binds a Ring function or object methods to JavaScript.
 	 *
+	 * The bound Ring function is called as func(id, req):
+	 *   id  - callback id, pass it back to wreturn().
+	 *   req - Ring list of the JS call arguments, decoded automatically
+	 *         from JSON (req[1] is the first JS argument, and so on).
+	 *
 	 * For simple functions:
 	 *   bind(jsName, ringFuncName)
 	 *
@@ -289,10 +294,17 @@ Class WebView
 		webview_eval(self._pWebView, js)
 
 	/**
-	 * Returns a result to a JavaScript callback.
+	 * Returns a result to a JavaScript callback (resolves the JS promise).
+	 *
+	 * The value is delivered to JavaScript as JSON:
+	 *   - Ring list -> encoded to a JSON array/object automatically.
+	 *   - Number    -> encoded to a JSON number automatically.
+	 *   - String    -> passed through verbatim as the JSON payload, so it must
+	 *                  already be valid JSON (e.g. '"text"', '{}', 'null').
+	 *
 	 * @param id Callback id.
-	 * @param result Result value e.g. WEBVIEW_ERROR_OK.
-	 * @param json JSON string.
+	 * @param result Status code, e.g. WEBVIEW_ERROR_OK.
+	 * @param json Result value: a Ring list, a number, or a raw JSON string.
 	 */
 	func wreturn(id, result, json)
 		if self.isDestroyed()
