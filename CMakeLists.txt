@@ -116,6 +116,12 @@ else()
     message(STATUS "webview found locally, adding as subdirectory.")
     add_subdirectory(src/c_src/webview)
 endif()
+set(YYJSON_BUILD_TESTS OFF)
+set(YYJSON_BUILD_FUZZER OFF)
+set(YYJSON_BUILD_MISC OFF)
+set(YYJSON_BUILD_DOC OFF)
+set(YYJSON_INSTALL OFF)
+add_subdirectory(src/c_src/yyjson EXCLUDE_FROM_ALL)
 
 # Create the Ring webview extension shared library
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -138,6 +144,7 @@ target_include_directories(ring_webview PRIVATE
 target_link_libraries(ring_webview PRIVATE
 	Ring::Ring
 	webview::core_static
+	yyjson
 )
 
 # Add libadwaita for Linux and FreeBSD
