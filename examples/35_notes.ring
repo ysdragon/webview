@@ -646,8 +646,7 @@ func loadNotesHTML()
 # Handles requests from JavaScript to get the initial list of notes.
 func handleGetInitialNotes(id, req)
 	see "Ring: JavaScript requested initial notes." + nl
-	cJsonArray = build_notes_json()
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonArray) # Return the notes as a JSON array.
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, build_notes_list()) # Return the notes as a JSON array.
 
 # Handles requests from JavaScript to get the initial application settings.
 func handleGetInitialSettings(id, req)
@@ -658,13 +657,11 @@ func handleGetInitialSettings(id, req)
 		# Add each setting as a key-value pair in the object
 		add(aSettingsObj, [aSetting[1], aSetting[2]])
 	next
-	# Convert the Ring list to JSON using json_encode
-	cJson = json_encode(aSettingsObj)
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson) # Return settings as a JSON object.
+	# Return settings as a JSON object (encoded automatically by wreturn()).
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aSettingsObj)
 
 # Handles requests from JavaScript to save updated settings.
 func handleSaveSettings(id, req)
-	req = json_decode(req) # Parse the request data.
 	cLang = req[1] # Extract the language setting.
 	see "Ring: JavaScript requested to save settings. New language: '" + cLang + "'" + nl
 
@@ -676,16 +673,16 @@ func handleSaveSettings(id, req)
 
 # Handles requests from JavaScript to add a new note.
 func handleAddNote(id, req)
-	cNoteText = json_decode(req)[1] # Extract the note text.
+	cNoteText = req[1] # Extract the note text.
 	cTimestamp = currentdatetime() # Get the current timestamp for the note.
 	see "Ring: Adding new note: '" + cNoteText + "' at " + cTimestamp + nl
 	add(aNotes, [cNoteText, cTimestamp]) # Add the new note to the in-memory list.
 	saveNotes() # Persist the updated notes list.
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, build_notes_json())
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, build_notes_list())
 
 # Handles requests from JavaScript to edit an existing note.
 func handleEditNote(id, req)
-	aReq = json_decode(req) # Parse the request data.
+	aReq = req # Parse the request data.
 	nIndex = aReq[1] # Extract the index of the note to edit.
 	cNewText = aReq[2] # Extract the new text for the note.
 	cTimestamp = currentdatetime() # Update timestamp on edit.
@@ -695,21 +692,21 @@ func handleEditNote(id, req)
 		aNotes[nIndex + 1][2] = cTimestamp # Update timestamp.
 		saveNotes() # Persist the updated notes list.
 	ok
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, build_notes_json())
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, build_notes_list())
 
 # Handles requests from JavaScript to delete a note.
 func handleDeleteNote(id, req)
-	nIndex = json_decode(req)[1] # Extract the index of the note to delete.
+	nIndex = req[1] # Extract the index of the note to delete.
 	see "Ring: Deleting note at index: " + nIndex + nl
 	if nIndex >= 0 and nIndex < len(aNotes)
 		del(aNotes, nIndex + 1) # Delete the note from the in-memory list.
 		saveNotes() # Persist the updated notes list.
 	ok
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, build_notes_json())
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, build_notes_list())
 
 # Helper Functions
 
-func build_notes_json()
+func build_notes_list()
 	# Create a Ring list structure
 	aNotesList = []
 	for i = 1 to len(aNotes)
@@ -720,8 +717,8 @@ func build_notes_json()
 			:timestamp = aNote[2]
 		])
 	next
-	# Convert the Ring list to JSON using json_encode
-	return json_encode(aNotesList)
+	# Return the notes as a Ring list; wreturn() encodes it to JSON automatically.
+	return aNotesList
 
 # Loads application settings from `notes_settings.json`.
 func loadSettings()
@@ -784,7 +781,7 @@ func loadNotes()
 # Saves the current list of notes to the `notes.json` file.
 func saveNotes()
 	see "Saving notes to file: " + cNotesFile + nl
-	cJsonArray = build_notes_json()
+	cJsonArray = json_encode(build_notes_list())
 	write(cNotesFile, cJsonArray) # Write the JSON string to the file.
 	see "Notes saved successfully." + nl
 

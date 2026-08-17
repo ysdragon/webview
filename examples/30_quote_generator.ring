@@ -217,8 +217,7 @@ func fetchQuote(id)
 				:quote = aJson[:text],
 				:author = aJson[:author]
 			]
-			cJsonResult = json_encode(aResult) # Convert to JSON string.
-			oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult) # Return success with the quote data.
+			oWebView.wreturn(id, WEBVIEW_ERROR_OK, aResult) # Return success with the quote data.
 		else
 			bError = true
 			cErrorMessage = "Invalid API response format. Expected 'text' and 'author' fields."
@@ -231,7 +230,7 @@ func fetchQuote(id)
 		
 	if bError
 		# If an error occurred (either network or invalid format), return an error message.
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMessage]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:error = cErrorMessage])
 	ok
 
 # Function to make a HTTP request using libcurl

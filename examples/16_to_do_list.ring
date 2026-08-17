@@ -570,12 +570,12 @@ func handleGetInitialTodos(id, req)
 	]
 	
 	# Return the data as a JSON string
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aResult))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aResult)
 
 # Handles requests from JavaScript to add a new to-do item.
 func handleAddTodo(id, req)
 	# Parse the request data.
-	aReq = json_decode(req)
+	aReq = req
 	# Extract the task text.
 	cTaskText = aReq[1]
 	# Extract the category.
@@ -594,7 +594,7 @@ func handleAddTodo(id, req)
 # Handles requests from JavaScript to toggle the completion status of a to-do item.
 func handleToggleTodo(id, req)
 	# Extract the index of the to-do item.
-	nIndex = json_decode(req)[1]
+	nIndex = req[1]
 	? "Ring: Toggling todo at index: " + nIndex
 	if nIndex >= 0 and nIndex < len(aTodos)
 		# Toggle the boolean completed status.
@@ -611,7 +611,7 @@ func handleToggleTodo(id, req)
 # Handles requests from JavaScript to delete a to-do item.
 func handleDeleteTodo(id, req)
 	# Extract the index of the to-do item.
-	nIndex = json_decode(req)[1]
+	nIndex = req[1]
 	? "Ring: Deleting todo at index: " + nIndex
 	if nIndex >= 0 and nIndex < len(aTodos)
 		# Delete the item from the list.
@@ -630,7 +630,7 @@ func handleGetCategories(id, req)
 	? "Ring: JavaScript requested categories."
 	
 	# Return unique categories as JSON.
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(getUniqueCategories()))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, getUniqueCategories())
 
 # Handles requests from JavaScript to get the initial application settings.
 func handleGetInitialSettings(id, req)
@@ -641,16 +641,12 @@ func handleGetInitialSettings(id, req)
 		# Add each setting as a key-value pair
 		add(aSettingsObj, [aSetting[1], aSetting[2]])
 	next
-	# Convert the Ring list to JSON using json_encode
-	cJson = json_encode(aSettingsObj)
-
-	# Return settings as a JSON object.
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson)
+	# Return settings as a JSON object (encoded automatically by wreturn()).
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aSettingsObj)
 
 # Handles requests from JavaScript to save updated settings.
 func handleSaveSettings(id, req)
 	# Parse the request data.
-	req = json_decode(req)
 	
 	# Extract the theme setting.
 	cTheme = req[1]

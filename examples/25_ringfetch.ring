@@ -5,7 +5,6 @@
 */
 load "webview.ring"
 load "SysInfo.ring"
-load "simplejson.ring"
 
 # Global variable to hold the WebView instance.
 oWebView = NULL
@@ -865,7 +864,7 @@ func loadFetchHTML()
 # Handles requests from JavaScript to get all system data.
 func handleGetSystemData(id, req)
 	aData = buildSystemDataList()
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aData))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aData)
 
 # --- Helper Functions ---
 

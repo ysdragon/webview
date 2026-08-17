@@ -213,8 +213,7 @@ func fetchQuote(id)
 			:quote = aJson[:quote],
 			:character = aJson[:character]
 		]
-		cJsonResult = json_encode(aResult) # Convert to JSON string.
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult) # Return success with the quote data.
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, aResult) # Return success with the quote data.
 	catch
 		bError = true
 		cErrorMessage = "Network Error: " + ccatcherror # Capture network errors.
@@ -223,7 +222,7 @@ func fetchQuote(id)
 
 	if bError
 		# If an error occurred, return an error message.
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMessage]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:error = cErrorMessage])
 	ok
 
 # Function to make a HTTP request using libcurl

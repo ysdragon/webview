@@ -5,7 +5,6 @@
 
 load "webview.ring"
 load "markdown.ring"
-load "simplejson.ring"
 
 # --- Global variables ---
 oWebView = NULL
@@ -277,7 +276,6 @@ func loadEditorHTML()
 	oWebView.setHtml(cHTML)
 
 func handleMarkdownUpdate(id, req)
-	req = json_decode(req)
 	
 	# Parse the JSON request string into a Ring list
 	cMarkdownText = req[1]
@@ -286,6 +284,5 @@ func handleMarkdownUpdate(id, req)
 	cRenderedHTML = oMarkdown.toHTML(cMarkdownText)
 
 	# Return the generated HTML back to the JavaScript promise.
-	cJsonResult = json_encode([crenderedHTML])
-	
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult)
+	# The list is encoded to JSON automatically by wreturn().
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, [cRenderedHTML])

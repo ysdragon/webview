@@ -422,12 +422,10 @@ func loadPOS_HTML()
 # Handles requests from JavaScript to get the initial product list and current cart state.
 func handleGetInitialData(id, req)
 	see "Ring: JavaScript requested initial data." + nl
-	cJson = buildStateJSON() # Build the JSON string representing the current state.
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson) # Return the JSON data.
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, buildStateList()) # Return the state data.
 
 # Handles requests from JavaScript to add a product to the cart.
 func handleAddToCart(id, req)
-	req = json_decode(req) # Parse the request data.
 	nProductIndex = req[1] + 1 # Get the product index (adjust for 1-based indexing in Ring).
 	if nProductIndex >= 1 and nProductIndex <= len(aProducts)
 		add(aCart, aProducts[nProductIndex]) # Add the selected product to the cart.
@@ -437,7 +435,6 @@ func handleAddToCart(id, req)
 
 # Handles requests from JavaScript to remove a product from the cart.
 func handleRemoveFromCart(id, req)
-	req = json_decode(req) # Parse the request data.
 	nCartIndex = req[1] + 1 # Get the cart item index (adjust for 1-based indexing in Ring).
 	if nCartIndex >= 1 and nCartIndex <= len(aCart)
 		del(aCart, nCartIndex) # Delete the item from the cart.
@@ -458,13 +455,13 @@ func handleCheckout(id, req)
 # Updates the UI in the webview by pushing the current cart and total.
 func updateUI()
 	see "Ring: Pushing cart update to UI." + nl
-	cJson = buildStateJSON() # Rebuild the entire state JSON.
+	cJson = json_encode(buildStateJSON()) # Rebuild the entire state JSON for evalJS.
 	# Construct JavaScript code to call `renderCart` with updated cart data and total.
 	cJsCode = "renderCart(" + cJson + ".cart, " + cJson + ".total);"
 	oWebView.evalJS(cJsCode) # Execute the JavaScript in the webview.
 
 # Builds a JSON string representing the current state of products, cart, and total.
-func buildStateJSON()
+func buildStateList()
 	# Prepare products list.
 	aProductsList = []
 	for aItem in aProducts
@@ -488,5 +485,5 @@ func buildStateJSON()
 		:total = nTotal
 	]
 
-	# Convert to JSON string.
-	return json_encode(aState)
+	# Return the state as a Ring list
+	return aState

@@ -169,7 +169,7 @@ func loadGameHTML()
 # --- Ring Callback Handlers ---
 
 func handlePlayerMove(id, req)
-	nIndex = json_decode(req)[1]
+	nIndex = req[1]
 
 	if aBoard[nIndex + 1] = "" and not checkWinner()
 		aBoard[nIndex + 1] = cCurrentPlayer
@@ -184,8 +184,7 @@ func handlePlayerMove(id, req)
 func handleResetGame(id, req)
 	aBoard = ["", "", "", "", "", "", "", "", ""]
 	cCurrentPlayer = "X"
-	cJson = buildStateJSON()
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson)
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, buildStateJSON())
 
 # --- Game Logic ---
 
@@ -239,10 +238,11 @@ func updateGame()
 
 func buildStateJSON()
 	cStatus = "Player " + cCurrentPlayer + "'s turn"
-	return json_encode([
+	# Return a Ring list; wreturn() encodes it to JSON automatically.
+	return [
 		:board = aBoard,
 		:status = cStatus
-	])
+	]
 
 func buildBoardJson()
 	aJsonList = []

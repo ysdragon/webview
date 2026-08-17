@@ -41,11 +41,10 @@ func main()
 # Handles requests from JavaScript to get the initial application settings.
 func handleGetInitialSettings(id, req)
 	see "Ring: JavaScript requested initial settings." + nl
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aSettings)) # Return settings as a JSON object.
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aSettings) # Return settings as a JSON object.
 
 # Handles incoming messages from the JavaScript frontend.
 func handleSendMessage(id, req)
-	req = json_decode(req) # Parse the request data.
 	cUserMessage = req[1] # Extract the user's message.
 	cLang = req[2] # Extract the current language from JS.
 	see "User (" + cLang + ")> " + cUserMessage + nl
@@ -60,7 +59,6 @@ func handleSendMessage(id, req)
 
 # Handles requests from JavaScript to save updated application settings.
 func handleSaveSettings(id, req)
-	req = json_decode(req) # Parse the request data.
 	cTheme = req[1] # Extract the new theme.
 	cLang = req[2] # Extract the new language.
 	

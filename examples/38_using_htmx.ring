@@ -444,13 +444,13 @@ func handleGetQuote(id, req)
 	cQuote = aQuotes[nIndex]
 	cHTML = '<i class="fa-solid fa-quote-left"></i> ' + cQuote
 	see "Ring: Serving random quote #" + nIndex + nl
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([cHTML]))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, [cHTML])
 
 # Handler for incrementing the counter
 func handleIncrementCounter(id, req)
 	nClickCount++
 	see "Ring: Counter incremented to " + nClickCount + nl
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([nClickCount]))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, [nClickCount])
 
 # Handler for loading user data
 func handleLoadUserData(id, req)
@@ -480,11 +480,11 @@ func handleLoadUserData(id, req)
 	</div>
 	'
 	
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([cHTML]))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, [cHTML])
 
 # Handler for form submission
 func handleSubmitForm(id, req)
-	aFormData = json_decode(json_decode(req)[1])
+	aFormData = json_decode(req[1])
 	
 	cName = aFormData[:name]
 	cEmail = aFormData[:email]
@@ -502,10 +502,10 @@ func handleSubmitForm(id, req)
 	</div>
 	'
 	
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([cHTML]))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, [cHTML])
 
 # Handler for deleting items
 func handleDeleteItem(id, req)
-	cItemId = json_decode(req)[1]
+	cItemId = req[1]
 	see "Ring: Deleting item: " + cItemId + nl
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(["OK"]))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, ["OK"])

@@ -2,7 +2,6 @@
 # Demonstrates: setDecorated, setOpacity, setBackgroundColor, setIcon, setAlwaysOnTop
 
 load "webview.ring"
-load "simplejson.ring"
 
 aBindList = [
     ["toggleDecorated", :toggleDecorated],
@@ -138,13 +137,11 @@ func toggleDecorated(id, req)
     oWebView.wreturn(id, WEBVIEW_ERROR_OK, "null")
 
 func setOpacityValue(id, req)
-    nVal = json_decode(req)[1]
-    oWebView.setOpacity(nVal / 100)
+    oWebView.setOpacity(req[1] / 100)
     oWebView.wreturn(id, WEBVIEW_ERROR_OK, "null")
 
 func setBgColor(id, req)
-    aParams = json_decode(req)
-    oWebView.setBackgroundColor(number(aParams[1]), number(aParams[2]), number(aParams[3]), number(aParams[4]))
+    oWebView.setBackgroundColor(number(req[1]), number(req[2]), number(req[3]), number(req[4]))
     oWebView.wreturn(id, WEBVIEW_ERROR_OK, "null")
 
 func toggleOnTop(id, req)
