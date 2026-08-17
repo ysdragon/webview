@@ -108,7 +108,6 @@ Expose Ring functions to JavaScript using the `bind()` method:
 
 ```ring
 load "webview.ring"
-load "simplejson.ring"
 
 # Global variables
 oWebView = NULL
@@ -163,18 +162,18 @@ func main()
 
 # Ring functions called from JavaScript
 func handleGreeting(id, req)
-    # req is a JSON string: ["World"]
-    see "Greeting requested: " + req + nl
+    # req is a Ring list of the JS arguments: ["World"]
+    see "Greeting requested: " + req[1] + nl
     
-    # Send response back to JavaScript
+    # Send response back to JavaScript. A string is passed through as the
+    # raw JSON payload, so it must be valid JSON (note the quotes).
     oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello from Ring!"')
 
 func doMath(id, req)
-    # Parse arguments from JSON
-    aArgs = json_decode(req)  # Expected format: [5, 3, "add"]
-    n1 = number(aArgs[1])
-    n2 = number(aArgs[2])
-    operation = aArgs[3]
+    # Arguments arrive already decoded as a Ring list: [5, 3, "add"]
+    n1 = number(req[1])
+    n2 = number(req[2])
+    operation = req[3]
     
     switch operation
     on "add"
@@ -187,7 +186,8 @@ func doMath(id, req)
         result = n1 / n2
     off
     
-    oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(result))
+    # Numbers are encoded as JSON numbers automatically
+    oWebView.wreturn(id, WEBVIEW_ERROR_OK, result)
 ```
 
 ### Binding Object Methods
@@ -208,14 +208,14 @@ class Counter
     
     func increment(id, req)
         self.value++
-        oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(self.value))
+        oWebView.wreturn(id, WEBVIEW_ERROR_OK, self.value)
     
     func decrement(id, req)
         self.value--
-        oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(self.value))
+        oWebView.wreturn(id, WEBVIEW_ERROR_OK, self.value)
     
     func getValue(id, req)
-        oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(self.value))
+        oWebView.wreturn(id, WEBVIEW_ERROR_OK, self.value)
 ```
 
 ### Anonymous Function Binding
@@ -225,7 +225,7 @@ Bind anonymous functions directly:
 ```ring
 # Bind an anonymous function
 oWebView.bind("showAlert", func (id, req) {
-    see "Anonymous function called: " + req + nl
+    see "Anonymous function called: " see req see nl
     oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Message received!"')
 })
 ```
@@ -292,21 +292,23 @@ func updateUI()
 
 ## Function Parameters and Return Values
 
+The binding converts between JSON and Ring lists automatically (using the
+[yyjson](https://github.com/ibireme/yyjson) parser), so no JSON library is
+needed for the JavaScript ↔ Ring data path.
+
 ### Parameter Passing
 
 JavaScript calls to Ring functions receive two parameters:
 
 - `id`: Callback ID for sending responses back to JavaScript
-- `req`: JSON string containing arguments from JavaScript
+- `req`: A Ring list with the arguments from JavaScript, decoded automatically
+  (`req[1]` is the first JS argument, `req[2]` the second, and so on)
 
 ```ring
 func myFunction(id, req)
-    # Parse JSON arguments
-    aArgs = json_decode(req)  # Converts JSON string to Ring list
-    
-    # Access arguments
-    arg1 = aArgs[1]
-    arg2 = aArgs[2]
+    # Access arguments directly (already decoded from JSON)
+    arg1 = req[1]
+    arg2 = req[2]
     
     # Process the request...
     
@@ -316,18 +318,37 @@ func myFunction(id, req)
 
 ### Return Values
 
-Always use `wreturn()` to send responses back to JavaScript:
+Use `wreturn()` to send responses back to JavaScript. The value is delivered
+to the JavaScript `await` call as JSON:
 
 ```ring
-# String response
+# List response -> encoded to a JSON array/object automatically
+oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:success = true, :data = "value"])
+
+# Number response -> encoded to a JSON number automatically
+oWebView.wreturn(id, WEBVIEW_ERROR_OK, 42)
+
+# String response -> passed through verbatim as the JSON payload,
+# so it must already be valid JSON
 oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello from Ring!"')
-
-# Number response
-oWebView.wreturn(id, WEBVIEW_ERROR_OK, string(42))
-
-# JSON response
-oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{"success": true, "data": "value"}')
 ```
+
+### JSON ↔ Ring Value Mapping
+
+| JSON | Ring list item |
+|---|---|
+| object | list of `[key, value]` pairs |
+| array | list |
+| string | string |
+| number | number (integer values stay integers) |
+| `true` / `false` | `"__JSON_TRUE__"` / `"__JSON_FALSE__"` |
+| `null` | `""` (empty string) |
+
+The same mapping applies in reverse when encoding a Ring list to JSON:
+a list of two-element `[key, value]` pairs (including hash lists like
+`[:key = value]`) becomes a JSON object, any other list becomes an array,
+an empty string becomes `null`, and the sentinel strings above become real
+booleans.
 
 ## Complete Examples
 
@@ -370,14 +391,13 @@ class Counter
         self.value++
         # Update UI and send response
         oWebView.evalJS("document.getElementById('counter').innerText = " + string(self.value))
-        oWebView.wreturn(id, WEBVIEW_ERROR_OK, "")
+        oWebView.wreturn(id, WEBVIEW_ERROR_OK, self.value)
 ```
 
 ### Form Handler
 
 ```ring
 load "webview.ring"
-load "simplejson.ring"
 
 # Global variable to hold the WebView instance.
 oWebView = NULL
@@ -427,11 +447,12 @@ func main()
     }
 
 func handleForm(id, req)
-    # Parse form data from JSON
-    aData = json_decode(req)
-    ? aData
-    name = aData[1][1]
-    email = aData[1][2]
+    # req is the decoded argument list: [[name, email]]
+    # The form array was the single JS argument, so it is req[1].
+    ? req
+    aData = req[1]
+    name = aData[1]
+    email = aData[2]
     
     see "Form submitted - Name: " + name + ", Email: " + email + nl
     
