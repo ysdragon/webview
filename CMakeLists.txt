@@ -18,6 +18,33 @@ set(YYJSON_INSTALL OFF)
 add_subdirectory(src/c_src/yyjson EXCLUDE_FROM_ALL)
 set_target_properties(yyjson PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+# ============================================================================
+# Android backend
+# ============================================================================
+if(ANDROID)
+    add_library(ring_webview_android OBJECT
+        src/c_src/ring_webview_android.c
+    )
+    set_target_properties(ring_webview_android PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+    )
+    if(TARGET ring)
+        target_link_libraries(ring_webview_android PUBLIC ring)
+    else()
+        target_include_directories(ring_webview_android PUBLIC
+            "${RING_ROOT}/language/include"
+        )
+    endif()
+    target_link_libraries(ring_webview_android PUBLIC
+        android
+        log
+        yyjson
+    )
+    message(STATUS "Ring Webview: Android backend")
+    return()
+endif()
+
+
 if(NOT TARGET Ring::Ring)
     add_library(Ring::Ring UNKNOWN IMPORTED)
     find_path(RING_INCLUDE_DIR ring.h PATHS "${RING_ROOT}/language/include")
