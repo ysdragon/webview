@@ -48,6 +48,11 @@ aPackageInfo = [
 			:name = "weblib",
 			:version = "1.0.9",
 			:providerusername = "ringpackages"
+		],
+		[
+			:name = "ring2apk",
+			:version = "1.1.0",
+			:providerusername = "ysdragon"
 		]
 	],
 	:files = 	[
