@@ -39,7 +39,7 @@ This project is made possible by the tiny [webview](https://github.com/webview/w
 
 ## ✨ Features
 
-- **Cross-Platform:** Build applications for Windows, macOS, Linux, and FreeBSD from a single codebase.
+- **Cross-Platform:** Build applications for Windows, macOS, Linux, FreeBSD, and Android from a single codebase.
 - **Modern UI:** Use familiar web technologies to design your user interface.
 - **Two-Way Binding:** Seamlessly call Ring functions from JavaScript and vice-versa.
 - **Easy to Use:** A simple and clean API makes it easy to get started.
@@ -90,6 +90,15 @@ The compiled FreeBSD library in this package requires WebKitGTK 6.
 The compiled macOS library in this package uses the built-in WebKit framework.
 
 *   **macOS systems:** No additional dependencies required. The WebKit framework is included with macOS.
+
+</details>
+
+<details>
+<summary>Click here for instructions on <img width="20" height="20" src="https://developer.android.com/static/images/favicon-v2.png" /> Android</summary>
+
+Android apps are built with [ring2apk](https://github.com/ysdragon/ring2apk) (no Gradle).
+You need the Android SDK, the NDK, a JDK, and CMake + Ninja.
+See [📱 Android](#-android) and [`docs/ANDROID.md`](docs/ANDROID.md) for the full guide.
 
 </details>
 
@@ -152,6 +161,25 @@ ring main.ring
 ```
 
 See [`examples/templates/`](examples/templates/) for details.
+
+## 📱 Android
+
+The same `main.ring` runs on Android via [ring2apk](https://github.com/ysdragon/ring2apk)
+— no Gradle. See [`examples/android/`](examples/android/) (a
+glassmorphism notes app) and [`docs/ANDROID.md`](docs/ANDROID.md) (backend
+architecture, lifecycle, recovery).
+
+See [`docs/ANDROID.md`](docs/ANDROID.md) to build and run it.
+
+<div align="center">
+  <a href="examples/android/">
+    <img src="examples/android/img/nota-screenshot.png" alt="Nota notes app on Android" width="300">
+  </a>
+  <br>
+  <sub>
+    <a href="examples/android/">Nota notes app on Android</a>
+  </sub>
+</div>
 
 ## 📚 API Reference
 

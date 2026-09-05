@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Edge-to-edge theme: the window draws behind the system bars and the
+        status bar background is transparent, so web content is visible
+        underneath the status bar icons.
+
+        windowDrawsSystemBarBackgrounds is required for statusBarColor to
+        take effect; without it the system draws an opaque black scrim.
+    -->
+    <style name="AppTheme" parent="@android:style/Theme.NoTitleBar">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

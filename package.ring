@@ -5,12 +5,16 @@ aPackageInfo = [
 	:developer = "ysdragon",
 	:email = "youssefelkholey@gmail.com",
 	:license = "MIT License",
-	:version = "1.5.2",
+	:version = "1.6.0",
 	:ringversion = "1.27",
 	:versions = 	[
 		[
-			:version = "1.5.2",
+			:version = "1.6.0",
 			:branch = "main"
+		],
+		[
+			:version = "1.5.2",
+			:branch = "v1.5.2"
 		]
 	],
 	:libs = 	[
@@ -48,11 +52,19 @@ aPackageInfo = [
 			:name = "weblib",
 			:version = "1.0.9",
 			:providerusername = "ringpackages"
+		],
+		[
+			:name = "ring2apk",
+			:version = "1.1.0",
+			:providerusername = "ysdragon"
 		]
 	],
 	:files = 	[
 		"src/c_src/ring_webview.c",
 		"src/c_src/ring_webview_json.h",
+		"src/c_src/ring_webview_android.c",
+		"src/android/io/github/ysdragon/webview/MainActivity.java",
+		"src/android/proguard-webview.pro",
 		"CMakeLists.txt",
 		"lib.ring",
 		"main.ring",
@@ -204,9 +216,31 @@ aPackageInfo = [
 		"examples/templates/vue/frontend/tsconfig.json",
 		"examples/templates/vue/frontend/tsconfig.node.json",
 		"examples/templates/vue/frontend/vite.config.ts",
+		"examples/android/.gitignore",
+		"examples/android/README.md",
+		"examples/android/img/nota-screenshot.png",
+		"examples/android/res/mipmap-hdpi/ic_launcher.png",
+		"examples/android/res/mipmap-mdpi/ic_launcher.png",
+		"examples/android/res/mipmap-xhdpi/ic_launcher.png",
+		"examples/android/res/mipmap-xxhdpi/ic_launcher.png",
+		"examples/android/res/mipmap-xxxhdpi/ic_launcher.png",
+		"examples/android/res/values/colors.xml",
+		"examples/android/res/values/strings.xml",
+		"examples/android/res/values/styles.xml",
+		"examples/android/ring/main.ring",
+		"examples/android/ring/src/assets.ring",
+		"examples/android/ring/src/webview.rh",
+		"examples/android/ring/src/webview.ring",
+		"examples/android/ring/webview.ring",
+		"examples/android/ring2apk.ring",
+		"examples/android/src/cpp/CMakeLists.txt",
+		"examples/android/src/cpp/main.c",
+		"examples/android/src/java/io/github/ysdragon/webview/MainActivity.java",
+		"examples/android/src/proguard-webview.pro",
 		"README.md",
 		"docs/REFERENCE.md",
 		"docs/USAGE.md",
+		"docs/ANDROID.md",
 		"LICENSE"
 	],
 	:ringfolderfiles = 	[
