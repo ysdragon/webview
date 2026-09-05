@@ -1,3 +1,6 @@
 [submodule "src/c_src/webview"]
 	path = src/c_src/webview
 	url = https://github.com/webview/webview.git
+[submodule "src/c_src/yyjson"]
+	path = src/c_src/yyjson
+	url = https://github.com/ibireme/yyjson

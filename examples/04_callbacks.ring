@@ -27,7 +27,7 @@ func main
 		# The Ring function receives `id` (callback ID for `wreturn`) and `req` (request data from JS).
 		# This example uses an anonymous function for the callback.
 		bind("myRingFunc", func (id, req) {
-				see "Called from JavaScript! Callback ID: " + id + ", Request Data: " + req + nl
+				see "Called from JavaScript! Callback ID: " + id + ", Request Data: " see req see nl
 				# Send a response back to JavaScript using `wreturn`.
 				oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello back from Ring anonymous function!"')
 			}
@@ -223,18 +223,18 @@ func main
 
 # A regular Ring function to be bound and called from JavaScript.
 func myRingCallback(id, req)
-	see "Called from JavaScript! Callback ID: " + id + ", Request Data: " + req + nl
+	see "Called from JavaScript! Callback ID: " + id + ", Request Data: " see req see nl
 	# Send a response back to JavaScript.
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello back from Ring normal function!"')
 
 # A regular Ring function to be bound and called from JavaScript.
 func myRingCallback2(id, req)
-	see "Called from JavaScript! Callback ID: " + id + ", Request Data: " + req + nl
+	see "Called from JavaScript! Callback ID: " + id + ", Request Data: " see req see nl
 	# Send a response back to JavaScript.
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello back Ring aBindList"')
 
 # A class to demonstrate object method binding.
 Class myClass
 	func myMethod(id, req)
-		see "Called from JavaScript on an object! Callback ID: " + id + ", Request Data: " + req + nl
+		see "Called from JavaScript on an object! Callback ID: " + id + ", Request Data: " see req see nl
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Hello back from Ring object method!"')

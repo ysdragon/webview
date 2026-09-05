@@ -2,7 +2,6 @@
 # Demonstrates most functions of the WebView class with an interactive UI.
 
 load "webview.ring"
-load "simplejson.ring"
 
 # Global variable for the WebView instance.
 oWebView = NULL
@@ -517,7 +516,7 @@ func main()
 
 # Echo handler for JS ring_echo.
 func handle_echo(id, req)
-	cMessage = json_decode(req)[1]
+	cMessage = req[1]
 	see "   Ring: handle_echo received: '" + cMessage + "'" + nl
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"Echo: ' + cMessage + '"')
 
@@ -530,17 +529,17 @@ func handle_getVersion(id, req)
 		:minor = WEBVIEW_VERSION_MINOR,
 		:patch = WEBVIEW_VERSION_PATCH
 	]
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aResult))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aResult)
 
 # Set window title from JS.
 func handle_setTitle(id, req)
-	cTitle = json_decode(req)[1]
+	cTitle = req[1]
 	oWebView.setTitle(cTitle)
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}')
 
 # Set window size from JS.
 func handle_setSize(id, req)
-	aReq = json_decode(req)
+	aReq = req
 	nWidth = aReq[1]
 	nHeight = aReq[2]
 	nHint = aReq[3]
@@ -549,19 +548,19 @@ func handle_setSize(id, req)
 
 # Navigate to URL from JS.
 func handle_navigate(id, req)
-	cUrl = json_decode(req)[1]
+	cUrl = req[1]
 	oWebView.navigate(cUrl)
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}')
 
 # Set HTML content from JS.
 func handle_setHtml(id, req)
-	cHtml = json_decode(req)[1]
+	cHtml = req[1]
 	oWebView.setHtml(cHtml)
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}')
 
 # Evaluate JS code from Ring.
 func handle_evalJs(id, req)
-	cJsCode = json_decode(req)[1]
+	cJsCode = req[1]
 	oWebView.evalJS(cJsCode)
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}')
 
@@ -572,13 +571,13 @@ func handle_dispatch(id, req)
 
 # Inject JS code before page load.
 func handle_initJs(id, req)
-	cJsInitCode = json_decode(req)[1]
+	cJsInitCode = req[1]
 	oWebView.injectJS(cJsInitCode)
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}')
 
 # Unbind a JS function.
 func handle_unbindFunc(id, req)
-	cFuncName = json_decode(req)[1]
+	cFuncName = req[1]
 	oWebView.unbind(cFuncName)
 	oWebView.wreturn(id, WEBVIEW_ERROR_OK, '{}')
 

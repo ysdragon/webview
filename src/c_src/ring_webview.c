@@ -7,6 +7,8 @@
 
 #include "ring.h"
 
+#include "ring_webview_json.h"
+
 #include "webview/version.h"
 #include "webview/webview.h"
 
@@ -120,7 +122,16 @@ void ring_webview_bind_callback(const char *id, const char *req, void *arg)
 
 	// Push function arguments onto the stack.
 	RING_VM_STACK_PUSHCVALUE2(id, strlen(id));
-	RING_VM_STACK_PUSHCVALUE2(req, strlen(req));
+
+	{
+		List *pReqList = json_decode_to_ring_list(pVM, req);
+		if (!pReqList)
+		{
+			fprintf(stderr, "webview bind call: invalid JSON request; passing an empty list\n");
+			pReqList = ring_vm_api_newlist(pVM);
+		}
+		ring_vm_api_retlist2(pVM, pReqList, RING_OUTPUT_RETLISTBYREF);
+	}
 
 	// Finalize call setup (jump PC to Ring function).
 	ring_vm_call2(pVM);
@@ -911,18 +922,50 @@ RING_FUNC(ring_webview_return)
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	if (!RING_API_ISSTRING(4))
-	{
-		RING_API_ERROR(RING_API_BADPARATYPE);
-		return;
-	}
 	RingWebView *pRingWebView = (RingWebView *)RING_API_GETCPOINTER(1, "webview_t");
 	if (pRingWebView == NULL)
 	{
 		RING_API_ERROR(RING_API_BADPARATYPE);
 		return;
 	}
-	webview_return(pRingWebView->webview, RING_API_GETSTRING(2), (int)RING_API_GETNUMBER(3), RING_API_GETSTRING(4));
+
+	const char *cJson;
+	char *cJsonOwned = NULL;
+	if (RING_API_ISLIST(4))
+	{
+		cJsonOwned = ring_list_to_json_string(RING_API_STATE, RING_API_GETLIST(4));
+		if (!cJsonOwned)
+		{
+			RING_API_ERROR("Failed to generate JSON string from list.");
+			return;
+		}
+		cJson = cJsonOwned;
+	}
+	else if (RING_API_ISNUMBER(4))
+	{
+		cJsonOwned = ring_number_to_json_string(RING_API_GETNUMBER(4));
+		if (!cJsonOwned)
+		{
+			RING_API_ERROR("Failed to generate JSON number.");
+			return;
+		}
+		cJson = cJsonOwned;
+	}
+	else if (RING_API_ISSTRING(4))
+	{
+		cJson = RING_API_GETSTRING(4);
+	}
+	else
+	{
+		RING_API_ERROR(RING_API_BADPARATYPE);
+		return;
+	}
+
+	webview_return(pRingWebView->webview, RING_API_GETSTRING(2), (int)RING_API_GETNUMBER(3), cJson);
+	if (cJsonOwned)
+	{
+		free(cJsonOwned);
+	}
 }
 
 /* ============================================================================

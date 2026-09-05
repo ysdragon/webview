@@ -5,7 +5,6 @@
 
 load "webview.ring"
 load "dialog.ring"
-load "simplejson.ring"
 
 # Global variable to hold the webview instance.
 oWebView = NULL
@@ -37,7 +36,7 @@ func main()
 # --- Callback Functions ---
 
 func handleMessageDialog(id, req)
-	cMessage = json_decode(req)[1]
+	cMessage = req[1]
 	nResult = dialog_message(DIALOG_INFO, DIALOG_OK_CANCEL, cMessage)
 	if nResult = 1
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '"User clicked OK!"')
@@ -46,8 +45,7 @@ func handleMessageDialog(id, req)
 	ok
 
 func handlePromptDialog(id, req)
-	aReq = json_decode(req)[1]
-	cPrompt = aReq
+	cPrompt = req[1]
 	cDefault = ""
 	cName = dialog_prompt(DIALOG_INFO, cPrompt, cDefault)
 	if cName != ""
@@ -57,25 +55,23 @@ func handlePromptDialog(id, req)
 	ok
 
 func handleFileDialog(id, req)
-	aReq = json_decode(req)
-	nMode = aReq[1]
-	cTitle = aReq[2]
-	cDefaultPath = aReq[3]
-	cFilters = aReq[4]
+	nMode = req[1]
+	cTitle = req[2]
+	cDefaultPath = req[3]
+	cFilters = req[4]
 
 	cPath = dialog_file(nMode, cTitle, cDefaultPath, cFilters)
 	cPath = substr(cPath, "\", "\\")
 
 	if cPath != ""
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([cPath]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, [cPath])
 	else
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '""')
 	ok
 
 func handleColorPicker(id, req)
-	aReq = json_decode(req)
-	aInitialColor = aReq[1]
-	nEnableOpacity = aReq[2]
+	aInitialColor = req[1]
+	nEnableOpacity = req[2]
 
 	aColor = [aInitialColor[1], aInitialColor[2], aInitialColor[3], aInitialColor[4]]
 	nResult = dialog_color_picker(aColor, nEnableOpacity)
@@ -86,7 +82,7 @@ func handleColorPicker(id, req)
 	next
 
 	if nResult
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aColor2))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, aColor2)
 	else
 		oWebView.wreturn(id, WEBVIEW_ERROR_OK, '""')
 	ok

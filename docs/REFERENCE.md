@@ -75,7 +75,10 @@ Sets the HTML content of the webview directly.
 
 ### `bind(p1, p2)`
 
-Binds a Ring function or a Ring object's methods to JavaScript.
+Binds a Ring function or a Ring object's methods to JavaScript. The bound
+Ring function is called with two arguments: `id` (the callback ID) and `req`
+(a Ring list with the JavaScript call arguments, decoded automatically from
+JSON — `req[1]` is the first JS argument, `req[2]` the second, and so on).
 
 -   **Function Binding**: `bind(jsName, ringFuncName)`
     -   `jsName` (String): The name of the function to expose in JavaScript (e.g., `myFunc`).
@@ -145,11 +148,14 @@ Returns a native handle of a specific kind, providing more granular access to th
 
 ### `wreturn(id, result, json)`
 
-Returns a result back to a JavaScript function that initiated a `bind()` call. This allows Ring to send data or acknowledge completion to the JavaScript frontend.
+Returns a result back to a JavaScript function that initiated a `bind()` call. This allows Ring to send data or acknowledge completion to the JavaScript frontend. The value is delivered to the JavaScript `Promise` as JSON.
 
 -   **`id`**: (Number) The callback ID received from the `bind()` call (first argument to the Ring function).
 -   **`result`**: (Number) The status code for the operation. Use `WEBVIEW_ERROR_OK` for success. Other `WEBVIEW_ERROR_` constants can indicate specific issues.
--   **`json`**: (String) A JSON string containing the data to return to JavaScript. This will be the resolved value of the JavaScript `Promise`.
+-   **`json`**: (List | Number | String) The data to return to JavaScript:
+    -   A Ring list is encoded to a JSON array/object automatically.
+    -   A number is encoded to a JSON number automatically.
+    -   A string is passed through verbatim as the JSON payload, so it must already be valid JSON (e.g., `'"text"'`, `'{}'`, `'null'`).
 
 ---
 

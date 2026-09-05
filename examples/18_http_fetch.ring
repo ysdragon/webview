@@ -216,7 +216,7 @@ func loadFetchHTML()
 
 # Handles requests from JavaScript to fetch content from a given URL.
 func handleFetchURL(id, req)
-	cURL = json_decode(req)[1]
+	cURL = req[1]
 	see "Ring: Attempting to fetch URL: " + cURL + nl
 	
 	cResponse = ""
@@ -244,8 +244,5 @@ func handleFetchURL(id, req)
 		end
 	ok
 
-	 # Convert the result to a JSON string.
-	cJsonResult = json_encode(aResult)
-
-	# Return the JSON result to JavaScript.
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult)
+	# Return the result to JavaScript (encoded automatically by wreturn()).
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aResult)

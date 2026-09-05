@@ -1,6 +1,7 @@
 # Weather App
-# This example demonstrates a weather application that fetches weather data from an API
-# and displays current weather conditions and forecast information.
+# This example demonstrates a weather application that fetches weather data
+# from the Open-Meteo API (free, no API key required) and displays current
+# weather conditions and forecast information.
 
 load "webview.ring"
 load "simplejson.ring"
@@ -8,9 +9,9 @@ load "libcurl.ring"
 
 # Global Variables
 oWebView = NULL
-cWeatherAPI = "https://api.openweathermap.org/data/2.5/weather?q={city}&appid={key}&units=metric"
-cForecastAPI = "https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={key}&units=metric"
-cAPIKey = "b1b15e88fa797225412429c1c50c122a1"  # Demo API key from OpenWeatherMap
+# Open-Meteo APIs (free, no API key required)
+cGeocodingAPI = "https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en"
+cForecastAPI = "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,surface_pressure,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5&wind_speed_unit=ms"
 aBindList = [
 	["getWeather", :handleGetWeather],
 	["getForecast", :handleGetForecast],
@@ -351,8 +352,8 @@ func loadWeatherHTML()
 				return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 			}
 			
-			function formatDate(timestamp) {
-				const date = new Date(timestamp * 1000);
+			function formatDate(dtTxt) {
+				const date = new Date(dtTxt.replace(" ", "T"));
 				return date.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
 			}
 			
@@ -416,7 +417,7 @@ func loadWeatherHTML()
 				// Get one forecast per day (at noon)
 				const dailyForecasts = {};
 				for (const item of forecastData.list) {
-					const date = formatDate(item.dt);
+					const date = formatDate(item.dt_txt);
 					if (!dailyForecasts[date] || item.dt_txt.includes("12:00:00")) {
 						dailyForecasts[date] = item;
 					}
@@ -515,7 +516,7 @@ func loadWeatherHTML()
 
 # Handles requests from JavaScript to get current weather data.
 func handleGetWeather(id, req)
-	cCity = json_decode(req)[1]
+	cCity = req[1]
 	see "Ring: JavaScript requested weather for city: " + cCity + nl
 	
 	cResponse = NULL
@@ -523,21 +524,35 @@ func handleGetWeather(id, req)
 	cErrorMessage = NULL
 	
 	try
-		# Replace placeholders in the API URL
-		cURL = substr(cWeatherAPI, "{city}", cCity)
-		cURL = substr(cURL, "{key}", cAPIKey)
-		
-		cResponse = request(cURL)
-		aJson = json_decode(cResponse)
-		
-		# Check if the response contains expected fields
-		if isList(aJson) and aJson[:name] and aJson[:main] and aJson[:weather]
-			# Return the weather data as is
-			cJsonResult = json_encode(aJson)
-			oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult)
-		else
+		# Geocode the city name to coordinates, then fetch the current weather.
+		aGeo = geocodeCity(cCity)
+		if isNull(aGeo)
 			bError = true
-			cErrorMessage = "Invalid API response format."
+			cErrorMessage = "City not found: " + cCity
+		else
+			cURL = substr(cForecastAPI, "{lat}", string(aGeo[:latitude]))
+			cURL = substr(cURL, "{lon}", string(aGeo[:longitude]))
+			aData = json_decode(request(cURL))
+			if isList(aData) and aData[:current]
+				aCurrent = aData[:current]
+				# Shape the Open-Meteo response like the frontend expects.
+				aResult = [
+					:name = aGeo[:name],
+					:sys = [:country = aGeo[:country]],
+					:weather = [wmoToWeather(aCurrent[:weather_code], aCurrent[:is_day])],
+					:main = [
+						:temp = aCurrent[:temperature_2m],
+						:feels_like = aCurrent[:apparent_temperature],
+						:humidity = aCurrent[:relative_humidity_2m],
+						:pressure = aCurrent[:surface_pressure]
+					],
+					:wind = [:speed = aCurrent[:wind_speed_10m]]
+				]
+				oWebView.wreturn(id, WEBVIEW_ERROR_OK, aResult)
+			else
+				bError = true
+				cErrorMessage = "Invalid API response format."
+			ok
 		ok
 	catch
 		bError = true
@@ -547,12 +562,12 @@ func handleGetWeather(id, req)
 		
 	if bError
 		# If an error occurred, return an error message
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMessage]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:error = cErrorMessage])
 	ok
 
 # Handles requests from JavaScript to get weather forecast data.
 func handleGetForecast(id, req)
-	cCity = json_decode(req)[1]
+	cCity = req[1]
 	see "Ring: JavaScript requested forecast for city: " + cCity + nl
 	
 	cResponse = NULL
@@ -560,21 +575,33 @@ func handleGetForecast(id, req)
 	cErrorMessage = NULL
 	
 	try
-		# Replace placeholders in the API URL
-		cURL = substr(cForecastAPI, "{city}", cCity)
-		cURL = substr(cURL, "{key}", cAPIKey)
-		
-		cResponse = request(cURL)
-		aJson = json_decode(cResponse)
-		
-		# Check if the response contains expected fields
-		if isList(aJson) and aJson[:list] and aJson[:city]
-			# Return the forecast data as is
-			cJsonResult = json_encode(aJson)
-			oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult)
-		else
+		# Geocode the city name to coordinates, then fetch the daily forecast.
+		aGeo = geocodeCity(cCity)
+		if isNull(aGeo)
 			bError = true
-			cErrorMessage = "Invalid API response format."
+			cErrorMessage = "City not found: " + cCity
+		else
+			cURL = substr(cForecastAPI, "{lat}", string(aGeo[:latitude]))
+			cURL = substr(cURL, "{lon}", string(aGeo[:longitude]))
+			aData = json_decode(request(cURL))
+			if isList(aData) and aData[:daily] and aData[:daily][:time]
+				aDaily = aData[:daily]
+				aList = []
+				for i = 1 to len(aDaily[:time])
+					add(aList, [
+						:dt_txt = aDaily[:time][i] + " 12:00:00",
+						:main = [:temp = aDaily[:temperature_2m_max][i]],
+						:weather = [wmoToWeather(aDaily[:weather_code][i], 1)]
+					])
+				next
+				oWebView.wreturn(id, WEBVIEW_ERROR_OK, [
+					:city = [:name = aGeo[:name]],
+					:list = aList
+				])
+			else
+				bError = true
+				cErrorMessage = "Invalid API response format."
+			ok
 		ok
 	catch
 		bError = true
@@ -584,7 +611,7 @@ func handleGetForecast(id, req)
 		
 	if bError
 		# If an error occurred, return an error message
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMessage]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:error = cErrorMessage])
 	ok
 
 # Handles requests from JavaScript to get location using ip-api.com
@@ -608,7 +635,60 @@ func handleGetLocation(id, req)
 		cCity = NULL
 		cCountry = NULL
 	done
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:city = cCity, :country = cCountry]))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:city = cCity, :country = cCountry])
+
+# Geocodes a city name via the Open-Meteo geocoding API.
+# Returns the first matching location as a list, or NULL if not found.
+func geocodeCity(cCity)
+	cURL = substr(cGeocodingAPI, "{city}", substr(cCity, " ", "%20"))
+	aJson = json_decode(request(cURL))
+	if isList(aJson) and aJson[:results] and len(aJson[:results]) > 0
+		return aJson[:results][1]
+	ok
+	return NULL
+
+# Maps a WMO weather code to a description and an OpenWeather-style icon code.
+func wmoToWeather(nCode, nIsDay)
+	cSuffix = "d"
+	if nIsDay = 0
+		cSuffix = "n"
+	ok
+	aMap = [
+		[0, "clear sky", "01"],
+		[1, "mainly clear", "01"],
+		[2, "partly cloudy", "02"],
+		[3, "overcast", "04"],
+		[45, "fog", "50"],
+		[48, "depositing rime fog", "50"],
+		[51, "light drizzle", "09"],
+		[53, "drizzle", "09"],
+		[55, "dense drizzle", "09"],
+		[56, "freezing drizzle", "09"],
+		[57, "dense freezing drizzle", "09"],
+		[61, "light rain", "10"],
+		[63, "rain", "10"],
+		[65, "heavy rain", "10"],
+		[66, "freezing rain", "10"],
+		[67, "heavy freezing rain", "10"],
+		[71, "light snow", "13"],
+		[73, "snow", "13"],
+		[75, "heavy snow", "13"],
+		[77, "snow grains", "13"],
+		[80, "light rain showers", "09"],
+		[81, "rain showers", "09"],
+		[82, "violent rain showers", "09"],
+		[85, "snow showers", "13"],
+		[86, "heavy snow showers", "13"],
+		[95, "thunderstorm", "11"],
+		[96, "thunderstorm with hail", "11"],
+		[99, "thunderstorm with heavy hail", "11"]
+	]
+	for aEntry in aMap
+		if aEntry[1] = nCode
+			return [:description = aEntry[2], :icon = aEntry[3] + cSuffix]
+		ok
+	next
+	return [:description = "unknown", :icon = "03" + cSuffix]
 
 # Function to make a HTTP request using libcurl
 func request(url)

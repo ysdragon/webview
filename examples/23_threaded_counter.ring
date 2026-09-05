@@ -193,7 +193,7 @@ func loadCounterHTML()
 
 
 func toggleCounter(id, req)
-	bStart = number(substr(req, 2, len(req)-2))
+	bStart = req[1]
 	if bStart
 		if not bRunCounter
 			bRunCounter = true

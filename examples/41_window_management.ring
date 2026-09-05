@@ -3,7 +3,6 @@
 #               getSize, setMinSize, setMaxSize, setResizable, setFullscreen
 
 load "webview.ring"
-load "simplejson.ring"
 
 aBindList = [
     ["doMinimize", :doMinimize],
@@ -153,8 +152,7 @@ func doFullscreen(id, req)
     oWebView.wreturn(id, WEBVIEW_ERROR_OK, "null")
 
 func setPos(id, req)
-    aParams = json_decode(req)
-    oWebView.setPosition(number(aParams[1]), number(aParams[2]))
+    oWebView.setPosition(number(req[1]), number(req[2]))
     oWebView.wreturn(id, WEBVIEW_ERROR_OK, "null")
 
 func getInfo(id, req)

@@ -1,7 +1,6 @@
 # Ring Playground App
 
 load "webview.ring"
-load "simplejson.ring"
 load "stdlibcore.ring"
 
 # Global variable to hold the webview instance.
@@ -530,7 +529,7 @@ func load_html()
 
 # Handles requests from JavaScript to execute Ring code.
 func handleExecuteCode(id, req)
-	cCode = json_decode(req)[1]
+	cCode = req[1]
 	cTempFile = substr(tempname(), ".", "") + ".ring"
 	cOutputFile = tempname()
 	bHasError = false
@@ -553,5 +552,4 @@ func handleExecuteCode(id, req)
 	ok
 	
 	aResult = [ :output = cOutput, :error = bHasError ]
-	cJsonResult = json_encode(aResult)
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult)
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aResult)

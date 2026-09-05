@@ -4,7 +4,6 @@
 # from JavaScript callbacks in WebView.
 
 load "webview.ring"
-load "simplejson.ring"
 
 # Global variables
 oWebView = NULL
@@ -201,7 +200,7 @@ class myClass
 		? "Method myClass.myMethod() called from JavaScript."
 		
 		# Parse the JSON request from JavaScript.
-		aReq = json_decode(req)
+		aReq = req
 		cDataFromJS = aReq[1]
 		
 		? "  Callback ID: " + id
@@ -212,7 +211,7 @@ class myClass
 
 	func myOtherMethod(id, req)
 		? "Method myClass.myOtherMethod() called directly from JavaScript."
-		aReq = json_decode(req)
+		aReq = req
 		cDataFromJS = aReq[1]
 		? "  Callback ID: " + id
 		see "  Data from JS: " see cDataFromJS

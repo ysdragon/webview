@@ -3,7 +3,6 @@
 # It allows browsing the file system, navigating into directories, and going back up.
 
 load "webview.ring"
-load "simplejson.ring"
 
 # Global Variables
 oWebView = NULL
@@ -481,7 +480,7 @@ func handleGetInitialPath(id, req)
 
 # Gets the contents of a specified directory path.
 func handleGetDirectoryContents(id, req)
-	cPath = json_decode(req)[1]
+	cPath = req[1]
 	see "Ring: JavaScript requested contents for path: " + cPath + nl
 
 	if not direxists(cPath)
@@ -526,12 +525,11 @@ func handleGetDirectoryContents(id, req)
 		:items = aItems
 	]
 
-	cJson = json_encode(aResult)
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJson)
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aResult)
 
 # Handles opening a file.
 func handleOpenFile(id, req)
-	cPath = json_decode(req)[1]
+	cPath = req[1]
 	see "Ring: JavaScript requested to open file: " + cPath + nl
 
 	if fexists(cPath)

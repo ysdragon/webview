@@ -130,7 +130,7 @@ oWebView {
 }
 
 func goTo(id, req)
-    cUrl = substr(req, 3, len(req) - 4)
+    cUrl = req[1]
     oWebView.navigate(cUrl)
     oWebView.wreturn(id, WEBVIEW_ERROR_OK, "null")
 

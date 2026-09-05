@@ -31,7 +31,7 @@ func main()
 
 # Fetch stories by type (front_page, story, show_hn, ask_hn)
 func handleFetchStories(id, req)
-	aParams = json_decode(req)
+	aParams = req
 	cType = aParams[1]
 	nPage = aParams[2]
 		
@@ -46,7 +46,7 @@ func handleFetchStories(id, req)
 
 # Search stories by query
 func handleSearchStories(id, req)
-	aParams = json_decode(req)
+	aParams = req
 	cQuery = aParams[1]
 	nPage = aParams[2]
 		
@@ -56,7 +56,7 @@ func handleSearchStories(id, req)
 
 # Get item details (for comments)
 func handleGetItem(id, req)
-	aParams = json_decode(req)
+	aParams = req
 	cItemId = string(aParams[1])
 		
 	cURL = cBaseAPI + "items/" + cItemId
@@ -80,8 +80,7 @@ func fetchWorkerThread(id, cURL)
 		aJson = json_decode(cResponse)
 		
 		if isList(aJson)
-			cJsonResult = json_encode(aJson)
-			oWebView.wreturn(id, WEBVIEW_ERROR_OK, cJsonResult)
+			oWebView.wreturn(id, WEBVIEW_ERROR_OK, aJson)
 		else
 			bError = true
 			cErrorMessage = "Invalid API response"
@@ -93,7 +92,7 @@ func fetchWorkerThread(id, cURL)
 	end
 	
 	if bError
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMessage]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:error = cErrorMessage])
 	ok
 
 # URL encode helper

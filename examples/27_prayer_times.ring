@@ -636,10 +636,9 @@ func handleGetPrayerTimes(id, req)
 	cCity = "القاهرة"
 	cCountry = "مصر"
 	
-	aReq = json_decode(req)
-	cCity = aReq[1]
-	if len(aReq) > 1
-		cCountry = aReq[2]
+	cCity = req[1]
+	if len(req) > 1
+		cCountry = req[2]
 	ok
 
 	# Select calculation method based on country
@@ -660,7 +659,7 @@ func handleGetPrayerTimes(id, req)
 		cResponse = download(cUrl)
 	catch
 		see "HTTP GET Error: " + ccatcherror + nl
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = "Failed to fetch data: " + ccatcherror]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:error = "Failed to fetch data: " + cCatchError])
 		return
 	done
 	
@@ -675,13 +674,13 @@ func handleGetPrayerTimes(id, req)
 			:city = cCity,
 			:country = cCountry
 		]
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aReturn))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, aReturn)
 	else
 		cErrorMsg = "Failed to get prayer times."
 		if isList(aJson) and isString(aJson[:status])
 			cErrorMsg += " Status: " + aJson[:status]
 		ok
-		oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:error = cErrorMsg]))
+		oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:error = cErrorMsg])
 	ok
 
 # Handles requests from JavaScript to get location using ip-api.com
@@ -705,7 +704,7 @@ func handleGetLocation(id, req)
 		cCity = ""
 		cCountry = ""
 	done
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode([:city = cCity, :country = cCountry]))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, [:city = cCity, :country = cCountry])
 
 
 func getCalculationMethods()

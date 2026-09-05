@@ -272,7 +272,7 @@ func loadDrawingHTML()
 # --- Ring Callback Handlers (Bound to JavaScript) ---
 
 func handleAddStroke(id, req)
-	cStrokeJson = json_decode(req)[1]
+	cStrokeJson = req[1]
 	aStroke = json_decode(cStrokeJson)
 	if nCurrentHistoryIndex < len(aDrawingHistory) - 1
 		aNewHistory = []
@@ -325,7 +325,7 @@ func handleGetDrawingHistory(id, req)
 		:canUndo = bCanUndo,
 		:canRedo = bCanRedo
 	]
-	oWebView.wreturn(id, WEBVIEW_ERROR_OK, json_encode(aResult))
+	oWebView.wreturn(id, WEBVIEW_ERROR_OK, aResult)
 
 func updateDrawingUI()
 	see "Ring: Pushing drawing update to UI." + nl
