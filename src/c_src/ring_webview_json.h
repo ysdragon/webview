@@ -180,7 +180,7 @@ static yyjson_mut_val *ring_item_to_yyjson(yyjson_mut_doc *pDoc, void *pState, I
 		return yyjson_mut_str(pDoc, cStr);
 	}
 	case ITEMTYPE_NUMBER:
-		if (pItem->nNumberFlag == ITEM_NUMBERFLAG_INT)
+		if (pItem->nNumberType == ITEM_NUMBERTYPE_INT)
 			return yyjson_mut_sint(pDoc, ring_item_getint(pItem));
 		return yyjson_mut_real(pDoc, ring_item_getnumber(pItem));
 	case ITEMTYPE_LIST:
