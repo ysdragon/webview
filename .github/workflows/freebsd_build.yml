@@ -13,17 +13,17 @@ jobs:
     strategy:
       matrix:
         include:
-        - release: "15.0"
+        - release: "15.1"
           arch: amd64
           arch_name: amd64
           name: freebsd-amd64
-        # - release: "15.0"
+        # - release: "15.1"
         #   arch: aarch64
         #   arch_name: arm64
         #   name: freebsd-arm64
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
 
@@ -65,7 +65,7 @@ jobs:
           ninja
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ring-webview-${{ matrix.name }}
         path: lib

@@ -23,12 +23,12 @@ jobs:
 
     steps:
     - name: Checkout ring-webview
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         submodules: recursive
 
     - name: Clone Ring Language
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         repository: ringpackages/ringsrc
         path: ring
@@ -54,7 +54,7 @@ jobs:
         cmake --build . --config Release
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ring-webview-windows-${{ matrix.arch_name }}
         path: lib
